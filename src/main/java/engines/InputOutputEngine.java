@@ -1,7 +1,8 @@
 package engines;
 
-import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
-import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
+import java.util.Arrays;
+
+import static org.lwjgl.glfw.GLFW.*;
 
 /**
  * Moteur entrée/sortie
@@ -13,14 +14,22 @@ public class InputOutputEngine {
     private static InputOutputEngine instance;
 
     /**
-     * Touche pressée
+     * Touches clavier
      */
-    private boolean[] key_pressed = new boolean[350];
+    private boolean[] keyboard_keys = new boolean[GLFW_KEY_LAST];
+
+    /**
+     * Boutons souris
+     */
+    private boolean[] mouse_buttons = new boolean[GLFW_MOUSE_BUTTON_LAST];
 
     /**
      * Constructeur
      */
-    private InputOutputEngine() {}
+    private InputOutputEngine() {
+        Arrays.fill(keyboard_keys, false);
+        Arrays.fill(mouse_buttons, false);
+    }
 
     /**
      * Obtenir l'instance
@@ -32,24 +41,45 @@ public class InputOutputEngine {
     }
 
     /**
-     * Fonction de rappel touche clavier
+     * Fonction de rappel touches clavier
      * @param window fenêtre
      * @param key touche
-     * @param scancode ?
+     * @param scancode scanner
      * @param action action
-     * @param mods ?
+     * @param mods touche combinée
      */
     public static void keyCallback(long window, int key, int scancode, int action, int mods) {
-        if (action == GLFW_PRESS) get().key_pressed[key] = true;
-        else if (action == GLFW_RELEASE) get().key_pressed[key] = false;
+        if (action == GLFW_PRESS) get().keyboard_keys[key] = true;
+        else if (action == GLFW_RELEASE) get().keyboard_keys[key] = false;
     }
 
     /**
-     * Savoir si une touche est pressée
-     * @param keyCode code ASCII décimal
+     * Fonction de rappel boutons souris
+     * @param window fenêtre
+     * @param button bouton
+     * @param action action
+     * @param mods touche combinée
+     */
+    public static void mouseCallback(long window, int button, int action, int mods) {
+        if (action == GLFW_PRESS) get().mouse_buttons[button] = true;
+        else if (action == GLFW_RELEASE) get().mouse_buttons[button] = false;
+    }
+
+    /**
+     * Savoir si une touche clavier est pressée
+     * @param code code de la touche
      * @return booléen
      */
-    public static boolean isKeyPressed(int keyCode) {
-        return get().key_pressed[keyCode];
+    public static boolean isKeyPressed(int code) {
+        return get().keyboard_keys[code];
+    }
+
+    /**
+     * Savoir si un bouton souris est pressée
+     * @param code code du bouton
+     * @return booléen
+     */
+    public static boolean isMouseButtonPressed(int code) {
+        return get().mouse_buttons[code];
     }
 }

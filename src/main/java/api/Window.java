@@ -95,6 +95,8 @@ public class Window {
 
         // Définition de la fonction de rappel pour les entrées clavier
         glfwSetKeyCallback(glfwWindow, InputOutputEngine::keyCallback);
+        // Définition de la fonction de rappel pour les entrées souris
+        glfwSetMouseButtonCallback(glfwWindow, InputOutputEngine::mouseCallback);
 
         // Indiquer le contexte OpenGL
         glfwMakeContextCurrent(glfwWindow);
@@ -121,7 +123,7 @@ public class Window {
             glClear(GL_COLOR_BUFFER_BIT);
 
             //Si la touche espace est appuyée
-            if (InputOutputEngine.isKeyPressed(GLFW_KEY_SPACE))
+            if (InputOutputEngine.isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT))
                 System.out.println("ok");
 
             glfwSwapBuffers(glfwWindow);
