@@ -1,38 +1,55 @@
 package engines;
 
-import api.API;
-
-import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
+import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 
 /**
  * Moteur entrée/sortie
  */
 public class InputOutputEngine {
     /**
-     * Initialiser le moteur entrée/sortie
+     * Instance
      */
-    public static void init() {
-        //Ajout d'un écouteur sur les entrées clavier
-        glfwSetKeyCallback(API.getWindow(), (window, key, scancode, action, mods) -> {
-            //Si une touche est pressée
-            if (action == GLFW_PRESS) {
-                switch (key) {
-                    case GLFW_KEY_UP:
-                    case GLFW_KEY_RIGHT:
-                    case GLFW_KEY_LEFT:
-                    case GLFW_KEY_DOWN:
-                    case GLFW_MOUSE_BUTTON_LEFT:
-                        //Envoi de l'information au moteur noyau
-                        KernelEngine.newInput(key);
-                        break;
-                    case GLFW_KEY_ESCAPE:
-                        //Sortie du jeu
-                        glfwSetWindowShouldClose(window, true);
-                        break;
-                    default:
-                        break;
-                }
-            }
-        });
+    private static InputOutputEngine instance;
+
+    /**
+     * Touche pressée
+     */
+    private boolean[] key_pressed = new boolean[350];
+
+    /**
+     * Constructeur
+     */
+    private InputOutputEngine() {}
+
+    /**
+     * Obtenir l'instance
+     * @return instance
+     */
+    public static InputOutputEngine get() {
+        if (instance == null) instance = new InputOutputEngine();
+        return instance;
+    }
+
+    /**
+     * Fonction de rappel touche clavier
+     * @param window fenêtre
+     * @param key touche
+     * @param scancode ?
+     * @param action action
+     * @param mods ?
+     */
+    public static void keyCallback(long window, int key, int scancode, int action, int mods) {
+        if (action == GLFW_PRESS) get().key_pressed[key] = true;
+        else if (action == GLFW_RELEASE) get().key_pressed[key] = false;
+    }
+
+    /**
+     * Savoir si une touche est pressée
+     * @param keyCode code ASCII décimal
+     * @return booléen
+     */
+    public static boolean isKeyPressed(int keyCode) {
+        return get().key_pressed[keyCode];
     }
 }

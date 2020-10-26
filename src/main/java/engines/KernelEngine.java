@@ -5,18 +5,21 @@ package engines;
  */
 public class KernelEngine {
     /**
-     * Initialiser le moteur noyau
+     * Instance
      */
-    public static void init() {
-        GraphicsEngine.init();
-        InputOutputEngine.init();
-        PhysicsEngine.init();
-    }
+    private static KernelEngine instance;
 
     /**
-     * Nouvelle saisie clavier détectée
+     * Constructeur
      */
-    public static void newInput(int key) {
-        System.out.println(key);
+    private KernelEngine() {}
+
+    /**
+     * Obtenir l'instance
+     * @return instance
+     */
+    public static KernelEngine get() {
+        if (instance == null) instance = new KernelEngine();
+        return instance;
     }
 }

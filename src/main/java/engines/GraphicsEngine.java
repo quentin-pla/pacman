@@ -1,28 +1,25 @@
 package engines;
 
-import static org.lwjgl.opengl.GL11.*;
-
 /**
  * Moteur graphique
  */
 public class GraphicsEngine {
     /**
-     * Initialiser le moteur graphique
+     * Instance
      */
-    public static void init() {
-        //
-    }
+    private static GraphicsEngine instance;
 
     /**
-     * Dessiner le contenu de la fenêtre
+     * Constructeur
      */
-    public static void drawGraphics() {
-        //Dessiner un carré blanc
-        glBegin(GL_QUADS);
-            glVertex2d(-0.5, 0.5);
-            glVertex2d(0.5, 0.5);
-            glVertex2d(0.5, -0.5);
-            glVertex2d(-0.5, -0.5);
-        glEnd();
+    private GraphicsEngine() {}
+
+    /**
+     * Obtenir l'instance
+     * @return instance
+     */
+    public static GraphicsEngine get() {
+        if (instance == null) instance = new GraphicsEngine();
+        return instance;
     }
 }

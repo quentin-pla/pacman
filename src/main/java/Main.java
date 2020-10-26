@@ -1,7 +1,11 @@
-import api.API;
+import api.Window;
 
+/**
+ * Main
+ */
 public class Main {
     public static void main(String[] args) {
-        new API().run();
+        Window window = Window.get();
+        window.run();
     }
 }
