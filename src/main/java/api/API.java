@@ -1,3 +1,5 @@
+package api;
+
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
@@ -10,8 +12,10 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
-public class Pacman {
-
+/**
+ * API LWJGL
+ */
+public class API {
     // The window handle
     private long window;
 
@@ -104,9 +108,4 @@ public class Pacman {
             glfwPollEvents();
         }
     }
-
-    public static void main(String[] args) {
-        new Pacman().run();
-    }
-
 }
