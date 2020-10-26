@@ -41,11 +41,7 @@ public class Window {
     /**
      * Constructeur
      */
-    private Window() {
-        this.height = 600;
-        this.width = 600;
-        this.title = "PACMAN";
-    }
+    private Window() {}
 
     /**
      * Obtenir l'instance de la fenêtre
@@ -128,5 +124,23 @@ public class Window {
 
             glfwSwapBuffers(glfwWindow);
         }
+    }
+
+    /**
+     * Définir la taille de la fenêtre
+     * @param height hauteur
+     * @param width largeur
+     */
+    public void setSize(int height, int width) {
+        this.height = height;
+        this.width = width;
+    }
+
+    /**
+     * Définit le titre de la fenêtre
+     * @param title titre
+     */
+    public void setTitle(String title) {
+        this.title = title;
     }
 }
