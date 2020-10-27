@@ -1,9 +1,11 @@
 package api.tiles;
 
+import api.Entity;
+
 /**
  * Carreau
  */
-public abstract class Tile {
+public abstract class Tile implements Entity {
     /**
      * Position horizontale
      */
@@ -27,11 +29,7 @@ public abstract class Tile {
         this.size = size;
     }
 
-    /**
-     * Générer le carreau
-     * @param x position horizontale
-     * @param y position verticale
-     */
+    @Override
     public abstract void render(int x, int y);
 
     // GETTERS & SETTERS //
