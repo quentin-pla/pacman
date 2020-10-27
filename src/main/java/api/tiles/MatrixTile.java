@@ -1,9 +1,9 @@
-package api;
+package api.tiles;
 
 /**
  * Matrice de carreaux
  */
-public class Matrix {
+public class MatrixTile {
     /**
      * Position horizontale
      */
@@ -28,7 +28,7 @@ public class Matrix {
      * Constructeur
      * @param matrix matrice
      */
-    public Matrix(Tile[][] matrix, int gap) {
+    public MatrixTile(Tile[][] matrix, int gap) {
         this.matrix = matrix;
         this.gap = gap;
     }

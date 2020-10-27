@@ -1,4 +1,4 @@
-package api;
+package api.textures;
 
 import org.lwjgl.BufferUtils;
 
