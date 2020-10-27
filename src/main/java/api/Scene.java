@@ -29,7 +29,7 @@ public class Scene {
     public Scene(int height, int width) {
         this.height = height;
         this.width = width;
-        this.entities = null;
+        this.entities = new ArrayList<>();
     }
 
     /**
@@ -46,8 +46,11 @@ public class Scene {
     /**
      * Ajouter une entité à la scène
      * @param entity entité
+     * @param x position horizontale
+     * @param y position verticale
      */
-    public void addEntity(Entity entity) {
+    public void addEntity(Entity entity, int x, int y) {
+        entity.setPosition(x, y);
         entities.add(entity);
     }
 
@@ -57,6 +60,13 @@ public class Scene {
      */
     public void removeEntity(Entity entity) {
         entities.remove(entity);
+    }
+
+    /**
+     * Générer la scène
+     */
+    public void render() {
+        for (Entity entity : entities) entity.render();
     }
 
     // GETTERS
