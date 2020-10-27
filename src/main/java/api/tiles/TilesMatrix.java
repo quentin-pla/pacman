@@ -3,7 +3,7 @@ package api.tiles;
 /**
  * Matrice de carreaux
  */
-public class MatrixTile {
+public class TilesMatrix {
     /**
      * Position horizontale
      */
@@ -28,7 +28,7 @@ public class MatrixTile {
      * Constructeur
      * @param matrix matrice
      */
-    public MatrixTile(Tile[][] matrix, int gap) {
+    public TilesMatrix(Tile[][] matrix, int gap) {
         this.matrix = matrix;
         this.gap = gap;
     }
