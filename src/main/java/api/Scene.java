@@ -50,7 +50,8 @@ public class Scene {
      * @param y position verticale
      */
     public void addEntity(Entity entity, int x, int y) {
-        entity.setPosition(x, y);
+        entity.setScene(this);
+        entity.translate(x, y);
         entities.add(entity);
     }
 
@@ -66,7 +67,7 @@ public class Scene {
      * Générer la scène
      */
     public void render() {
-        for (Entity entity : entities) entity.render();
+        for (Entity entity : entities) entity.draw();
     }
 
     // GETTERS
