@@ -53,7 +53,12 @@ public class Window {
     /**
      * Constructeur
      */
-    private Window() {}
+    private Window() {
+        //Scène par défaut
+        scene = new Scene(600,600);
+        height = scene.getHeight();
+        width = scene.getWidth();
+    }
 
     /**
      * Obtenir l'instance de la fenêtre
@@ -68,13 +73,6 @@ public class Window {
      * Afficher la fenêtre
      */
     public void run() {
-        //Si la scène n'est pas définit on définit la scène
-        if (scene == null) {
-            scene = new Scene(600,600);
-            height = 600;
-            width = 600;
-        }
-
         init();
         loop();
 
@@ -132,12 +130,17 @@ public class Window {
      * Initialiser OpenGL
      */
     private void initOpenGL() {
+        //Initialiser OpenGL pour utiliser les pixels dans une scène 2D
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         glOrtho(0, width, height, 0, -1, 1);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
+        //Activer les textures
         glEnable(GL_TEXTURE_2D);
+        //Conserver la transparence des textures
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
     /**
