@@ -167,16 +167,8 @@ public class Window {
      */
     public void setScene(Scene scene) {
         this.scene = scene;
-    }
-
-    /**
-     * Définir la taille de la fenêtre
-     * @param height hauteur
-     * @param width largeur
-     */
-    public void setSize(int height, int width) {
-        this.height = height;
-        this.width = width;
+        this.height = scene.getHeight();
+        this.width = scene.getWidth();
     }
 
     /**
