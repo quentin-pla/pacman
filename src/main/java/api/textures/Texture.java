@@ -16,14 +16,19 @@ public class Texture {
     /**
      * ID de la texture
      */
-    private int id;
+    private Integer id = null;
+
+    /**
+     * Lien vers le fichier
+     */
+    private String link;
 
     /**
      * Constructeur
      * @param link lien vers le fichier
      */
     public Texture(String link) {
-        generate("target/classes/assets/" + link);
+        this.link = link;
     }
 
     /**
@@ -51,7 +56,7 @@ public class Texture {
         IntBuffer channels = BufferUtils.createIntBuffer(1);
 
         //Récupération de l'image
-        ByteBuffer image = stbi_load(link, width, height, channels, 0);
+        ByteBuffer image = stbi_load("target/classes/assets/" + link, width, height, channels, 0);
 
         if (image != null) {
             //Image RGB
@@ -72,6 +77,7 @@ public class Texture {
      * Lier la texture
      */
     public void bind() {
+        if (id == null) generate(link);
         glBindTexture(GL_TEXTURE_2D, id);
     }
 
