@@ -27,10 +27,18 @@ public abstract class Tile implements Entity {
      */
     protected Tile(int size) {
         this.size = size;
+        this.x = 0;
+        this.y = 0;
     }
 
     @Override
-    public abstract void render(int x, int y);
+    public abstract void render();
+
+    @Override
+    public void setPosition(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
 
     // GETTERS & SETTERS //
 

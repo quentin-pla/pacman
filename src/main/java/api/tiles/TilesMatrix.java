@@ -1,9 +1,11 @@
 package api.tiles;
 
+import api.Entity;
+
 /**
  * Matrice de carreaux
  */
-public class TilesMatrix {
+public class TilesMatrix implements Entity {
     /**
      * Position horizontale
      */
@@ -31,23 +33,25 @@ public class TilesMatrix {
     public TilesMatrix(Tile[][] matrix, int gap) {
         this.matrix = matrix;
         this.gap = gap;
+        this.x = 0;
+        this.y = 0;
     }
 
-    /**
-     * Générer la matrice
-     */
-    public void render(int x, int y) {
-        this.x = x;
-        this.y = y;
+    @Override
+    public void render() {
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix[i].length; j++) {
                 Tile tile = matrix[i][j];
-                tile.render(
-                x + (tile.getSize() * i) + (i * gap),
-                y + (tile.getSize() * j) + (j * gap)
-                );
+                tile.setPosition(x + (tile.getSize() * i) + (i * gap), y + (tile.getSize() * j) + (j * gap));
+                tile.render();
             }
         }
+    }
+
+    @Override
+    public void setPosition(int x, int y) {
+        this.x = x;
+        this.y = y;
     }
 
     // GETTERS & SETTERS //
