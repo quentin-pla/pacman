@@ -1,6 +1,5 @@
 package api;
 
-import engines.GraphicsEngine;
 import engines.InputOutputEngine;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
@@ -44,7 +43,7 @@ public class Window {
     /**
      * Scène liée à la fenêtre
      */
-    private Scene scene;
+    private Scene scene = null;
 
     /**
      * Instance fenêtre
@@ -69,6 +68,13 @@ public class Window {
      * Afficher la fenêtre
      */
     public void run() {
+        //Si la scène n'est pas définit on définit la scène
+        if (scene == null) {
+            scene = new Scene(600,600);
+            height = 600;
+            width = 600;
+        }
+
         init();
         loop();
 
@@ -147,12 +153,13 @@ public class Window {
             //Effacer l'écran
             glClear(GL_COLOR_BUFFER_BIT);
 
-            //Générer les graphismes
-            GraphicsEngine.render();
+            //Générer la scène
+            scene.render();
 
             //Échanger les tampons de la fenêtre
             glfwSwapBuffers(glfwWindow);
 
+            //Ajout d'un timer pour limiter l'utilisation de la batterie
             try {
                 TimeUnit.MILLISECONDS.sleep(100);
             } catch (InterruptedException e) {
@@ -161,20 +168,18 @@ public class Window {
         }
     }
 
-    /**
-     * Définir la scène de la fenêtre
-     * @param scene scène
-     */
+    // GETTERS & SETTERS //
+
     public void setScene(Scene scene) {
         this.scene = scene;
         this.height = scene.getHeight();
         this.width = scene.getWidth();
     }
 
-    /**
-     * Définit le titre de la fenêtre
-     * @param title titre
-     */
+    public Scene getScene() {
+        return scene;
+    }
+
     public void setTitle(String title) {
         this.title = title;
     }
