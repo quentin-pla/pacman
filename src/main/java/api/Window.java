@@ -1,8 +1,11 @@
 package api;
 
+import engines.GraphicsEngine;
 import engines.InputOutputEngine;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
+
+import java.util.concurrent.TimeUnit;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -24,6 +27,11 @@ public class Window {
     int width;
 
     /**
+     * Échelle
+     */
+    int scale = 1;
+
+    /**
      * Titre de la fenêtre
      */
     String title;
@@ -32,6 +40,11 @@ public class Window {
      * Fenêtre GLFW
      */
     private long glfwWindow;
+
+    /**
+     * Scène liée à la fenêtre
+     */
+    private Scene scene;
 
     /**
      * Instance fenêtre
@@ -53,7 +66,7 @@ public class Window {
     }
 
     /**
-     * Exécuter la fenêtre
+     * Afficher la fenêtre
      */
     public void run() {
         init();
@@ -84,7 +97,7 @@ public class Window {
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
         // Création de la fenêtre
-        glfwWindow = glfwCreateWindow(this.width, this.height, this.title, NULL, NULL);
+        glfwWindow = glfwCreateWindow(width * scale, height * scale, title, NULL, NULL);
         //Vérification que la fenêtre a bien été créée
         if (glfwWindow == NULL)
             throw new IllegalStateException("Failed to create the GLFW window.");
@@ -104,6 +117,21 @@ public class Window {
 
         //Liaison avec OpenGL
         GL.createCapabilities();
+
+        //Initialiser OpenGL
+        initOpenGL();
+    }
+
+    /**
+     * Initialiser OpenGL
+     */
+    private void initOpenGL() {
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glOrtho(0, width, height, 0, -1, 1);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        glEnable(GL_TEXTURE_2D);
     }
 
     /**
@@ -114,16 +142,31 @@ public class Window {
         while (!glfwWindowShouldClose(glfwWindow)) {
             // Interroger les évènements
             glfwPollEvents();
-
+            //Définition couleur pour effacer l'écran
             glClearColor(0f, 0f, 0f, 0f);
+            //Effacer l'écran
             glClear(GL_COLOR_BUFFER_BIT);
 
-            //Si la touche espace est appuyée
-            if (InputOutputEngine.isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT))
-                System.out.println("ok");
+            //Générer les graphismes
+            GraphicsEngine.render();
 
+            //Échanger les tampons de la fenêtre
             glfwSwapBuffers(glfwWindow);
+
+            try {
+                TimeUnit.MILLISECONDS.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
+    }
+
+    /**
+     * Définir la scène de la fenêtre
+     * @param scene scène
+     */
+    public void setScene(Scene scene) {
+        this.scene = scene;
     }
 
     /**
