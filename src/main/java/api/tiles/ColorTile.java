@@ -23,7 +23,7 @@ public class ColorTile extends Tile {
     }
 
     @Override
-    public void render() {
+    public void draw() {
         glColor4f(color[0], color[1], color[2], color[3]);
         glBegin(GL_QUADS);
         glVertex2i(x, y);

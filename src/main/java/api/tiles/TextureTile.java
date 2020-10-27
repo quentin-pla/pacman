@@ -24,7 +24,7 @@ public class TextureTile extends Tile {
     }
 
     @Override
-    public void render() {
+    public void draw() {
         texture.bind();
         glBegin(GL_QUADS);
         glTexCoord2f(0,0);  glVertex2i(x, y);

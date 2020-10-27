@@ -1,11 +1,17 @@
 package api.tiles;
 
 import api.Entity;
+import api.Scene;
 
 /**
  * Carreau
  */
 public abstract class Tile implements Entity {
+    /**
+     * Scène dans laquelle il se situe
+     */
+    protected Scene scene;
+
     /**
      * Position horizontale
      */
@@ -32,37 +38,36 @@ public abstract class Tile implements Entity {
     }
 
     @Override
-    public abstract void render();
+    public abstract void draw();
 
     @Override
-    public void setPosition(int x, int y) {
+    public void erase() {
+        scene.removeEntity(this);
+    }
+
+    @Override
+    public void translate(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
     // GETTERS & SETTERS //
 
-    public int getSize() {
-        return size;
-    }
+    @Override
+    public Scene getScene() { return scene; }
 
-    public int getX() {
-        return x;
-    }
+    @Override
+    public void setScene(Scene scene) { this.scene = scene; }
 
-    public int getY() {
-        return y;
-    }
+    public int getSize() { return size; }
 
-    public void setX(int x) {
-        this.x = x;
-    }
+    public int getX() { return x; }
 
-    public void setY(int y) {
-        this.y = y;
-    }
+    public int getY() { return y; }
 
-    public void setSize(int size) {
-        this.size = size;
-    }
+    public void setX(int x) { this.x = x; }
+
+    public void setY(int y) { this.y = y; }
+
+    public void setSize(int size) { this.size = size; }
 }

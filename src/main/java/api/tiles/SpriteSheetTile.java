@@ -36,7 +36,7 @@ public class SpriteSheetTile extends Tile {
     }
 
     @Override
-    public void render() {
+    public void draw() {
         spriteSheet.getTexture().bind();
         glBegin(GL_QUADS);
         glTexCoord2f((x_coord + 0f) / spriteSheet.getWidth(),(y_coord + 0f) / spriteSheet.getHeight());

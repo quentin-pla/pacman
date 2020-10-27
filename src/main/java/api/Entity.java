@@ -5,14 +5,25 @@ package api;
  */
 public interface Entity {
     /**
-     * Générer l'entité
+     * Dessiner l'entité
      */
-    public void render();
+    void draw();
 
     /**
-     * Définir sa position
+     * Effacer l'entité
+     */
+    void erase();
+
+    /**
+     * Translater l'entité
      * @param x position horizontale
      * @param y position verticale
      */
-    public void setPosition(int x, int y);
+    void translate(int x, int y);
+
+    // GETTERS & SETTERS //
+
+    Scene getScene();
+
+    void setScene(Scene scene);
 }
