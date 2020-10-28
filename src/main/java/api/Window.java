@@ -18,61 +18,44 @@ public class Window {
     /**
      * Hauteur
      */
-    int height;
+    private static int height;
 
     /**
      * Largeur
      */
-    int width;
+    private static int width;
 
     /**
      * Échelle
      */
-    int scale = 1;
+    private static int scale = 1;
 
     /**
      * Titre de la fenêtre
      */
-    String title;
+    private static String title;
 
     /**
      * Fenêtre GLFW
      */
-    private long glfwWindow;
+    private static long glfwWindow;
 
     /**
      * Scène liée à la fenêtre
      */
-    private Scene scene = null;
-
-    /**
-     * Instance fenêtre
-     */
-    private static Window window = null;
-
-    /**
-     * Constructeur
-     */
-    private Window() {
-        //Scène par défaut
-        scene = new Scene(600,600);
-        height = scene.getHeight();
-        width = scene.getWidth();
-    }
-
-    /**
-     * Obtenir l'instance de la fenêtre
-     * @return instance de la fenêtre
-     */
-    public static Window get() {
-        if (window == null) window = new Window();
-        return window;
-    }
+    private static Scene scene;
 
     /**
      * Afficher la fenêtre
      */
-    public void run() {
+    public static void show() {
+        try {
+            if (scene == null)
+                throw new Exception("Aucune scène spécifiée");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         init();
         loop();
 
@@ -88,7 +71,7 @@ public class Window {
     /**
      * Initialiser la fenêtre
      */
-    public void init() {
+    private static void init() {
         // Affichage console en cas d'erreur
         GLFWErrorCallback.createPrint(System.err).set();
 
@@ -129,7 +112,7 @@ public class Window {
     /**
      * Initialiser OpenGL
      */
-    private void initOpenGL() {
+    private static void initOpenGL() {
         //Initialiser OpenGL pour utiliser les pixels dans une scène 2D
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
@@ -146,7 +129,7 @@ public class Window {
     /**
      * Rafraichir la fenêtre
      */
-    public void loop() {
+    private static void loop() {
         // Tant que la fenêtre est ouverte
         while (!glfwWindowShouldClose(glfwWindow)) {
             // Interroger les évènements
@@ -173,17 +156,17 @@ public class Window {
 
     // GETTERS & SETTERS //
 
-    public void setScene(Scene scene) {
-        this.scene = scene;
-        this.height = scene.getHeight();
-        this.width = scene.getWidth();
+    public static void setScene(Scene scene) {
+        Window.scene = scene;
+        Window.height = scene.getHeight();
+        Window.width = scene.getWidth();
     }
 
-    public Scene getScene() {
+    public static Scene getScene() {
         return scene;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public static void setTitle(String title) {
+        Window.title = title;
     }
 }

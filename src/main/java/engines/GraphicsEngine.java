@@ -7,7 +7,6 @@ import api.textures.Texture;
 import api.tiles.ColorTile;
 import api.tiles.SpriteSheetTile;
 import api.tiles.TextureTile;
-import api.tiles.Tile;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,34 +18,12 @@ public class GraphicsEngine {
     /**
      * Textures sauvegardées
      */
-    private Map<String,Texture> saved_textures;
+    private static Map<String,Texture> saved_textures = new HashMap<>();
 
     /**
      * Fichiers de texture sauvegardés
      */
-    private Map<String,SpriteSheet> saved_sprite_sheets;
-
-    /**
-     * Instance
-     */
-    private static GraphicsEngine instance;
-
-    /**
-     * Constructeur
-     */
-    private GraphicsEngine() {
-        saved_textures = new HashMap<>();
-        saved_sprite_sheets = new HashMap<>();
-    }
-
-    /**
-     * Obtenir l'instance
-     * @return instance
-     */
-    public static GraphicsEngine get() {
-        if (instance == null) instance = new GraphicsEngine();
-        return instance;
-    }
+    private static Map<String,SpriteSheet> saved_sprite_sheets = new HashMap<>();
 
     // CARREAUX //
 
@@ -57,9 +34,9 @@ public class GraphicsEngine {
      * @param y position verticale
      * @param color couleur
      */
-    public void drawColorTile(int size, int x, int y, float[] color) {
+    public static void drawColorTile(int size, int x, int y, float[] color) {
         ColorTile tile = new ColorTile(size, color);
-        Window.get().getScene().addEntity(tile, x, y);
+        Window.getScene().addEntity(tile, x, y);
     }
 
     /**
@@ -67,13 +44,18 @@ public class GraphicsEngine {
      * @param size dimensions
      * @param x position horizontale
      * @param y position verticale
-     * @param link lien vers la texture
+     * @param name nom de la texture
      */
-    public void drawTextureTile(int size, int x, int y, String link) {
-        if (!saved_textures.containsKey(link))
-            saved_textures.put(link, new Texture(link));
-        TextureTile tile = new TextureTile(size, saved_textures.get(link));
-        Window.get().getScene().addEntity(tile, x, y);
+    public static void drawTextureTile(int size, int x, int y, String name) {
+        try {
+            if (saved_textures.containsKey(name)) {
+                TextureTile tile = new TextureTile(size, saved_textures.get(name));
+                Window.getScene().addEntity(tile, x, y);
+            }
+            else throw new Exception("Texture introuvable");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -81,31 +63,38 @@ public class GraphicsEngine {
      * @param size dimensions
      * @param x position horizontale
      * @param y position verticale
-     * @param link lien vers la texture
+     * @param name nom de la texture
      */
-    public void drawSpriteSheetTile(int size, int x, int y, String link, int x_coord, int y_coord) {
-        if (saved_sprite_sheets.containsKey(link)) {
-            SpriteSheetTile tile = new SpriteSheetTile(size, saved_sprite_sheets.get(link), x_coord, y_coord);
-            Window.get().getScene().addEntity(tile, x, y);
+    public static void drawSpriteSheetTile(int size, int x, int y, String name, int x_coord, int y_coord) {
+        try {
+            if (saved_sprite_sheets.containsKey(name)) {
+                SpriteSheetTile tile = new SpriteSheetTile(size, saved_sprite_sheets.get(name), x_coord, y_coord);
+                Window.getScene().addEntity(tile, x, y);
+            }
+            else throw new Exception("Fichier de texture introuvable");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
+    // ENTITES //
+
     /**
-     * Supprimer un carreau
+     * Supprimer une entité
      * @param entity entité
      */
-    public void eraseTile(Entity entity) {
-        Window.get().getScene().removeEntity(entity);
+    public static void eraseEntity(Entity entity) {
+        Window.getScene().removeEntity(entity);
     }
 
     /**
-     * Translater un carreau
-     * @param tile carreau
+     * Translater une entité
+     * @param entity entité
      * @param x position horizontale
      * @param y position verticale
      */
-    public void translateTile(Tile tile, int x, int y) {
-        tile.translate(x, y);
+    public static void translateEntity(Entity entity, int x, int y) {
+        entity.translate(x, y);
     }
 
     // TEXTURES //
@@ -114,9 +103,14 @@ public class GraphicsEngine {
      * Transférer une texture à OpenGL
      * @param link lien du fichier
      */
-    public void uploadTexture(String link) {
-        if (!saved_textures.containsKey(link))
-            saved_textures.put(link, new Texture(link));
+    public static void uploadTexture(String link, String name) {
+        try {
+            if (!saved_textures.containsKey(name))
+                saved_textures.put(name, new Texture(link));
+            else throw new Exception("Nom de texture déjà existant");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -125,8 +119,17 @@ public class GraphicsEngine {
      * @param height nombre d'éléments horizontaux
      * @param width nombre d'éléments verticaux
      */
-    public void uploadSpriteSheet(String link, int height, int width) {
-        if (!saved_sprite_sheets.containsKey(link))
-            saved_sprite_sheets.put(link, new SpriteSheet(link, height, width));
+    public static void uploadSpriteSheet(String link, String name, int height, int width) {
+        try {
+            if (!saved_sprite_sheets.containsKey(name))
+                saved_sprite_sheets.put(name, new SpriteSheet(link, height, width));
+            else throw new Exception("Nom de fichier de texture déjà existant");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Map<String, Texture> getSaved_textures() {
+        return saved_textures;
     }
 }
