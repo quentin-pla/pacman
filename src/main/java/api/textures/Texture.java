@@ -33,9 +33,8 @@ public class Texture {
 
     /**
      * Générer la texture
-     * @param link lien vers le fichier
      */
-    public void generate(String link) {
+    public void generate() {
         //Générer la texture sur le GPU
         id = glGenTextures();
         //Lier la texture
@@ -77,7 +76,7 @@ public class Texture {
      * Lier la texture
      */
     public void bind() {
-        if (id == null) generate(link);
+        if (id == null) generate();
         glBindTexture(GL_TEXTURE_2D, id);
     }
 
