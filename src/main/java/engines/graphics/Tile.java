@@ -22,7 +22,7 @@ public class Tile extends Entity {
     /**
      * Fichier de texture
      */
-    private SpriteSheet spriteSheet;
+    private SpriteSheet sprite_sheet;
 
     /**
      * Coordonnées de la texture dans le fichier de texture
@@ -36,6 +36,19 @@ public class Tile extends Entity {
     public Tile(int size) {
         super(0,0);
         this.size = size;
+    }
+
+    /**
+     * Constructeur par clonage
+     * @param clone clone
+     */
+    public Tile(Tile clone) {
+        super(clone.x, clone.y);
+        this.size = clone.size;
+        this.color = clone.color;
+        this.texture = clone.texture;
+        this.sprite_sheet = clone.sprite_sheet;
+        this.sprite_coords = clone.sprite_coords;
     }
 
     /**
@@ -64,7 +77,7 @@ public class Tile extends Entity {
      * @param col coordonnée verticale de la texture
      */
     public void bindSpriteSheet(SpriteSheet spriteSheet, int row, int col) {
-        this.spriteSheet = spriteSheet;
+        this.sprite_sheet = spriteSheet;
         this.sprite_coords = new int[]{row-1, col-1};
     }
 
@@ -74,9 +87,9 @@ public class Tile extends Entity {
             renderQUAD(size, x, y, color);
         else if (texture != null)
             renderTexturedQUAD(size, x, y, texture.getId());
-        else if (spriteSheet != null)
-            renderSpriteSheetQUAD(size, x, y, spriteSheet.getTexture().getId(),
-                    spriteSheet.getHeight(), spriteSheet.getWidth(), sprite_coords);
+        else if (sprite_sheet != null)
+            renderSpriteSheetQUAD(size, x, y, sprite_sheet.getTexture().getId(),
+                    sprite_sheet.getHeight(), sprite_sheet.getWidth(), sprite_coords);
     }
 
     // GETTERS & SETTERS //
@@ -89,5 +102,5 @@ public class Tile extends Entity {
 
     public Texture getTexture() { return texture; }
 
-    public SpriteSheet getSpriteSheet() { return spriteSheet; }
+    public SpriteSheet getSprite_sheet() { return sprite_sheet; }
 }
