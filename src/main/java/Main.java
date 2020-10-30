@@ -1,15 +1,30 @@
-import api.Window;
-import engines.GraphicsEngine;
+import engines.graphics.*;
 
 /**
  * Main
  */
 public class Main {
     public static void main(String[] args) {
-        Window.get().setTitle("PACMAN");
-        GraphicsEngine.get().uploadSpriteSheet("sprite_sheet.png", 11, 11);
-        GraphicsEngine.get().drawColorTile(50,0,0,new float[]{1,1,1,1});
-        GraphicsEngine.get().drawSpriteSheetTile(50,30,0,"sprite_sheet.png", 1, 3);
-        Window.get().run();
+        //Transfert du fichier de texture
+        SpriteSheet.upload("sprite_sheet.png", 11, 11, "pacman");
+
+        //Création d'une matrice
+        TilesMatrix matrix = new TilesMatrix(10,10, 30);
+        //Carreau par défaut pour la matrice
+        Tile tile = new Tile(30);
+        tile.bindSpriteSheet(SpriteSheet.get("pacman"),3,1);
+        matrix.fill(tile);
+
+        //Création d'une nouvelle scène
+        Scene scene = new Scene(600,600);
+        //Ajout de la matrice dans la scène
+        scene.addEntity(matrix,100,100);
+
+        //Ajout de la scène dans la fenêtre
+        Window.addScene(scene, "game_view");
+        //Définition du titre
+        Window.setTitle("PACMAN");
+        //Affichage de la fenêtre
+        Window.show();
     }
 }
