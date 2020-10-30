@@ -6,22 +6,23 @@ import engines.graphics.*;
 public class Main {
     public static void main(String[] args) {
         //Transfert du fichier de texture
-        //SpriteSheet.upload("sprite_sheet.png", 11, 11, "pacman");
+        SpriteSheet.upload("sprite_sheet.png", 11, 11, "sprite");
 
         //Carreau par défaut pour la matrice
         Tile tile = new Tile(30);
-        tile.bindColor(1,1,1,1);
+        tile.bindColor(1,0,0,1);
 
         //Création d'une matrice
         TilesMatrix matrix = new TilesMatrix(10,10, tile);
-        matrix.setGap(1);
 
-        matrix.get(1, 1).bindColor(1,0,0,1);
+        Tile pacman = new Tile(30);
+        pacman.bindSpriteSheet(SpriteSheet.get("sprite"),1,2);
 
         //Création d'une nouvelle scène
         Scene scene = new Scene(600,600);
-        //Ajout de la matrice dans la scène
+        //Ajout des éléments dans la scène
         scene.addEntity(matrix,100,100);
+        scene.addEntity(pacman,150,150);
 
         //Ajout de la scène dans la fenêtre
         Window.addScene(scene, "game_view");
