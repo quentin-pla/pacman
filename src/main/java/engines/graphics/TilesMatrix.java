@@ -1,7 +1,5 @@
 package engines.graphics;
 
-import java.util.Arrays;
-
 /**
  * Matrice de carreaux
  */
@@ -18,15 +16,15 @@ public class TilesMatrix extends Entity {
 
     /**
      * Constructeur
-     * @param height hauteur
-     * @param width largeur
-     * @param tile_size taille carreau
+     * @param rows lignes
+     * @param columns colonnes
+     * @param tile carreau
      */
-    public TilesMatrix(int height, int width, int tile_size) {
+    public TilesMatrix(int rows, int columns, Tile tile) {
         super(0,0);
-        this.matrix = new Tile[width][height];
+        this.matrix = new Tile[rows][columns];
         this.gap = 0;
-        fill(new Tile(tile_size));
+        fill(tile);
     }
 
     /**
@@ -34,7 +32,13 @@ public class TilesMatrix extends Entity {
      * @param tile carreau
      */
     public void fill(Tile tile) {
-        for (Tile[] tiles : matrix) Arrays.fill(tiles, tile);
+        for (int row = 0; row < matrix.length; row++) {
+            for (int col = 0; col < matrix[row].length; col++) {
+                matrix[row][col] = new Tile(tile);
+                matrix[row][col].setX((tile.getSize() * row) + (row * gap));
+                matrix[row][col].setY((tile.getSize() * col) + (col * gap));
+            }
+        }
     }
 
     /**
@@ -48,13 +52,17 @@ public class TilesMatrix extends Entity {
 
     @Override
     protected void draw() {
-        for (int i = 0; i < matrix.length; i++) {
-            for (int j = 0; j < matrix[i].length; j++) {
-                Tile tile = matrix[i][j];
-                tile.translate(x + (tile.getSize() * i) + (i * gap), y + (tile.getSize() * j) + (j * gap));
+        for (Tile[] tiles : matrix)
+            for (Tile tile : tiles)
                 tile.draw();
-            }
-        }
+    }
+
+    @Override
+    protected void translate(int x, int y) {
+        super.translate(x, y);
+        for (Tile[] tiles : matrix)
+            for (Tile tile : tiles)
+                tile.translate(x + tile.getX(), y + tile.getY());
     }
 
     // GETTERS & SETTERS //

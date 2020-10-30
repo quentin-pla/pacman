@@ -1,5 +1,6 @@
 package application;
 
+import engines.graphics.Tile;
 import engines.graphics.TilesMatrix;
 
 /**
@@ -23,7 +24,7 @@ public class Level {
      * @param max_time temps maximum
      */
     public Level(int height, int width, int max_time) {
-        this.matrix = new TilesMatrix(height, width, 30);
+        this.matrix = new TilesMatrix(height, width, new Tile(30));
         this.timer = max_time;
     }
 }

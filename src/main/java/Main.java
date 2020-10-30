@@ -6,14 +6,17 @@ import engines.graphics.*;
 public class Main {
     public static void main(String[] args) {
         //Transfert du fichier de texture
-        SpriteSheet.upload("sprite_sheet.png", 11, 11, "pacman");
+        //SpriteSheet.upload("sprite_sheet.png", 11, 11, "pacman");
 
-        //Création d'une matrice
-        TilesMatrix matrix = new TilesMatrix(10,10, 30);
         //Carreau par défaut pour la matrice
         Tile tile = new Tile(30);
-        tile.bindSpriteSheet(SpriteSheet.get("pacman"),3,1);
-        matrix.fill(tile);
+        tile.bindColor(1,1,1,1);
+
+        //Création d'une matrice
+        TilesMatrix matrix = new TilesMatrix(10,10, tile);
+        matrix.setGap(1);
+
+        matrix.get(1, 1).bindColor(1,0,0,1);
 
         //Création d'une nouvelle scène
         Scene scene = new Scene(600,600);
