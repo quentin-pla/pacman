@@ -5,11 +5,6 @@ package engines.graphics;
  */
 public class TilesMatrix extends Entity {
     /**
-     * Espacement (entre carreaux)
-     */
-    private int gap;
-
-    /**
      * Matrice
      */
     private Tile[][] matrix;
@@ -23,7 +18,6 @@ public class TilesMatrix extends Entity {
     public TilesMatrix(int rows, int columns, Tile tile) {
         super(0,0);
         this.matrix = new Tile[rows][columns];
-        this.gap = 0;
         fill(tile);
     }
 
@@ -35,8 +29,8 @@ public class TilesMatrix extends Entity {
         for (int row = 0; row < matrix.length; row++) {
             for (int col = 0; col < matrix[row].length; col++) {
                 matrix[row][col] = new Tile(tile);
-                matrix[row][col].setX((tile.getSize() * row) + (row * gap));
-                matrix[row][col].setY((tile.getSize() * col) + (col * gap));
+                matrix[row][col].setX((tile.getSize() * row));
+                matrix[row][col].setY((tile.getSize() * col));
             }
         }
     }
@@ -73,13 +67,5 @@ public class TilesMatrix extends Entity {
 
     protected void setMatrix(Tile[][] matrix) {
         this.matrix = matrix;
-    }
-
-    public int getGap() {
-        return gap;
-    }
-
-    public void setGap(int gap) {
-        this.gap = gap;
     }
 }
