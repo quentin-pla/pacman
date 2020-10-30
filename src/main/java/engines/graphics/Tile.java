@@ -85,9 +85,9 @@ public class Tile extends Entity {
     protected void draw() {
         if (color != null)
             renderQUAD(size, x, y, color);
-        else if (texture != null)
+        if (texture != null)
             renderTexturedQUAD(size, x, y, texture.getId());
-        else if (sprite_sheet != null)
+        if (sprite_sheet != null)
             renderSpriteSheetQUAD(size, x, y, sprite_sheet.getTexture().getId(),
                     sprite_sheet.getHeight(), sprite_sheet.getWidth(), sprite_coords);
     }

@@ -38,6 +38,7 @@ public class Renderer {
      * @param texture_id id texture
      */
     protected static void renderTexturedQUAD(int size, int x, int y, int texture_id) {
+        glColor4f(1,1,1,1);
         bindTexture(texture_id);
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex2i(x, y);
@@ -59,6 +60,7 @@ public class Renderer {
      * @param sprite_coords coordonnées de la texture
      */
     protected static void renderSpriteSheetQUAD(int size, int x, int y, int texture_id, int height, int width, int[] sprite_coords) {
+        glColor4f(1,1,1,1);
         bindTexture(texture_id);
         glBegin(GL_QUADS);
         glTexCoord2f((sprite_coords[1] + 0f) / width,(sprite_coords[0] + 0f) / height);
@@ -101,19 +103,30 @@ public class Renderer {
         //Récupération de l'image
         ByteBuffer image = stbi_load("target/classes/assets/" + link, width, height, channels, 0);
 
-        if (image != null) {
-            //Image RGB
-            if (channels.get(0) == 3)
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width.get(0), height.get(0),
-                        0, GL_RGB, GL_UNSIGNED_BYTE, image);
-            //Image RGBA
-            else if (channels.get(0) == 4)
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width.get(0), height.get(0),
-                        0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-
-            //Libérer les données
-            stbi_image_free(image);
+        if (image == null) {
+            try {
+                throw new Exception("Récupération de l'image impossible");
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.exit(1);
+            }
         }
+
+        //Image RGB
+        if (channels.get(0) == 3)
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width.get(0), height.get(0),
+                    0, GL_RGB, GL_UNSIGNED_BYTE, image);
+        //Image RGBA
+        else if (channels.get(0) == 4)
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width.get(0), height.get(0),
+                    0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+
+        //Libérer les données
+        stbi_image_free(image);
+
+        //Détachement de la texture
+        glBindTexture(GL_TEXTURE_2D, 0);
+
         return id;
     }
 
