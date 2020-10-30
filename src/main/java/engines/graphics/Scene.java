@@ -1,4 +1,4 @@
-package api;
+package engines.graphics;
 
 import java.util.ArrayList;
 
@@ -19,7 +19,7 @@ public class Scene {
     /**
      * Liste des entités présentes dans la scène
      */
-    private ArrayList<Entity> entities;
+    private ArrayList<Entity> entities = new ArrayList<>();
 
     /**
      * Consctructeur par défaut
@@ -29,18 +29,6 @@ public class Scene {
     public Scene(int height, int width) {
         this.height = height;
         this.width = width;
-        this.entities = new ArrayList<>();
-    }
-
-    /**
-     * Constructeur surchargé
-     * @param height hauteur
-     * @param width largeur
-     * @param entities liste des entités
-     */
-    public Scene(int height, int width, ArrayList<Entity> entities) {
-        this(height, width);
-        this.entities = entities;
     }
 
     /**
@@ -66,21 +54,21 @@ public class Scene {
     /**
      * Générer la scène
      */
-    public void render() {
+    protected void render() {
         for (Entity entity : entities) entity.draw();
     }
 
     // GETTERS
 
-    public int getHeight() {
+    protected int getHeight() {
         return height;
     }
 
-    public int getWidth() {
+    protected int getWidth() {
         return width;
     }
 
-    public ArrayList<Entity> getEntities() {
+    protected ArrayList<Entity> getEntities() {
         return entities;
     }
 }

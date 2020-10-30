@@ -1,4 +1,4 @@
-package engines;
+package engines.UI;
 
 public class UIEngine {
 }

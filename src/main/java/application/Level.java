@@ -1,11 +1,29 @@
 package application;
 
-import api.tiles.TilesMatrix;
+import engines.graphics.TilesMatrix;
 
+/**
+ * Niveau de jeu
+ */
 public class Level {
     /**
-     * Matrice liée au niveau
+     * Matrice
      */
-    private TilesMatrix matrice;
+    private TilesMatrix matrix;
 
+    /**
+     * Chronomètre
+     */
+    private float timer;
+
+    /**
+     * Constructeur
+     * @param height hauteur
+     * @param width largeur
+     * @param max_time temps maximum
+     */
+    public Level(int height, int width, int max_time) {
+        this.matrix = new TilesMatrix(height, width, 30);
+        this.timer = max_time;
+    }
 }
