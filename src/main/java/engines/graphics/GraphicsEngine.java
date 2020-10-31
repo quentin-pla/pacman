@@ -40,8 +40,8 @@ public class GraphicsEngine extends Renderer {
     /**
      * Translater une entité
      * @param entity entité
-     * @param x position horizontale
-     * @param y position verticale
+     * @param x position horizontale à additionner
+     * @param y position verticale à additionner
      */
     protected static void translateEntity(Entity entity, int x, int y) {
         entity.translate(x, y);
