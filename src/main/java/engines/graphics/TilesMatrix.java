@@ -16,7 +16,7 @@ public class TilesMatrix extends Entity {
      * @param tile carreau
      */
     public TilesMatrix(int rows, int columns, Tile tile) {
-        super(0,0);
+        super(tile.getHeight() * (rows - 1), tile.getWidth() * (columns - 1), 0, 0);
         this.matrix = new Tile[rows][columns];
         fill(tile);
     }
@@ -29,8 +29,8 @@ public class TilesMatrix extends Entity {
         for (int row = 0; row < matrix.length; row++) {
             for (int col = 0; col < matrix[row].length; col++) {
                 matrix[row][col] = new Tile(tile);
-                matrix[row][col].setX((tile.getSize() * row));
-                matrix[row][col].setY((tile.getSize() * col));
+                matrix[row][col].setX((tile.getWidth() * row));
+                matrix[row][col].setY((tile.getHeight() * col));
             }
         }
     }
@@ -52,11 +52,22 @@ public class TilesMatrix extends Entity {
     }
 
     @Override
+    public void update() {}
+
+    @Override
     protected void translate(int x, int y) {
         super.translate(x, y);
         for (Tile[] tiles : matrix)
             for (Tile tile : tiles)
-                tile.translate(x + tile.getX(), y + tile.getY());
+                tile.translate(x, y);
+    }
+
+    @Override
+    protected void move(int x, int y) {
+        super.move(x, y);
+        for (Tile[] tiles : matrix)
+            for (Tile tile : tiles)
+                tile.move(x + tile.getX(), y + tile.getY());
     }
 
     // GETTERS & SETTERS //
