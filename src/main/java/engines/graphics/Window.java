@@ -4,7 +4,6 @@ import engines.graphics.api.GLFW;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import static engines.graphics.GraphicsEngine.generateTextures;
 
@@ -74,12 +73,6 @@ public class Window extends GLFW {
             clearGLFWWindow();
             actual_scene.render();
             swapBuffers();
-            //Ajout d'un timer pour limiter l'utilisation de la batterie
-            try {
-                TimeUnit.MILLISECONDS.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
     }
 
