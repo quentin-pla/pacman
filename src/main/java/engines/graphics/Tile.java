@@ -5,11 +5,6 @@ package engines.graphics;
  */
 public class Tile extends Entity {
     /**
-     * Dimensions
-     */
-    private int size;
-
-    /**
      * Couleur
      */
     private float[] color;
@@ -17,25 +12,23 @@ public class Tile extends Entity {
     /**
      * Texture
      */
-    private Texture texture;
-
-    /**
-     * Fichier de texture
-     */
-    private SpriteSheet sprite_sheet;
-
-    /**
-     * Coordonnées de la texture dans le fichier de texture
-     */
-    private int[] sprite_coords;
+    private TileTexture texture;
 
     /**
      * Constructeur par défaut
-     * @param size dimensions
+     * @param height hauteur
+     * @param width largeur
+     */
+    public Tile(int height, int width) {
+        super(height, width,0,0);
+    }
+
+    /**
+     * Constructeur avec taille
+     * @param size taille
      */
     public Tile(int size) {
-        super(0,0);
-        this.size = size;
+        super(size,0,0);
     }
 
     /**
@@ -43,12 +36,9 @@ public class Tile extends Entity {
      * @param clone clone
      */
     public Tile(Tile clone) {
-        super(clone.x, clone.y);
-        this.size = clone.size;
+        super(clone.height, clone.width, clone.x, clone.y);
         this.color = clone.color;
         this.texture = clone.texture;
-        this.sprite_sheet = clone.sprite_sheet;
-        this.sprite_coords = clone.sprite_coords;
     }
 
     /**
@@ -59,48 +49,39 @@ public class Tile extends Entity {
      * @param alpha opacité
      */
     public void bindColor(float red, float green, float blue, float alpha) {
-        this.color = new float[]{red, green, blue, alpha};
+        color = new float[]{red, green, blue, alpha};
     }
+
+    /**
+     * Détacher la couleur
+     */
+    public void unbindColor() { color = null; }
 
     /**
      * Attacher une texture
      * @param texture texture
      */
-    public void bindTexture(Texture texture) {
-        this.texture = texture;
-    }
+    public void bindTexture(TileTexture texture) { this.texture = texture; }
 
     /**
-     * Attacher une texture depuis un fichier de texture
-     * @param spriteSheet fichier de texture
-     * @param row coordonnée horizontal de la texture
-     * @param col coordonnée verticale de la texture
+     * Détacher la texture
      */
-    public void bindSpriteSheet(SpriteSheet spriteSheet, int row, int col) {
-        this.sprite_sheet = spriteSheet;
-        this.sprite_coords = new int[]{row-1, col-1};
+    public void unbindTexture() { texture = null; }
+
+    @Override
+    public void draw() {
+        if (color != null) renderQUAD(height, width, x, y, color);
+        if (texture != null) texture.cover(this);
     }
 
     @Override
-    protected void draw() {
-        if (color != null)
-            renderQUAD(size, x, y, color);
-        if (texture != null)
-            renderTexturedQUAD(size, x, y, texture.getId());
-        if (sprite_sheet != null)
-            renderSpriteSheetQUAD(size, x, y, sprite_sheet.getTexture().getId(),
-                    sprite_sheet.getHeight(), sprite_sheet.getWidth(), sprite_coords);
+    public void update() {
+        if (texture != null) texture.update();
     }
 
     // GETTERS & SETTERS //
 
-    public int getSize() { return size; }
-
-    public void setSize(int size) { this.size = size; }
-
     public float[] getColor() { return color; }
 
-    public Texture getTexture() { return texture; }
-
-    public SpriteSheet getSprite_sheet() { return sprite_sheet; }
+    public TileTexture getTexture() { return texture; }
 }

@@ -6,7 +6,7 @@ import static engines.graphics.GraphicsEngine.uploadTexture;
 /**
  * Texture
  */
-public class Texture {
+public class Texture extends TileTexture {
     /**
      * ID de la texture
      */
@@ -42,6 +42,14 @@ public class Texture {
     public static Texture get(String name) {
         return getTexture(name);
     }
+
+    @Override
+    public void cover(Tile tile) {
+        renderTexturedQUAD(tile.height, tile.width, tile.x, tile.y, id);
+    }
+
+    @Override
+    public void update() {}
 
     // GETTERS & SETTERS //
 
