@@ -15,62 +15,64 @@ import static org.lwjgl.stb.STBImage.stbi_load;
 public class Renderer {
     /**
      * Générer un carré
-     * @param size taille en pixels
+     * @param height hauteur en pixels
+     * @param width largeur en pixels
      * @param x position horizontale
      * @param y position verticale
      * @param color couleur
      */
-    protected static void renderQUAD(int size, int x, int y, float[] color) {
+    protected static void renderQUAD(int height, int width, int x, int y, float[] color) {
         glColor4f(color[0], color[1], color[2], color[3]);
         glBegin(GL_QUADS);
         glVertex2i(x, y);
-        glVertex2i(x + size, y);
-        glVertex2i(x + size, y + size);
-        glVertex2i(x, y + size);
+        glVertex2i(x + width, y);
+        glVertex2i(x + width, y + height);
+        glVertex2i(x, y + height);
         glEnd();
     }
 
     /**
      * Générer un carré texturisé
-     * @param size taille en pixels
+     * @param height hauteur en pixels
+     * @param width largeur en pixels
      * @param x position horizontale
      * @param y position verticale
      * @param texture_id id texture
      */
-    protected static void renderTexturedQUAD(int size, int x, int y, int texture_id) {
+    protected static void renderTexturedQUAD(int height, int width, int x, int y, int texture_id) {
         glColor4f(1,1,1,1);
         bindTexture(texture_id);
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex2i(x, y);
-        glTexCoord2f(1, 0); glVertex2i(x + size, y);
-        glTexCoord2f(1, 1); glVertex2i(x + size, y + size);
-        glTexCoord2f(0, 1); glVertex2i(x, y + size);
+        glTexCoord2f(1, 0); glVertex2i(x + width, y);
+        glTexCoord2f(1, 1); glVertex2i(x + width, y + height);
+        glTexCoord2f(0, 1); glVertex2i(x, y + height);
         glEnd();
         unbindTexture();
     }
 
     /**
      * Générer un carré texturisé à partir d'un fichier de texture
-     * @param size taille en pixels
+     * @param height hauteur en pixels
+     * @param width largeur en pixels
      * @param x position horizontale
      * @param y position verticale
      * @param texture_id id texture
-     * @param height nombre d'éléments horizontaux fichier de texture
-     * @param width nombre d'élements verticaux fichier de texture
+     * @param sheet_size taille du fichier de textures
      * @param sprite_coords coordonnées de la texture
      */
-    protected static void renderSpriteSheetQUAD(int size, int x, int y, int texture_id, int height, int width, int[] sprite_coords) {
+    protected static void renderSpriteQUAD(int height, int width, int x, int y, int texture_id, int[] sheet_size, int[] sprite_coords) {
         glColor4f(1,1,1,1);
         bindTexture(texture_id);
         glBegin(GL_QUADS);
-        glTexCoord2f((sprite_coords[1] + 0f) / width,(sprite_coords[0] + 0f) / height);
+        glTexCoord2f((sprite_coords[1] + 0f) / sheet_size[1],(sprite_coords[0] + 0f) / sheet_size[0]);
         glVertex2i(x, y);
-        glTexCoord2f((sprite_coords[1] + 1f) / width,(sprite_coords[0] + 0f) / height);
-        glVertex2i(x + size, y);
-        glTexCoord2f((sprite_coords[1] + 1f) / width,(sprite_coords[0] + 1f) / height);
-        glVertex2i(x + size, y + size);
-        glTexCoord2f((sprite_coords[1] + 0f) / width,(sprite_coords[0] + 1f) / height);
-        glVertex2i(x, y + size);
+        glTexCoord2f((sprite_coords[1] + 1f) / sheet_size[1],(sprite_coords[0] + 0f) / sheet_size[0]);
+        glVertex2i(x + width, y);
+        glTexCoord2f((sprite_coords[1] + 1f) / sheet_size[1],(sprite_coords[0] + 1f) / sheet_size[0]);
+        glVertex2i(x + width, y + height);
+        glTexCoord2f((sprite_coords[1] + 0f) / sheet_size[1],(sprite_coords[0] + 1f) / sheet_size[0]);
+        glVertex2i(x, y + height);
         glEnd();
         unbindTexture();
     }
