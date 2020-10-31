@@ -1,44 +1,23 @@
 package engines.input_output;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 
-import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
+import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 
 /**
  * Moteur entrée/sortie
  */
 public class InputOutputEngine {
     /**
-     * Instance
+     * Touches préssées
      */
-    private static InputOutputEngine instance;
+    private static ArrayList<Integer> pressed_keys = new ArrayList<>();
 
     /**
-     * Touches clavier
+     * Boutons pressés
      */
-    private boolean[] keyboard_keys = new boolean[GLFW_KEY_LAST];
-
-    /**
-     * Boutons souris
-     */
-    private boolean[] mouse_buttons = new boolean[GLFW_MOUSE_BUTTON_LAST];
-
-    /**
-     * Constructeur
-     */
-    private InputOutputEngine() {
-        Arrays.fill(keyboard_keys, false);
-        Arrays.fill(mouse_buttons, false);
-    }
-
-    /**
-     * Obtenir l'instance
-     * @return instance
-     */
-    public static InputOutputEngine get() {
-        if (instance == null) instance = new InputOutputEngine();
-        return instance;
-    }
+    private static ArrayList<Integer> pressed_buttons = new ArrayList<>();
 
     /**
      * Fonction de rappel touches clavier
@@ -49,8 +28,10 @@ public class InputOutputEngine {
      * @param mods touche combinée
      */
     public static void keyCallback(long window, int key, int scancode, int action, int mods) {
-        if (action == GLFW_PRESS) get().keyboard_keys[key] = true;
-        else if (action == GLFW_RELEASE) get().keyboard_keys[key] = false;
+        if (action == GLFW_PRESS && !pressed_keys.contains(key))
+            pressed_keys.add(key);
+        else if (action == GLFW_RELEASE && pressed_keys.contains(key))
+            pressed_keys.remove((Integer) key);
     }
 
     /**
@@ -61,8 +42,10 @@ public class InputOutputEngine {
      * @param mods touche combinée
      */
     public static void mouseCallback(long window, int button, int action, int mods) {
-        if (action == GLFW_PRESS) get().mouse_buttons[button] = true;
-        else if (action == GLFW_RELEASE) get().mouse_buttons[button] = false;
+        if (action == GLFW_PRESS && !pressed_buttons.contains(button))
+            pressed_buttons.add(button);
+        else if (action == GLFW_RELEASE && pressed_buttons.contains(button))
+            pressed_buttons.remove((Integer) button);
     }
 
     /**
@@ -71,7 +54,15 @@ public class InputOutputEngine {
      * @return booléen
      */
     public static boolean isKeyPressed(int code) {
-        return get().keyboard_keys[code];
+        return pressed_keys.contains(code);
+    }
+
+    /**
+     * Savoir si le clavier n'est pas utilisé
+     * @return booléen
+     */
+    public static boolean isKeyboardFree() {
+        return pressed_keys.isEmpty();
     }
 
     /**
@@ -80,6 +71,24 @@ public class InputOutputEngine {
      * @return booléen
      */
     public static boolean isMouseButtonPressed(int code) {
-        return get().mouse_buttons[code];
+        return pressed_buttons.contains(code);
+    }
+
+    /**
+     * Savoir si la souris n'est pas utilisée
+     * @return booléen
+     */
+    public static boolean isMouseFree() {
+        return pressed_buttons.isEmpty();
+    }
+
+    // GETTERS //
+
+    public static ArrayList<Integer> getPressedKeys() {
+        return pressed_keys;
+    }
+
+    public static ArrayList<Integer> getPressedButtons() {
+        return pressed_buttons;
     }
 }
