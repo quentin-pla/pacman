@@ -62,7 +62,7 @@ public class Level extends TilesMatrix {
      */
     public void addPlayer(Player player, int row, int col) {
         player.addMoveBounds(getBounds());
-        Tile tile = get(row-1,col-1);
+        Tile tile = get(row,col);
         player.teleport(tile.getX(), tile.getY());
         this.player = player;
         game_objects.add(player);

@@ -3,7 +3,6 @@ package application;
 import engines.graphics.SpriteAnimation;
 import engines.graphics.TileTexture;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -75,7 +74,6 @@ public class Player extends GameObject {
      */
     public void addMoveBounds(int[] bounds) {
         move_bounds = bounds;
-        System.out.println(Arrays.toString(move_bounds));
     }
 
     /**
