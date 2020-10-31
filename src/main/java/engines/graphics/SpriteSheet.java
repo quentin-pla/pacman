@@ -14,12 +14,7 @@ public class SpriteSheet {
     /**
      * Nombre de textures horizontales
      */
-    private int height;
-
-    /**
-     * Nombre de textures verticales
-     */
-    private int width;
+    private int[] size;
 
     /**
      * Constructeur
@@ -29,8 +24,7 @@ public class SpriteSheet {
      */
     protected SpriteSheet(String link, int height, int width) {
         this.texture = new Texture(link);
-        this.height = height;
-        this.width = width;
+        this.size = new int[]{height,width};
     }
 
     /**
@@ -53,15 +47,7 @@ public class SpriteSheet {
 
     // GETTERS //
 
-    protected Texture getTexture() {
-        return texture;
-    }
+    protected Texture getTexture() { return texture; }
 
-    protected int getHeight() {
-        return height;
-    }
-
-    protected int getWidth() {
-        return width;
-    }
+    protected int[] getSize() { return size; }
 }
