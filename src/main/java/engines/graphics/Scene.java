@@ -38,9 +38,9 @@ public class Scene {
      * @param y position verticale
      */
     public void addEntity(Entity entity, int x, int y) {
-        entity.setScene(this);
-        entity.translate(x, y);
         entities.add(entity);
+        entity.setScene(this);
+        entity.move(x, y);
     }
 
     /**
@@ -55,20 +55,23 @@ public class Scene {
      * Générer la scène
      */
     protected void render() {
-        for (Entity entity : entities) entity.draw();
+        for (Entity entity : entities) {
+            entity.update();
+            entity.draw();
+        }
     }
 
-    // GETTERS
+    // GETTERS //
 
-    protected int getHeight() {
+    public int getHeight() {
         return height;
     }
 
-    protected int getWidth() {
+    public int getWidth() {
         return width;
     }
 
-    protected ArrayList<Entity> getEntities() {
+    public ArrayList<Entity> getEntities() {
         return entities;
     }
 }
