@@ -5,8 +5,6 @@ import engines.graphics.api.GLFW;
 import java.util.HashMap;
 import java.util.Map;
 
-import static engines.graphics.GraphicsEngine.generateTextures;
-
 /**
  * Fenêtre
  */
@@ -44,7 +42,7 @@ public class Window extends GLFW {
     /**
      * Afficher la fenêtre
      */
-    public static void show() {
+    protected static void show() {
         try {
             if (scenes.isEmpty())
                 throw new Exception("Aucune scène spécifiée");
@@ -62,7 +60,7 @@ public class Window extends GLFW {
      */
     private static void init() {
         initGLFWWindow(width * scale, height * scale, title);
-        generateTextures();
+        Texture.generateLoadedTextures();
     }
 
     /**
@@ -79,7 +77,7 @@ public class Window extends GLFW {
     /**
      * Terminer l'exécution de la fenêtre
      */
-    private static void stop() {
+    protected static void stop() {
         stopGLFWWindow();
     }
 
@@ -87,7 +85,7 @@ public class Window extends GLFW {
      * Ajouter une nouvelle scène
      * @param scene scène
      */
-    public static void addScene(Scene scene, String name) {
+    protected static void addScene(Scene scene, String name) {
         scenes.put(name, scene);
         if (actual_scene == null) bindScene(name);
     }
@@ -96,7 +94,7 @@ public class Window extends GLFW {
      * Attacher une scène
      * @param name nom de la scène
      */
-    public static void bindScene(String name) {
+    protected static void bindScene(String name) {
         if (!scenes.containsKey(name)) {
             try {
                 throw new Exception("Scène introuvable");
@@ -113,19 +111,27 @@ public class Window extends GLFW {
 
     // GETTERS & SETTERS //
 
-    public static int getScale() {
+    protected static int getScale() {
         return scale;
     }
 
-    public static void setScale(int scale) {
+    protected static void setScale(int scale) {
         Window.scale = scale;
     }
 
-    public static String getTitle() {
+    protected static String getTitle() {
         return title;
     }
 
-    public static void setTitle(String title) {
+    protected static void setTitle(String title) {
         Window.title = title;
     }
+
+    protected static int getHeight() { return height; }
+
+    protected static int getWidth() { return width; }
+
+    protected static Map<String, Scene> getScenes() { return scenes; }
+
+    protected static Scene getActualScene() { return actual_scene; }
 }

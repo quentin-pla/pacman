@@ -5,7 +5,7 @@ import java.util.ArrayList;
 /**
  * Animation depuis un fichier de textures
  */
-public class SpriteAnimation extends TileTexture {
+public class SpriteAnimation extends EntityTexture {
     /**
      * Image de départ
      */
@@ -49,7 +49,7 @@ public class SpriteAnimation extends TileTexture {
     /**
      * Constructeur
      */
-    public SpriteAnimation(SpriteSheet sprite_sheet, int speed, boolean looping) {
+    protected SpriteAnimation(SpriteSheet sprite_sheet, int speed, boolean looping) {
         this.sprite_sheet = sprite_sheet;
         this.speed = speed;
         this.looping = looping;
@@ -59,7 +59,7 @@ public class SpriteAnimation extends TileTexture {
      * Constructeur par clonage
      * @param clone clone
      */
-    public SpriteAnimation(SpriteAnimation clone) {
+    protected SpriteAnimation(SpriteAnimation clone) {
         this(clone.sprite_sheet, clone.speed, clone.looping);
         this.actual_frame = clone.actual_frame;
         this.frames = new ArrayList<>(clone.frames);
@@ -73,31 +73,31 @@ public class SpriteAnimation extends TileTexture {
      * @param row ligne
      * @param col colonne
      */
-    public void addFrame(int row, int col) {
+    protected void addFrame(int row, int col) {
         frames.add(new int[]{row-1,col-1});
     }
 
     /**
      * Jouer / Mettre en pause l'animation
      */
-    public void playPause() { playing = !playing; }
+    protected void playPause() { playing = !playing; }
 
     /**
      * Réinitialiser l'animation
      */
-    public void reset() {
+    protected void reset() {
         actual_frame = 0;
         time = 0;
     }
 
     @Override
-    public void cover(Tile tile) {
-        renderSpriteQUAD(tile.height, tile.width, tile.x, tile.y, getSpriteSheet().getTexture().getId(),
+    protected void cover(Entity entity) {
+        renderSpriteQUAD(entity.height, entity.width, entity.x, entity.y, getSpriteSheet().getTexture().getId(),
                 getSpriteSheet().getSize(), getActualCoords());
     }
 
     @Override
-    public void update() {
+    protected void update() {
         if (playing) {
             ++time;
             if (time > speed) {
@@ -112,6 +112,11 @@ public class SpriteAnimation extends TileTexture {
                 time = 0;
             }
         }
+    }
+
+    @Override
+    protected EntityTexture clone() {
+        return new SpriteAnimation(this);
     }
 
     // GETTERS & SETTERS //

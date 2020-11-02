@@ -1,7 +1,7 @@
 package application;
 
 import engines.graphics.SpriteAnimation;
-import engines.graphics.TileTexture;
+import engines.graphics.EntityTexture;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +41,7 @@ public class Player extends GameObject {
     /**
      * Texture par défaut
      */
-    private TileTexture default_texture;
+    private EntityTexture default_texture;
 
     /**
      * Animations
@@ -52,8 +52,8 @@ public class Player extends GameObject {
      * Constructeur
      * @param size taille du joueur
      */
-    public Player(int size, int move_speed, TileTexture default_texture) {
-        super(size);
+    public Player(int height, int width, int move_speed, EntityTexture default_texture) {
+        super(height, width);
         this.move_speed = move_speed;
         this.default_texture = default_texture;
     }

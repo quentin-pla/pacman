@@ -1,48 +1,61 @@
 package engines.graphics;
 
-import static engines.graphics.GraphicsEngine.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Fichier de textures
  */
 public class SpriteSheet {
     /**
-     * Texture liée
+     * Fichiers de textures transférés
+     */
+    private static Map<String,SpriteSheet> loaded = new HashMap<>();
+
+    /**
+     * Textture
      */
     private Texture texture;
 
     /**
-     * Nombre de textures horizontales
+     * Nombre de textures horizontales / verticales
      */
     private int[] size;
 
     /**
      * Constructeur
-     * @param link lien vers la texture
      * @param height nombre de textures horizontales
      * @param width nombre de textures verticales
      */
-    protected SpriteSheet(String link, int height, int width) {
-        this.texture = new Texture(link);
+    private SpriteSheet(Texture texture, int height, int width) {
+        this.texture = texture;
         this.size = new int[]{height,width};
     }
 
     /**
-     * Transférer un fichier de texture
+     * Transférer une texture
      * @param link lien du fichier
-     * @param name nom du fichier
      */
-    public static void upload(String link, int height, int width, String name) {
-        uploadSpriteSheet(link, height, width, name);
+    protected static SpriteSheet load(String link, int height, int width) {
+        if (!loaded.containsKey(link)) {
+            loaded.put(link, new SpriteSheet(Texture.load(link), height, width));
+        } else {
+            try {
+                throw new Exception("Fichier de texture déjà transféré");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return loaded.get(link);
     }
 
     /**
      * Obtenir un fichier de texture
-     * @param name nom
+     * @param link lien du fichier
      * @return texture
      */
-    public static SpriteSheet get(String name) {
-        return getSpriteSheet(name);
+    protected static SpriteSheet get(String link) {
+        return loaded.get(link);
     }
 
     // GETTERS //
@@ -50,4 +63,8 @@ public class SpriteSheet {
     protected Texture getTexture() { return texture; }
 
     protected int[] getSize() { return size; }
+
+    protected static Map<String, SpriteSheet> getLoaded() {
+        return loaded;
+    }
 }

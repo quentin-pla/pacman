@@ -1,8 +1,8 @@
 package application;
 
-import engines.graphics.Tile;
+import engines.graphics.Entity;
 
-public abstract class GameObject extends Tile {
+public abstract class GameObject extends Entity {
     /**
      * Constructeur avec dimensions
      * @param height hauteur
@@ -13,19 +13,10 @@ public abstract class GameObject extends Tile {
     }
 
     /**
-     * Constructeur avec taille
-     * @param size taille
+     * Cloner un objet de jeu
      */
-    public GameObject(int size) {
-        super(size);
-    }
-
-    /**
-     * Constructeur par clonage
-     * @param clone clone
-     */
-    public GameObject(Tile clone) {
-        super(clone);
+    public GameObject clone() {
+        return (GameObject) super.clone();
     }
 
     /**

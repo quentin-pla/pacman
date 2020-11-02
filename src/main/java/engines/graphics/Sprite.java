@@ -3,9 +3,9 @@ package engines.graphics;
 /**
  * Texture issue d'un fichier de textures
  */
-public class Sprite extends TileTexture {
+public class Sprite extends EntityTexture {
     /**
-     * Fichier de texture
+     * Nom du fichier de textures
      */
     private SpriteSheet sprite_sheet;
 
@@ -25,20 +25,25 @@ public class Sprite extends TileTexture {
      * @param row ligne
      * @param col colonne
      */
-    public Sprite(SpriteSheet sprite_sheet, int row, int col) {
+    protected Sprite(SpriteSheet sprite_sheet, int row, int col) {
         this.sprite_sheet = sprite_sheet;
         this.row = row - 1;
         this.col = col - 1;
     }
 
     @Override
-    public void cover(Tile tile) {
-        renderSpriteQUAD(tile.height, tile.width, tile.x, tile.y, getSpriteSheet().getTexture().getId(),
+    protected void cover(Entity entity) {
+        renderSpriteQUAD(entity.height, entity.width, entity.x, entity.y, getSpriteSheet().getTexture().getId(),
                 getSpriteSheet().getSize(), getCoords());
     }
 
     @Override
-    public void update() {}
+    protected void update() {}
+
+    @Override
+    protected EntityTexture clone() {
+        return this;
+    }
 
     // GETTERS //
 

@@ -1,15 +1,16 @@
 package application;
 
+import engines.graphics.Entity;
+import engines.graphics.GraphicsEngine;
 import engines.graphics.Scene;
-import engines.graphics.Tile;
-import engines.graphics.TilesMatrix;
+import engines.graphics.EntitiesMatrix;
 
 import java.util.ArrayList;
 
 /**
  * Niveau de jeu
  */
-public class Level extends TilesMatrix {
+public class Level extends EntitiesMatrix {
     /**
      * Objets présents sur le niveau
      */
@@ -41,7 +42,7 @@ public class Level extends TilesMatrix {
      * @param cols nombre de colonnes
      */
     public Level(int rows, int cols) {
-        super(rows,cols, new Tile(30));
+        super(rows,cols, GraphicsEngine.newEntity(30,30));
     }
 
     /**
@@ -50,7 +51,7 @@ public class Level extends TilesMatrix {
      * @param cols nombre de colonnes
      * @param floor sol par défaut
      */
-    public Level(int rows, int cols, Tile floor) {
+    public Level(int rows, int cols, Entity floor) {
         super(rows,cols, floor);
     }
 
@@ -62,8 +63,8 @@ public class Level extends TilesMatrix {
      */
     public void addPlayer(Player player, int row, int col) {
         player.addMoveBounds(getBounds());
-        Tile tile = get(row,col);
-        player.teleport(tile.getX(), tile.getY());
+        Entity entity = get(row,col);
+        player.teleport(entity.getX(), entity.getY());
         this.player = player;
         game_objects.add(player);
     }
@@ -73,7 +74,7 @@ public class Level extends TilesMatrix {
         super.setScene(scene);
         //Ajout des objets du niveau à la scène
         for (GameObject object : game_objects)
-            scene.addEntity(object, object.getX(), object.getY());
+            GraphicsEngine.addEntityToCurrentScene(object, object.getX(), object.getY());
     }
 
     @Override
