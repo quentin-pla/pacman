@@ -26,7 +26,7 @@ public class Scene {
      * @param height hateur
      * @param width largeur
      */
-    protected Scene(int height, int width) {
+    public Scene(int height, int width) {
         this.height = height;
         this.width = width;
     }
@@ -37,7 +37,7 @@ public class Scene {
      * @param x position horizontale
      * @param y position verticale
      */
-    protected void addEntity(Entity entity, int x, int y) {
+    public void addEntity(Entity entity, int x, int y) {
         entities.add(entity);
         entity.setScene(this);
         entity.move(x, y);
@@ -47,7 +47,7 @@ public class Scene {
      * Supprimer une entité présente sur la scène
      * @param entity entité
      */
-    protected void removeEntity(Entity entity) {
+    public void removeEntity(Entity entity) {
         entities.remove(entity);
     }
 
@@ -63,15 +63,15 @@ public class Scene {
 
     // GETTERS //
 
-    protected int getHeight() {
+    public int getHeight() {
         return height;
     }
 
-    protected int getWidth() {
+    public int getWidth() {
         return width;
     }
 
-    protected ArrayList<Entity> getEntities() {
+    public ArrayList<Entity> getEntities() {
         return entities;
     }
 }

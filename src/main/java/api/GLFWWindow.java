@@ -1,4 +1,4 @@
-package engines.graphics.api;
+package api;
 
 import engines.input_output.InputOutputEngine;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -12,7 +12,7 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 /**
  * Bibliothèque GLFW (Gestionnaire de fenêtres OpenGL)
  */
-public class GLFW {
+public class GLFWWindow {
     /**
      * Fenêtre GLFW
      */

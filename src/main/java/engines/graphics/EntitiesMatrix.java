@@ -7,7 +7,7 @@ public class EntitiesMatrix extends Entity {
     /**
      * Matrice
      */
-    private Entity[][] matrix;
+    protected Entity[][] matrix;
 
     /**
      * Constructeur
@@ -15,7 +15,7 @@ public class EntitiesMatrix extends Entity {
      * @param columns colonnes
      * @param entity carreau
      */
-    protected EntitiesMatrix(int rows, int columns, Entity entity) {
+    public EntitiesMatrix(int rows, int columns, Entity entity) {
         super(entity.getHeight() * (rows - 1), entity.getWidth() * (columns - 1));
         this.matrix = new Entity[rows][columns];
         fill(entity);
@@ -25,7 +25,7 @@ public class EntitiesMatrix extends Entity {
      * Remplir la matrice
      * @param entity carreau
      */
-    protected void fill(Entity entity) {
+    public void fill(Entity entity) {
         for (int row = 0; row < matrix.length; row++) {
             for (int col = 0; col < matrix[row].length; col++) {
                 matrix[row][col] = entity.clone();
@@ -36,7 +36,7 @@ public class EntitiesMatrix extends Entity {
     }
 
     @Override
-    protected void draw() {
+    public void draw() {
         for (Entity[] entities : matrix)
             for (Entity entity : entities)
                 entity.draw();
@@ -50,7 +50,7 @@ public class EntitiesMatrix extends Entity {
     }
 
     @Override
-    protected void translate(int x, int y) {
+    public void translate(int x, int y) {
         super.translate(x, y);
         for (Entity[] entities : matrix)
             for (Entity entity : entities)
@@ -58,7 +58,7 @@ public class EntitiesMatrix extends Entity {
     }
 
     @Override
-    protected void move(int x, int y) {
+    public void move(int x, int y) {
         super.move(x, y);
         for (Entity[] entities : matrix)
             for (Entity entity : entities)

@@ -36,7 +36,7 @@ public class SpriteSheet {
      * Transférer une texture
      * @param link lien du fichier
      */
-    protected static SpriteSheet load(String link, int height, int width) {
+    public static SpriteSheet load(String link, int height, int width) {
         if (!loaded.containsKey(link)) {
             loaded.put(link, new SpriteSheet(Texture.load(link), height, width));
         } else {
@@ -54,7 +54,7 @@ public class SpriteSheet {
      * @param link lien du fichier
      * @return texture
      */
-    protected static SpriteSheet get(String link) {
+    public static SpriteSheet get(String link) {
         return loaded.get(link);
     }
 

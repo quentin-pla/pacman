@@ -128,7 +128,7 @@ public class Player extends Entity {
     }
 
     @Override
-    protected void update() {
+    public void update() {
         super.update();
         movePlayer();
     }

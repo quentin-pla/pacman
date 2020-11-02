@@ -1,9 +1,8 @@
 package gameplay;
 
-import engines.graphics.Entity;
-import engines.graphics.GraphicsEngine;
-import engines.graphics.Scene;
 import engines.graphics.EntitiesMatrix;
+import engines.graphics.Entity;
+import engines.graphics.Scene;
 
 import java.util.ArrayList;
 
@@ -37,7 +36,7 @@ public class Level extends EntitiesMatrix {
      * @param cols nombre de colonnes
      */
     public Level(int rows, int cols) {
-        super(rows,cols, GraphicsEngine.newEntity(30,30));
+        super(rows,cols, new Entity(30,30));
     }
 
     /**
@@ -58,34 +57,34 @@ public class Level extends EntitiesMatrix {
      */
     public void addPlayer(Player player, int row, int col) {
         player.addMoveBounds(getBounds());
-        Entity entity = getMatrix()[row][col];
-        GraphicsEngine.moveEntity(player, entity.getX(), entity.getY());
+        Entity entity = matrix[row][col];
+        player.move(entity.getX(), entity.getY());
         this.player = player;
         game_objects.add(player);
     }
 
     @Override
-    protected void setScene(Scene scene) {
+    public void setScene(Scene scene) {
         super.setScene(scene);
         //Ajout des objets du niveau à la scène
         for (Entity entity : game_objects)
-            GraphicsEngine.addEntityToCurrentScene(entity, entity.getX(), entity.getY());
+            scene.addEntity(entity, entity.getX(), entity.getY());
     }
 
     @Override
-    protected void translate(int x, int y) {
+    public void translate(int x, int y) {
         super.translate(x, y);
         //Translation des objets du niveau
-        for (Entity entity : game_objects) GraphicsEngine.translateEntity(entity, x, y);
+        for (Entity entity : game_objects) entity.translate(x, y);
         //Mise à jour des limites de déplacement pour le joueur
         if (player != null) player.addMoveBounds(getBounds());
     }
 
     @Override
-    protected void move(int x, int y) {
+    public void move(int x, int y) {
         super.move(x,y);
         //Translation des objets du niveau
-        for (Entity entity : game_objects) GraphicsEngine.translateEntity(entity, x, y);
+        for (Entity entity : game_objects) entity.translate(x, y);
         //Mise à jour des limites de déplacement pour le joueur
         if (player != null) player.addMoveBounds(getBounds());
     }

@@ -1,6 +1,6 @@
 package engines.graphics;
 
-import engines.graphics.api.Renderer;
+import api.Renderer;
 
 /**
  * Texture d'entité
@@ -10,15 +10,15 @@ public abstract class EntityTexture extends Renderer {
      * Recouvrir un carreau
      * @param tile carreau
      */
-    protected abstract void cover(Entity tile);
+    public abstract void cover(Entity tile);
 
     /**
      * Mettre à jour la texture
      */
-    protected abstract void update();
+    public abstract void update();
 
     /**
      * Cloner une texture
      */
-    protected abstract EntityTexture clone();
+    public abstract EntityTexture clone();
 }

@@ -1,6 +1,6 @@
 package engines.graphics;
 
-import engines.graphics.api.Renderer;
+import api.Renderer;
 
 /**
  * Entité
@@ -46,7 +46,7 @@ public class Entity extends Renderer {
      * @param height hauteur
      * @param width largeur
      */
-    protected Entity(int height, int width) {
+    public Entity(int height, int width) {
         this.height = height;
         this.width = width;
         this.x = 0;
@@ -70,14 +70,14 @@ public class Entity extends Renderer {
      * Cloner une entité
      * @return clone
      */
-    protected Entity clone() {
+    public Entity clone() {
         return new Entity(this);
     }
 
     /**
      * Dessiner l'entité
      */
-    protected void draw() {
+    public void draw() {
         if (color != null) renderQUAD(height, width, x, y, color);
         if (texture != null) texture.cover(this);
     }
@@ -85,14 +85,14 @@ public class Entity extends Renderer {
     /**
      * Mettre à jour l'entité
      */
-    protected void update() {
+    public void update() {
         if (texture != null) texture.update();
     }
 
     /**
      * Effacer l'entité
      */
-    protected void erase() {
+    public void erase() {
         scene.removeEntity(this);
     }
 
@@ -101,7 +101,7 @@ public class Entity extends Renderer {
      * @param x nombre à additionner à la position horizontale
      * @param y nombre à additionner à la position verticale
      */
-    protected void translate(int x, int y) {
+    public void translate(int x, int y) {
         this.x = this.x + x;
         this.y = this.y + y;
     }
@@ -111,7 +111,7 @@ public class Entity extends Renderer {
      * @param x nouvelle position horizontale
      * @param y nouvelle position verticale
      */
-    protected void move(int x, int y) {
+    public void move(int x, int y) {
         this.x = x;
         this.y = y;
     }
@@ -121,7 +121,7 @@ public class Entity extends Renderer {
      * @param height hauteur
      * @param width largeur
      */
-    protected void resize(int height, int width) {
+    public void resize(int height, int width) {
         this.height = height;
         this.width = width;
     }
@@ -133,25 +133,25 @@ public class Entity extends Renderer {
      * @param blue intensité bleu
      * @param alpha opacité
      */
-    protected void bindColor(float red, float green, float blue, float alpha) {
+    public void bindColor(float red, float green, float blue, float alpha) {
         color = new float[]{red, green, blue, alpha};
     }
 
     /**
      * Détacher la couleur
      */
-    protected void unbindColor() { color = null; }
+    public void unbindColor() { color = null; }
 
     /**
      * Attacher une texture
      * @param texture texture
      */
-    protected void bindTexture(EntityTexture texture) { this.texture = texture; }
+    public void bindTexture(EntityTexture texture) { this.texture = texture; }
 
     /**
      * Détacher la texture
      */
-    protected void unbindTexture() { texture = null; }
+    public void unbindTexture() { texture = null; }
 
     // GETTERS & SETTERS //
 
@@ -161,19 +161,19 @@ public class Entity extends Renderer {
 
     public int getHeight() { return height; }
 
-    protected void setHeight(int height) { this.height = height; }
+    public void setHeight(int height) { this.height = height; }
 
     public int getWidth() { return width; }
 
-    protected void setWidth(int width) { this.width = width; }
+    public void setWidth(int width) { this.width = width; }
 
     public int getX() { return x; }
 
-    protected void setX(int x) { this.x = x; }
+    public void setX(int x) { this.x = x; }
 
     public int getY() { return y; }
 
-    protected void setY(int y) { this.y = y; }
+    public void setY(int y) { this.y = y; }
 
     public float[] getColor() { return color; }
 

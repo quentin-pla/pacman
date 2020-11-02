@@ -49,7 +49,7 @@ public class SpriteAnimation extends EntityTexture {
     /**
      * Constructeur
      */
-    protected SpriteAnimation(SpriteSheet sprite_sheet, int speed, boolean looping) {
+    public SpriteAnimation(SpriteSheet sprite_sheet, int speed, boolean looping) {
         this.sprite_sheet = sprite_sheet;
         this.speed = speed;
         this.looping = looping;
@@ -59,7 +59,7 @@ public class SpriteAnimation extends EntityTexture {
      * Constructeur par clonage
      * @param clone clone
      */
-    protected SpriteAnimation(SpriteAnimation clone) {
+    private SpriteAnimation(SpriteAnimation clone) {
         this(clone.sprite_sheet, clone.speed, clone.looping);
         this.actual_frame = clone.actual_frame;
         this.frames = new ArrayList<>(clone.frames);
@@ -73,31 +73,31 @@ public class SpriteAnimation extends EntityTexture {
      * @param row ligne
      * @param col colonne
      */
-    protected void addFrame(int row, int col) {
+    public void addFrame(int row, int col) {
         frames.add(new int[]{row-1,col-1});
     }
 
     /**
      * Jouer / Mettre en pause l'animation
      */
-    protected void playPause() { playing = !playing; }
+    public void playPause() { playing = !playing; }
 
     /**
      * Réinitialiser l'animation
      */
-    protected void reset() {
+    public void reset() {
         actual_frame = 0;
         time = 0;
     }
 
     @Override
-    protected void cover(Entity entity) {
+    public void cover(Entity entity) {
         renderSpriteQUAD(entity.height, entity.width, entity.x, entity.y, getSpriteSheet().getTexture().getId(),
                 getSpriteSheet().getSize(), getActualCoords());
     }
 
     @Override
-    protected void update() {
+    public void update() {
         if (playing) {
             ++time;
             if (time > speed) {
@@ -115,7 +115,7 @@ public class SpriteAnimation extends EntityTexture {
     }
 
     @Override
-    protected EntityTexture clone() {
+    public SpriteAnimation clone() {
         return new SpriteAnimation(this);
     }
 
@@ -129,7 +129,7 @@ public class SpriteAnimation extends EntityTexture {
 
     public boolean isPlaying() { return playing; }
 
-    protected void setSpeed(int speed) { this.speed = speed; }
+    public void setSpeed(int speed) { this.speed = speed; }
 
-    protected void setLooping(boolean looping) { this.looping = looping; }
+    public void setLooping(boolean looping) { this.looping = looping; }
 }

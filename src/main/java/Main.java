@@ -1,7 +1,6 @@
+import engines.graphics.*;
 import gameplay.Level;
 import gameplay.Player;
-import engines.graphics.*;
-import static engines.graphics.GraphicsEngine.*;
 
 /**
  * Main
@@ -9,14 +8,14 @@ import static engines.graphics.GraphicsEngine.*;
 public class Main {
     public static void main(String[] args) {
         //Transfert des textures
-        SpriteSheet sprite_sheet = loadSpriteSheet("sprite_sheet.png", 11, 11);
-        Sprite coin = newSprite(sprite_sheet,10,2);
-        Sprite pacman_skin = newSprite(sprite_sheet,1,3);
+        SpriteSheet sprite_sheet = SpriteSheet.load("sprite_sheet.png", 11, 11);
+        Sprite coin = new Sprite(sprite_sheet,10,2);
+        Sprite pacman_skin = new Sprite(sprite_sheet,1,3);
 
         //Sol du niveau
-        Entity floor = newEntity(30, 30);
-        colorEntity(floor,0,0,1,1);
-        dressEntity(floor,coin);
+        Entity floor = new Entity(30, 30);
+        floor.bindColor(0,0,1,1);
+        floor.bindTexture(coin);
 
         //Niveau
         Level level = new Level(10,10, floor);
@@ -25,20 +24,20 @@ public class Main {
         Player pacman = new Player(30,30,2,pacman_skin);
 
         //Création des animations de mouvement
-        SpriteAnimation move = newAnimation(sprite_sheet,5,true);
-        addFrameToAnimation(move, 1, 3);
-        SpriteAnimation move_up = cloneAnimation(move);
-        addFrameToAnimation(move_up, 1, 7);
-        addFrameToAnimation(move_up, 1, 6);
-        SpriteAnimation move_right = cloneAnimation(move);
-        addFrameToAnimation(move_right, 1, 2);
-        addFrameToAnimation(move_right, 1, 1);
-        SpriteAnimation move_down = cloneAnimation(move);
-        addFrameToAnimation(move_down, 1, 9);
-        addFrameToAnimation(move_down, 1, 8);
-        SpriteAnimation move_left = cloneAnimation(move);
-        addFrameToAnimation(move_left, 1, 4);
-        addFrameToAnimation(move_left, 1, 5);
+        SpriteAnimation move = new SpriteAnimation(sprite_sheet,5,true);
+        move.addFrame(1, 3);
+        SpriteAnimation move_up = move.clone();
+        move_up.addFrame(1, 7);
+        move_up.addFrame(1, 6);
+        SpriteAnimation move_right = move.clone();
+        move_right.addFrame(1, 2);
+        move_right.addFrame(1, 1);
+        SpriteAnimation move_down = move.clone();
+        move_down.addFrame(1, 9);
+        move_down.addFrame(1, 8);
+        SpriteAnimation move_left = move.clone();
+        move_left.addFrame(1, 4);
+        move_left.addFrame(1, 5);
 
         //Ajout des animations de mouvement
         pacman.animateMove(Player.MoveDirection.UP, move_up);
@@ -50,12 +49,15 @@ public class Main {
         level.addPlayer(pacman, 0,0);
 
         //Création d'une nouvelle scène
-        GraphicsEngine.addScene("game_view",600,600);
+        Scene scene = new Scene(600,600);
         //Ajout du niveau dans la scène
-        GraphicsEngine.addEntityToCurrentScene(level,50,50);
+        scene.addEntity(level,50,50);
+
+        //Ajout de la scène dans la fenêtre
+        Window.addScene(scene,"game_view");
         //Définition du titre
-        GraphicsEngine.setWindowTitle("PACMAN");
+        Window.setTitle("PACMAN");
         //Affichage de la fenêtre
-        GraphicsEngine.showWindow();
+        Window.show();
     }
 }

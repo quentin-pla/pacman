@@ -1,6 +1,6 @@
 package engines.graphics;
 
-import engines.graphics.api.GLFW;
+import api.GLFWWindow;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Fenêtre
  */
-public class Window extends GLFW {
+public class Window extends GLFWWindow {
     /**
      * Hauteur
      */
@@ -42,7 +42,7 @@ public class Window extends GLFW {
     /**
      * Afficher la fenêtre
      */
-    protected static void show() {
+    public static void show() {
         try {
             if (scenes.isEmpty())
                 throw new Exception("Aucune scène spécifiée");
@@ -77,7 +77,7 @@ public class Window extends GLFW {
     /**
      * Terminer l'exécution de la fenêtre
      */
-    protected static void stop() {
+    public static void stop() {
         stopGLFWWindow();
     }
 
@@ -85,16 +85,16 @@ public class Window extends GLFW {
      * Ajouter une nouvelle scène
      * @param scene scène
      */
-    protected static void addScene(Scene scene, String name) {
+    public static void addScene(Scene scene, String name) {
         scenes.put(name, scene);
-        if (actual_scene == null) bindScene(name);
+        if (actual_scene == null) showScene(name);
     }
 
     /**
-     * Attacher une scène
+     * Afficher une scène
      * @param name nom de la scène
      */
-    protected static void bindScene(String name) {
+    public static void showScene(String name) {
         if (!scenes.containsKey(name)) {
             try {
                 throw new Exception("Scène introuvable");
@@ -115,7 +115,7 @@ public class Window extends GLFW {
         return scale;
     }
 
-    protected static void setScale(int scale) {
+    public static void setScale(int scale) {
         Window.scale = scale;
     }
 
@@ -123,7 +123,7 @@ public class Window extends GLFW {
         return title;
     }
 
-    protected static void setTitle(String title) {
+    public static void setTitle(String title) {
         Window.title = title;
     }
 
@@ -131,7 +131,7 @@ public class Window extends GLFW {
 
     public static int getWidth() { return width; }
 
-    protected static Map<String, Scene> getScenes() { return scenes; }
+    public static Map<String, Scene> getScenes() { return scenes; }
 
     public static Scene getActualScene() { return actual_scene; }
 }

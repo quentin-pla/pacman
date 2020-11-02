@@ -14,7 +14,7 @@
         <maven.compiler.target>13</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <main.class>engines.graphics.api.API</main.class>
+        <main.class>api.API</main.class>
         <java.version>13</java.version>
         <lwjgl.version>3.2.3</lwjgl.version>
         <lwjgl.natives>natives-macos</lwjgl.natives>

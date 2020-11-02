@@ -25,7 +25,7 @@ public class Texture extends EntityTexture {
      * Constructeur
      * @param link lien vers le fichier
      */
-    protected Texture(String link) {
+    private Texture(String link) {
         this.link = link;
     }
 
@@ -33,7 +33,7 @@ public class Texture extends EntityTexture {
      * Transférer une texture
      * @param link lien du fichier
      */
-    protected static Texture load(String link) {
+    public static Texture load(String link) {
         if (!loaded.containsKey(link)) {
             loaded.put(link, new Texture(link));
         } else {
@@ -51,7 +51,7 @@ public class Texture extends EntityTexture {
      * @param link lien du fichier
      * @return texture
      */
-    protected static Texture get(String link) {
+    public static Texture get(String link) {
         return loaded.get(link);
     }
 
@@ -64,15 +64,15 @@ public class Texture extends EntityTexture {
     }
 
     @Override
-    protected void cover(Entity entity) {
+    public void cover(Entity entity) {
         renderTexturedQUAD(entity.height, entity.width, entity.x, entity.y, id);
     }
 
     @Override
-    protected void update() {}
+    public void update() {}
 
     @Override
-    protected EntityTexture clone() {
+    public EntityTexture clone() {
         return this;
     }
 

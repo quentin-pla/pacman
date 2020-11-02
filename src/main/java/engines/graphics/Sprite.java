@@ -25,23 +25,23 @@ public class Sprite extends EntityTexture {
      * @param row ligne
      * @param col colonne
      */
-    protected Sprite(SpriteSheet sprite_sheet, int row, int col) {
+    public Sprite(SpriteSheet sprite_sheet, int row, int col) {
         this.sprite_sheet = sprite_sheet;
         this.row = row - 1;
         this.col = col - 1;
     }
 
     @Override
-    protected void cover(Entity entity) {
+    public void cover(Entity entity) {
         renderSpriteQUAD(entity.height, entity.width, entity.x, entity.y, getSpriteSheet().getTexture().getId(),
                 getSpriteSheet().getSize(), getCoords());
     }
 
     @Override
-    protected void update() {}
+    public void update() {}
 
     @Override
-    protected EntityTexture clone() {
+    public EntityTexture clone() {
         return this;
     }
 
