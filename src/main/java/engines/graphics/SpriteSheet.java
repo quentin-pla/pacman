@@ -60,11 +60,7 @@ public class SpriteSheet {
 
     // GETTERS //
 
-    protected Texture getTexture() { return texture; }
+    public Texture getTexture() { return texture; }
 
-    protected int[] getSize() { return size; }
-
-    protected static Map<String, SpriteSheet> getLoaded() {
-        return loaded;
-    }
+    public int[] getSize() { return size; }
 }

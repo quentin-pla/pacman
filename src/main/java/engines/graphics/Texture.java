@@ -82,5 +82,5 @@ public class Texture extends EntityTexture {
 
     protected void setId(Integer id) { this.id = id; }
 
-    protected String getLink() { return link; }
+    public String getLink() { return link; }
 }

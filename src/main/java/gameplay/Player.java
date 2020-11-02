@@ -1,5 +1,6 @@
-package application;
+package gameplay;
 
+import engines.graphics.Entity;
 import engines.graphics.SpriteAnimation;
 import engines.graphics.EntityTexture;
 
@@ -13,7 +14,7 @@ import static org.lwjgl.glfw.GLFW.*;
 /**
  * Joueur
  */
-public class Player extends GameObject {
+public class Player extends Entity {
     /**
      * Directions de déplacement
      */
@@ -50,7 +51,10 @@ public class Player extends GameObject {
 
     /**
      * Constructeur
-     * @param size taille du joueur
+     * @param height hauteur
+     * @param width largeur
+     * @param move_speed vitesse de déplacement
+     * @param default_texture texture par défaut
      */
     public Player(int height, int width, int move_speed, EntityTexture default_texture) {
         super(height, width);
@@ -124,7 +128,7 @@ public class Player extends GameObject {
     }
 
     @Override
-    public void update() {
+    protected void update() {
         super.update();
         movePlayer();
     }

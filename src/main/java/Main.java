@@ -1,5 +1,5 @@
-import application.Level;
-import application.Player;
+import gameplay.Level;
+import gameplay.Player;
 import engines.graphics.*;
 import static engines.graphics.GraphicsEngine.*;
 

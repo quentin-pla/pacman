@@ -15,7 +15,7 @@ public class EntitiesMatrix extends Entity {
      * @param columns colonnes
      * @param entity carreau
      */
-    public EntitiesMatrix(int rows, int columns, Entity entity) {
+    protected EntitiesMatrix(int rows, int columns, Entity entity) {
         super(entity.getHeight() * (rows - 1), entity.getWidth() * (columns - 1));
         this.matrix = new Entity[rows][columns];
         fill(entity);
@@ -25,7 +25,7 @@ public class EntitiesMatrix extends Entity {
      * Remplir la matrice
      * @param entity carreau
      */
-    public void fill(Entity entity) {
+    protected void fill(Entity entity) {
         for (int row = 0; row < matrix.length; row++) {
             for (int col = 0; col < matrix[row].length; col++) {
                 matrix[row][col] = entity.clone();
@@ -33,15 +33,6 @@ public class EntitiesMatrix extends Entity {
                 matrix[row][col].setY((entity.getHeight() * col));
             }
         }
-    }
-
-    /**
-     * Obtenir un carreau spécifique
-     * @param row ligne
-     * @param column colonne
-     */
-    public Entity get(int row, int column) {
-        return matrix[row][column];
     }
 
     @Override
@@ -76,7 +67,7 @@ public class EntitiesMatrix extends Entity {
 
     // GETTERS //
 
-    protected Entity[][] getMatrix() {
+    public Entity[][] getMatrix() {
         return matrix;
     }
 }

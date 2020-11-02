@@ -94,6 +94,28 @@ public class GraphicsEngine extends Renderer {
         entity.bindTexture(texture);
     }
 
+    // MATRICES //
+
+    /**
+     * Créer une matrice d'entités
+     * @param rows lignes
+     * @param columns colonnes
+     * @param entity entité par défaut
+     * @return matrice
+     */
+    public static EntitiesMatrix newMatrix(int rows, int columns, Entity entity) {
+        return new EntitiesMatrix(rows, columns, entity);
+    }
+
+    /**
+     * Remplir la matrice
+     * @param matrix matrice
+     * @param fill_entity entité pour le remplissage
+     */
+    public static void fillMatrix(EntitiesMatrix matrix, Entity fill_entity) {
+        matrix.fill(fill_entity);
+    }
+
     // TEXTURES //
 
     /**

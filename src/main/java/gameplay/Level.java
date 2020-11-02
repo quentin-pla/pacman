@@ -1,4 +1,4 @@
-package application;
+package gameplay;
 
 import engines.graphics.Entity;
 import engines.graphics.GraphicsEngine;
@@ -12,9 +12,9 @@ import java.util.ArrayList;
  */
 public class Level extends EntitiesMatrix {
     /**
-     * Objets présents sur le niveau
+     * Entités présentes sur le niveau
      */
-    private ArrayList<GameObject> game_objects = new ArrayList<>();
+    private ArrayList<Entity> game_objects = new ArrayList<>();
 
     /**
      * Joueur
@@ -25,11 +25,6 @@ public class Level extends EntitiesMatrix {
      * Chronomètre
      */
     private float timer;
-
-    /**
-     * Score minimum à atteindre pour gagner
-     */
-    private int minimum_score;
 
     /**
      * Score actuel
@@ -63,8 +58,8 @@ public class Level extends EntitiesMatrix {
      */
     public void addPlayer(Player player, int row, int col) {
         player.addMoveBounds(getBounds());
-        Entity entity = get(row,col);
-        player.teleport(entity.getX(), entity.getY());
+        Entity entity = getMatrix()[row][col];
+        GraphicsEngine.moveEntity(player, entity.getX(), entity.getY());
         this.player = player;
         game_objects.add(player);
     }
@@ -73,15 +68,15 @@ public class Level extends EntitiesMatrix {
     protected void setScene(Scene scene) {
         super.setScene(scene);
         //Ajout des objets du niveau à la scène
-        for (GameObject object : game_objects)
-            GraphicsEngine.addEntityToCurrentScene(object, object.getX(), object.getY());
+        for (Entity entity : game_objects)
+            GraphicsEngine.addEntityToCurrentScene(entity, entity.getX(), entity.getY());
     }
 
     @Override
     protected void translate(int x, int y) {
-        super.translate(x,y);
+        super.translate(x, y);
         //Translation des objets du niveau
-        for (GameObject object : game_objects) object.translate(x,y);
+        for (Entity entity : game_objects) GraphicsEngine.translateEntity(entity, x, y);
         //Mise à jour des limites de déplacement pour le joueur
         if (player != null) player.addMoveBounds(getBounds());
     }
@@ -90,7 +85,7 @@ public class Level extends EntitiesMatrix {
     protected void move(int x, int y) {
         super.move(x,y);
         //Translation des objets du niveau
-        for (GameObject object : game_objects) object.translate(x,y);
+        for (Entity entity : game_objects) GraphicsEngine.translateEntity(entity, x, y);
         //Mise à jour des limites de déplacement pour le joueur
         if (player != null) player.addMoveBounds(getBounds());
     }

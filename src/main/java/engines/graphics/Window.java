@@ -111,7 +111,7 @@ public class Window extends GLFW {
 
     // GETTERS & SETTERS //
 
-    protected static int getScale() {
+    public static int getScale() {
         return scale;
     }
 
@@ -119,7 +119,7 @@ public class Window extends GLFW {
         Window.scale = scale;
     }
 
-    protected static String getTitle() {
+    public static String getTitle() {
         return title;
     }
 
@@ -127,11 +127,11 @@ public class Window extends GLFW {
         Window.title = title;
     }
 
-    protected static int getHeight() { return height; }
+    public static int getHeight() { return height; }
 
-    protected static int getWidth() { return width; }
+    public static int getWidth() { return width; }
 
     protected static Map<String, Scene> getScenes() { return scenes; }
 
-    protected static Scene getActualScene() { return actual_scene; }
+    public static Scene getActualScene() { return actual_scene; }
 }

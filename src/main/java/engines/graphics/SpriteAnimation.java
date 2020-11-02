@@ -129,9 +129,7 @@ public class SpriteAnimation extends EntityTexture {
 
     public boolean isPlaying() { return playing; }
 
-    public void setSpriteSheet(SpriteSheet sprite_sheet) { this.sprite_sheet = sprite_sheet; }
+    protected void setSpeed(int speed) { this.speed = speed; }
 
-    public void setSpeed(int speed) { this.speed = speed; }
-
-    public void setLooping(boolean looping) { this.looping = looping; }
+    protected void setLooping(boolean looping) { this.looping = looping; }
 }
