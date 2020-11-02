@@ -15,9 +15,19 @@ public class InputOutputEngine {
     private static ArrayList<Integer> pressed_keys = new ArrayList<>();
 
     /**
+     * Dernière touche pressée
+     */
+    private static int last_pressed_key;
+
+    /**
      * Boutons pressés
      */
     private static ArrayList<Integer> pressed_buttons = new ArrayList<>();
+
+    /**
+     * Dernier bouton pressé
+     */
+    private static int last_pressed_button;
 
     /**
      * Fonction de rappel touches clavier
@@ -28,8 +38,10 @@ public class InputOutputEngine {
      * @param mods touche combinée
      */
     public static void keyCallback(long window, int key, int scancode, int action, int mods) {
-        if (action == GLFW_PRESS && !pressed_keys.contains(key))
+        if (action == GLFW_PRESS && !pressed_keys.contains(key)) {
             pressed_keys.add(key);
+            last_pressed_key = key;
+        }
         else if (action == GLFW_RELEASE && pressed_keys.contains(key))
             pressed_keys.remove((Integer) key);
     }
@@ -42,8 +54,10 @@ public class InputOutputEngine {
      * @param mods touche combinée
      */
     public static void mouseCallback(long window, int button, int action, int mods) {
-        if (action == GLFW_PRESS && !pressed_buttons.contains(button))
+        if (action == GLFW_PRESS && !pressed_buttons.contains(button)) {
             pressed_buttons.add(button);
+            last_pressed_button = button;
+        }
         else if (action == GLFW_RELEASE && pressed_buttons.contains(button))
             pressed_buttons.remove((Integer) button);
     }
@@ -90,5 +104,13 @@ public class InputOutputEngine {
 
     public static ArrayList<Integer> getPressedButtons() {
         return pressed_buttons;
+    }
+
+    public static int getLastPressedKey() {
+        return last_pressed_key;
+    }
+
+    public static int getLastPressedButton() {
+        return last_pressed_button;
     }
 }
