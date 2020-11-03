@@ -1,35 +1,31 @@
 package engines.graphics;
 
-import java.util.HashMap;
-import java.util.Map;
+import api.SwingRenderer;
 
 /**
  * Fichier de textures
  */
-public class SpriteSheet {
+public class SpriteSheet extends SwingRenderer {
     /**
-     * Fichiers de textures transférés
+     * Lien du fichier
      */
-    private static Map<String,SpriteSheet> loaded = new HashMap<>();
+    private String link;
 
     /**
-     * Textture
+     * Liste des sous-textures
      */
-    private Texture texture;
-
-    /**
-     * Nombre de textures horizontales / verticales
-     */
-    private int[] size;
+    private Sprite[][] sprites;
 
     /**
      * Constructeur
-     * @param height nombre de textures horizontales
-     * @param width nombre de textures verticales
+     * @param link lien vers le fichier
      */
-    private SpriteSheet(Texture texture, int height, int width) {
-        this.texture = texture;
-        this.size = new int[]{height,width};
+    private SpriteSheet(String link, int height, int width) {
+        this.link = link;
+        this.sprites = new Sprite[height][width];
+        for (int row = 0; row < height; row++)
+            for (int col = 0; col < width; col++)
+                sprites[row][col] = new Sprite(this, row, col);
     }
 
     /**
@@ -37,8 +33,8 @@ public class SpriteSheet {
      * @param link lien du fichier
      */
     public static SpriteSheet load(String link, int height, int width) {
-        if (!loaded.containsKey(link)) {
-            loaded.put(link, new SpriteSheet(Texture.load(link), height, width));
+        if (!SwingRenderer.isTextureLoaded(link)) {
+            SwingRenderer.loadSpriteSheet(link, height, width);
         } else {
             try {
                 throw new Exception("Fichier de texture déjà transféré");
@@ -46,21 +42,19 @@ public class SpriteSheet {
                 e.printStackTrace();
             }
         }
-        return loaded.get(link);
+        return new SpriteSheet(link, height, width);
     }
 
     /**
-     * Obtenir un fichier de texture
-     * @param link lien du fichier
-     * @return texture
+     * Obtenir une partie de la texture
+     * @param row ligne
+     * @param col colonne
      */
-    public static SpriteSheet get(String link) {
-        return loaded.get(link);
+    public Sprite getSprite(int row, int col) {
+        return sprites[row-1][col-1];
     }
 
     // GETTERS //
 
-    public Texture getTexture() { return texture; }
-
-    public int[] getSize() { return size; }
+    public String getLink() { return link; }
 }

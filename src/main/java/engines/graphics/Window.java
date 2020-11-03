@@ -1,6 +1,6 @@
 package engines.graphics;
 
-import api.GLFWWindow;
+import api.SwingWindow;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Fenêtre
  */
-public class Window extends GLFWWindow {
+public class Window extends SwingWindow {
     /**
      * Hauteur
      */
@@ -51,34 +51,20 @@ public class Window extends GLFWWindow {
             System.exit(1);
         }
         init();
-        update();
-        stop();
     }
 
     /**
      * Initialiser la fenêtre
      */
     private static void init() {
-        initGLFWWindow(width * scale, height * scale, title);
-        Texture.generateLoadedTextures();
-    }
-
-    /**
-     * Mettre à jour la fenêtre
-     */
-    private static void update() {
-        while (isGLFWWindowRunning()) {
-            clearGLFWWindow();
-            actual_scene.render();
-            swapBuffers();
-        }
+        initWindow(actual_scene, title);
     }
 
     /**
      * Terminer l'exécution de la fenêtre
      */
     public static void stop() {
-        stopGLFWWindow();
+        stopWindow();
     }
 
     /**
@@ -87,14 +73,14 @@ public class Window extends GLFWWindow {
      */
     public static void addScene(Scene scene, String name) {
         scenes.put(name, scene);
-        if (actual_scene == null) showScene(name);
+        if (actual_scene == null) bindScene(name);
     }
 
     /**
-     * Afficher une scène
+     * Attacher une scène
      * @param name nom de la scène
      */
-    public static void showScene(String name) {
+    public static void bindScene(String name) {
         if (!scenes.containsKey(name)) {
             try {
                 throw new Exception("Scène introuvable");
@@ -107,6 +93,7 @@ public class Window extends GLFWWindow {
         Window.actual_scene = scene;
         Window.height = scene.getHeight();
         Window.width = scene.getWidth();
+        SwingWindow.showScene(actual_scene);
     }
 
     // GETTERS & SETTERS //

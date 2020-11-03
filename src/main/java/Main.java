@@ -2,6 +2,8 @@ import engines.graphics.*;
 import gameplay.Level;
 import gameplay.Player;
 
+//-Dswing.volatileImageBufferEnabled=false
+
 /**
  * Main
  */
@@ -9,12 +11,12 @@ public class Main {
     public static void main(String[] args) {
         //Transfert des textures
         SpriteSheet sprite_sheet = SpriteSheet.load("sprite_sheet.png", 11, 11);
-        Sprite coin = new Sprite(sprite_sheet,10,2);
-        Sprite pacman_skin = new Sprite(sprite_sheet,1,3);
+        Sprite coin = sprite_sheet.getSprite(10,2);
+        Sprite pacman_skin = sprite_sheet.getSprite(1,3);
 
         //Sol du niveau
         Entity floor = new Entity(30, 30);
-        floor.bindColor(0,0,1,1);
+        floor.bindColor(0,0,255);
         floor.bindTexture(coin);
 
         //Niveau
@@ -49,9 +51,9 @@ public class Main {
         level.addPlayer(pacman, 0,0);
 
         //Création d'une nouvelle scène
-        Scene scene = new Scene(600,600);
+        Scene scene = new Scene(600,600, new Color(0,0,0));
         //Ajout du niveau dans la scène
-        scene.addEntity(level,50,50);
+        scene.addEntity(level,0,0);
 
         //Ajout de la scène dans la fenêtre
         Window.addScene(scene,"game_view");

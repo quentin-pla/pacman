@@ -1,14 +1,14 @@
 package gameplay;
 
 import engines.graphics.Entity;
-import engines.graphics.SpriteAnimation;
 import engines.graphics.EntityTexture;
+import engines.graphics.SpriteAnimation;
 
+import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.Map;
 
-import static engines.input_output.InputOutputEngine.*;
-import static org.lwjgl.glfw.GLFW.*;
+import static engines.input_output.KeyboardInputOutput.getLastPressedKey;
 
 /**
  * Joueur
@@ -77,19 +77,19 @@ public class Player extends Entity {
      */
     private void movePlayer() {
         switch (getLastPressedKey()) {
-            case GLFW_KEY_UP:
+            case KeyEvent.VK_UP:
                 if (move_bounds == null || y > move_bounds[1]) y -= move_speed;
                 bindTexture(animations.get(MoveDirection.UP.name()));
                 break;
-            case GLFW_KEY_RIGHT:
+            case KeyEvent.VK_RIGHT:
                 if (move_bounds == null || x < move_bounds[2]) x += move_speed;
                 bindTexture(animations.get(MoveDirection.RIGHT.name()));
                 break;
-            case GLFW_KEY_DOWN:
+            case KeyEvent.VK_DOWN:
                 if (move_bounds == null || y < move_bounds[3]) y += move_speed;
                 bindTexture(animations.get(MoveDirection.DOWN.name()));
                 break;
-            case GLFW_KEY_LEFT:
+            case KeyEvent.VK_LEFT:
                 if (move_bounds == null || x > move_bounds[0]) x -= move_speed;
                 bindTexture(animations.get(MoveDirection.LEFT.name()));
                 break;

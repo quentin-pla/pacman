@@ -14,7 +14,7 @@ public class SpriteAnimation extends EntityTexture {
     /**
      * Images de l'animation
      */
-    private ArrayList<int[]> frames = new ArrayList<>();
+    private ArrayList<Sprite> frames = new ArrayList<>();
 
     /**
      * Vitesse
@@ -74,7 +74,7 @@ public class SpriteAnimation extends EntityTexture {
      * @param col colonne
      */
     public void addFrame(int row, int col) {
-        frames.add(new int[]{row-1,col-1});
+        frames.add(sprite_sheet.getSprite(row, col));
     }
 
     /**
@@ -91,13 +91,12 @@ public class SpriteAnimation extends EntityTexture {
     }
 
     @Override
-    public void cover(Entity entity) {
-        renderSpriteQUAD(entity.height, entity.width, entity.x, entity.y, getSpriteSheet().getTexture().getId(),
-                getSpriteSheet().getSize(), getActualCoords());
+    protected void cover(Entity entity) {
+        renderTexturedRect(entity.height, entity.width, entity.x, entity.y, frames.get(actual_frame).getLink());
     }
 
     @Override
-    public void update() {
+    protected void update() {
         if (playing) {
             ++time;
             if (time > speed) {
@@ -121,11 +120,11 @@ public class SpriteAnimation extends EntityTexture {
 
     // GETTERS & SETTERS //
 
-    public int[] getActualCoords() { return frames.get(actual_frame); }
+    public Sprite getFrame() { return frames.get(actual_frame); }
 
     public SpriteSheet getSpriteSheet() { return sprite_sheet; }
 
-    public ArrayList<int[]> getFrames() { return frames; }
+    public ArrayList<Sprite> getFrames() { return frames; }
 
     public boolean isPlaying() { return playing; }
 

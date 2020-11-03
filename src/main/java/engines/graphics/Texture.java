@@ -1,6 +1,9 @@
 package engines.graphics;
 
+import api.SwingRenderer;
+
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Texture
@@ -9,12 +12,7 @@ public class Texture extends EntityTexture {
     /**
      * Textures transférées
      */
-    private static HashMap<String,Texture> loaded = new HashMap<>();
-
-    /**
-     * ID de la texture
-     */
-    private Integer id = null;
+    private static Map<String,Texture> loaded = new HashMap<>();
 
     /**
      * Lien vers le fichier
@@ -34,11 +32,12 @@ public class Texture extends EntityTexture {
      * @param link lien du fichier
      */
     public static Texture load(String link) {
-        if (!loaded.containsKey(link)) {
+        if (!SwingRenderer.isTextureLoaded(link)) {
+            SwingRenderer.loadTexture(link);
             loaded.put(link, new Texture(link));
         } else {
             try {
-                throw new Exception("Texture déjà transférée");
+                throw new Exception("Texture déjà chargée");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -55,21 +54,13 @@ public class Texture extends EntityTexture {
         return loaded.get(link);
     }
 
-    /**
-     * Générer les textures transférées
-     */
-    protected static void generateLoadedTextures() {
-        for (Texture texture : loaded.values())
-            texture.setId(generateTexture(texture.getLink()));
+    @Override
+    protected void cover(Entity entity) {
+        renderTexturedRect(entity.getHeight(), entity.getWidth(), entity.getX(), entity.getY(), link);
     }
 
     @Override
-    public void cover(Entity entity) {
-        renderTexturedQUAD(entity.height, entity.width, entity.x, entity.y, id);
-    }
-
-    @Override
-    public void update() {}
+    protected void update() {}
 
     @Override
     public EntityTexture clone() {
@@ -77,10 +68,6 @@ public class Texture extends EntityTexture {
     }
 
     // GETTERS & SETTERS //
-
-    protected Integer getId() { return id; }
-
-    protected void setId(Integer id) { this.id = id; }
 
     public String getLink() { return link; }
 }

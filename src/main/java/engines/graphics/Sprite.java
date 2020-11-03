@@ -10,14 +10,9 @@ public class Sprite extends EntityTexture {
     private SpriteSheet sprite_sheet;
 
     /**
-     * Ligne
+     * Lien vers la partie de la texture
      */
-    private int row;
-
-    /**
-     * Colonne
-     */
-    private int col;
+    private String link;
 
     /**
      * Constructeur
@@ -25,20 +20,18 @@ public class Sprite extends EntityTexture {
      * @param row ligne
      * @param col colonne
      */
-    public Sprite(SpriteSheet sprite_sheet, int row, int col) {
+    protected Sprite(SpriteSheet sprite_sheet, int row, int col) {
         this.sprite_sheet = sprite_sheet;
-        this.row = row - 1;
-        this.col = col - 1;
+        this.link = sprite_sheet.getLink() + row + col;
     }
 
     @Override
-    public void cover(Entity entity) {
-        renderSpriteQUAD(entity.height, entity.width, entity.x, entity.y, getSpriteSheet().getTexture().getId(),
-                getSpriteSheet().getSize(), getCoords());
+    protected void cover(Entity entity) {
+        renderTexturedRect(entity.height, entity.width, entity.x, entity.y, link);
     }
 
     @Override
-    public void update() {}
+    protected void update() {}
 
     @Override
     public EntityTexture clone() {
@@ -47,7 +40,7 @@ public class Sprite extends EntityTexture {
 
     // GETTERS //
 
-    public int[] getCoords() { return new int[]{row,col}; }
-
     public SpriteSheet getSpriteSheet() { return sprite_sheet; }
+
+    public String getLink() { return link; }
 }

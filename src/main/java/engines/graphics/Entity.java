@@ -1,11 +1,11 @@
 package engines.graphics;
 
-import api.Renderer;
+import api.SwingRenderer;
 
 /**
  * Entité
  */
-public class Entity extends Renderer {
+public class Entity extends SwingRenderer {
     /**
      * Scène
      */
@@ -34,7 +34,7 @@ public class Entity extends Renderer {
     /**
      * Couleur
      */
-    protected float[] color;
+    protected Color color;
 
     /**
      * Texture
@@ -78,7 +78,7 @@ public class Entity extends Renderer {
      * Dessiner l'entité
      */
     public void draw() {
-        if (color != null) renderQUAD(height, width, x, y, color);
+        if (color != null) color.cover(this);
         if (texture != null) texture.cover(this);
     }
 
@@ -131,10 +131,9 @@ public class Entity extends Renderer {
      * @param red intensité rouge
      * @param green intensité vert
      * @param blue intensité bleu
-     * @param alpha opacité
      */
-    public void bindColor(float red, float green, float blue, float alpha) {
-        color = new float[]{red, green, blue, alpha};
+    public void bindColor(int red, int green, int blue) {
+        color = new Color(red, green, blue);
     }
 
     /**
@@ -175,7 +174,7 @@ public class Entity extends Renderer {
 
     public void setY(int y) { this.y = y; }
 
-    public float[] getColor() { return color; }
+    public Color getColor() { return color; }
 
     public EntityTexture getTexture() { return texture; }
 }

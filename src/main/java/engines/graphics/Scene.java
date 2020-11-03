@@ -1,20 +1,18 @@
 package engines.graphics;
 
+import api.SwingScene;
+
+import java.awt.*;
 import java.util.ArrayList;
 
 /**
  * Scène
  */
-public class Scene {
+public class Scene extends SwingScene {
     /**
-     * Hauteur
+     * Couleur de fond
      */
-    private int height;
-
-    /**
-     * Largeur
-     */
-    private int width;
+    private Color background_color;
 
     /**
      * Liste des entités présentes dans la scène
@@ -26,9 +24,9 @@ public class Scene {
      * @param height hateur
      * @param width largeur
      */
-    public Scene(int height, int width) {
-        this.height = height;
-        this.width = width;
+    public Scene(int height, int width, Color background_color) {
+        super(height, width);
+        setBackgroundColor(background_color);
     }
 
     /**
@@ -52,9 +50,18 @@ public class Scene {
     }
 
     /**
-     * Générer la scène
+     * Définir la couleur de fond
+     * @param color couleur
      */
-    protected void render() {
+    public void setBackgroundColor(Color color) {
+        super.setBackgroundColor(color.getRed(), color.getGreen(), color.getBlue());
+        background_color = color;
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        graphics = (Graphics2D) g;
         for (Entity entity : entities) {
             entity.update();
             entity.draw();
@@ -74,4 +81,6 @@ public class Scene {
     public ArrayList<Entity> getEntities() {
         return entities;
     }
+
+    public Color getBackgroundColor() { return background_color; }
 }
