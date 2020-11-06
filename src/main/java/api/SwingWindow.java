@@ -1,7 +1,5 @@
 package api;
 
-import engines.input_output.KeyboardInputOutput;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
@@ -10,6 +8,25 @@ import java.awt.event.ActionListener;
  * Fenêtre JFrame (bibliothèque Swing)
  */
 public class SwingWindow {
+    /**
+     * Instance unique
+     */
+    private static SwingWindow instance;
+
+    /**
+     * Constructeur privé
+     */
+    private SwingWindow() {}
+
+    /**
+     * Récupérer l'instance
+     * @return instance
+     */
+    protected static SwingWindow getInstance() {
+        if (instance == null) instance = new SwingWindow();
+        return instance;
+    }
+
     /**
      * Fenêtre
      */
@@ -36,12 +53,11 @@ public class SwingWindow {
     /**
      * Initialiser la fenêtre
      */
-    protected static void initWindow(SwingScene scene, String title) {
+    public static void initWindow(SwingScene scene, String title) {
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setSize(new Dimension(scene.width, scene.height));
         window.setResizable(false);
         window.setTitle(title);
-        window.addKeyListener(KeyboardInputOutput.getInstance());
         window.setVisible(true);
         timer.start();
     }
@@ -50,14 +66,14 @@ public class SwingWindow {
      * Savoir si la fenêtre est en cours d'exécution
      * @return booléen
      */
-    protected static boolean isWindowOpen() {
+    public static boolean isWindowOpen() {
         return window != null;
     }
 
     /**
      * Terminer l'exécution de la fenêtre
      */
-    protected static void stopWindow() {
+    public static void stopWindow() {
         window.dispose();
     }
 
@@ -65,7 +81,7 @@ public class SwingWindow {
      * Afficher une scène
      * @param scene scène
      */
-    protected static void showScene(SwingScene scene) {
+    public static void showScene(SwingScene scene) {
         //Supprimer la scène courante
         if (window.getContentPane().getComponents().length > 0)
             window.getContentPane().remove(0);
@@ -79,7 +95,13 @@ public class SwingWindow {
      * Obtenir la scène courante
      * @return scène actuelle
      */
-    protected static SwingScene getCurrentScene() {
+    public static SwingScene getCurrentScene() {
         return (SwingScene) window.getContentPane().getComponent(0);
     }
+
+    /**
+     * Obtenir la fenêtre courante
+     * @return fenêtre courante
+     */
+    public static JFrame getWindow() { return window; }
 }

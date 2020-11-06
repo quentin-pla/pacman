@@ -14,6 +14,25 @@ import java.util.Map;
  */
 public class SwingRenderer {
     /**
+     * Instance unique
+     */
+    private static SwingRenderer instance;
+
+    /**
+     * Constructeur privé
+     */
+    private SwingRenderer() {}
+
+    /**
+     * Récupérer l'instance
+     * @return instance
+     */
+    protected static SwingRenderer getInstance() {
+        if (instance == null) instance = new SwingRenderer();
+        return instance;
+    }
+
+    /**
      * Environnement graphique
      */
     private static GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -36,7 +55,7 @@ public class SwingRenderer {
      * @param y position verticale
      * @param color couleur
      */
-    protected static void renderRect(int height, int width, int x, int y, Color color) {
+    public static void renderRect(int height, int width, int x, int y, Color color) {
         Graphics2D graphics2D = getCurrentGraphics();
         graphics2D.setColor(color);
         graphics2D.fillRect(x,y,width,height);
@@ -50,7 +69,7 @@ public class SwingRenderer {
      * @param y position verticale
      * @param link lien vers la texture
      */
-    protected static void renderTexturedRect(int height, int width, int x, int y, String link) {
+    public static void renderTexturedRect(int height, int width, int x, int y, String link) {
         getCurrentGraphics().drawImage(loaded_textures.get(link), x, y, width, height, null);
     }
 
@@ -58,7 +77,7 @@ public class SwingRenderer {
      * Charger une texture
      * @param link lien du fichier
      */
-    protected static void loadTexture(String link) {
+    public static void loadTexture(String link) {
         BufferedImage texture = getBufferedImage(link);
         VolatileImage volatile_texture = generateVolatileImage(texture);
         loaded_textures.put(link, volatile_texture);
@@ -68,7 +87,7 @@ public class SwingRenderer {
      * Charger un fichier de textures
      * @param link lien du fichier
      */
-    protected static void loadSpriteSheet(String link, int sheet_height, int sheet_width) {
+    public static void loadSpriteSheet(String link, int sheet_height, int sheet_width) {
         BufferedImage texture = getBufferedImage(link);
         VolatileImage volatile_texture = generateVolatileImage(texture);
         loaded_textures.put(link, volatile_texture);
@@ -124,7 +143,7 @@ public class SwingRenderer {
      * Vérifier si une texture a été chargée
      * @param link lien de la texture
      */
-    protected static boolean isTextureLoaded(String link) {
+    public static boolean isTextureLoaded(String link) {
         return loaded_textures.containsKey(link);
     }
 
@@ -135,7 +154,7 @@ public class SwingRenderer {
      * @param blue bleu
      * @return couleur swing
      */
-    protected static Color getSwingColor(int red, int green, int blue) {
+    public static Color getSwingColor(int red, int green, int blue) {
         return new Color(red, green, blue);
     }
 

@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Scène utilisant la librairie Swing
+ * Scène (JPanel) utilisant la librairie Swing
  */
 public class SwingScene extends JPanel {
     /**
