@@ -1,19 +1,22 @@
 package gameplay;
 
-import engines.graphics.EntitiesMatrix;
-import engines.graphics.Entity;
-import engines.graphics.Scene;
+import engines.kernel.Entity;
 
 import java.util.ArrayList;
 
 /**
  * Niveau de jeu
  */
-public class Level extends EntitiesMatrix {
+public class Level extends Entity {
+    /**
+     * Matrice d'entités graphiques
+     */
+    private Entity[][] matrix;
+
     /**
      * Entités présentes sur le niveau
      */
-    private ArrayList<Entity> game_objects = new ArrayList<>();
+    private ArrayList<Entity> level_entities = new ArrayList<>();
 
     /**
      * Joueur
@@ -31,22 +34,29 @@ public class Level extends EntitiesMatrix {
     private int actual_score;
 
     /**
-     * Constructeur
-     * @param rows nombre de lignes
-     * @param cols nombre de colonnes
-     */
-    public Level(int rows, int cols) {
-        super(rows,cols, new Entity(30,30));
-    }
-
-    /**
      * Constructeur surchargé
      * @param rows nombre de lignes
      * @param cols nombre de colonnes
      * @param floor sol par défaut
      */
     public Level(int rows, int cols, Entity floor) {
-        super(rows,cols, floor);
+        this.initGraphics((rows - 1) * floor.getHeight(), (cols - 1) * floor.getWidth());
+        this.matrix = new Entity[rows][cols];
+        fill(floor);
+    }
+
+    /**
+     * Remplir la matrice
+     * @param entity entité
+     */
+    public void fill(Entity entity) {
+        for (int row = 0; row < matrix.length; row++) {
+            for (int col = 0; col < matrix[row].length; col++) {
+                matrix[row][col] = entity.clone();
+                matrix[row][col].move((entity.getWidth() * col),(entity.getHeight() * row));
+                level_entities.add(matrix[row][col]);
+            }
+        }
     }
 
     /**
@@ -60,22 +70,36 @@ public class Level extends EntitiesMatrix {
         Entity entity = matrix[row][col];
         player.move(entity.getX(), entity.getY());
         this.player = player;
-        game_objects.add(player);
+        level_entities.add(player);
+    }
+
+    /**
+     * Récupérer les limites du niveau
+     * @return limites
+     */
+    public int[] getBounds() {
+        return new int[]{getX(), getY(), getX() + getWidth(), getY() + getHeight()};
     }
 
     @Override
-    public void setScene(Scene scene) {
-        super.setScene(scene);
-        //Ajout des objets du niveau à la scène
-        for (Entity entity : game_objects)
-            scene.addEntity(entity, entity.getX(), entity.getY());
+    public void draw() {
+        super.draw();
+        for (Entity entity : level_entities)
+            entity.draw();
+    }
+
+    @Override
+    public void update() {
+        super.update();
+        for (Entity entity : level_entities)
+            entity.update();
     }
 
     @Override
     public void translate(int x, int y) {
         super.translate(x, y);
         //Translation des objets du niveau
-        for (Entity entity : game_objects) entity.translate(x, y);
+        for (Entity entity : level_entities) entity.translate(x, y);
         //Mise à jour des limites de déplacement pour le joueur
         if (player != null) player.addMoveBounds(getBounds());
     }
@@ -84,14 +108,8 @@ public class Level extends EntitiesMatrix {
     public void move(int x, int y) {
         super.move(x,y);
         //Translation des objets du niveau
-        for (Entity entity : game_objects) entity.translate(x, y);
+        for (Entity entity : level_entities) entity.translate(x, y);
         //Mise à jour des limites de déplacement pour le joueur
         if (player != null) player.addMoveBounds(getBounds());
     }
-
-    /**
-     * Récupérer les limites du niveau
-     * @return limites
-     */
-    public int[] getBounds() { return new int[]{x, y, x + width, y + height}; }
 }
