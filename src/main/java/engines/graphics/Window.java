@@ -1,5 +1,6 @@
 package engines.graphics;
 
+import api.SwingAPI;
 import api.SwingWindow;
 
 import java.util.HashMap;
@@ -8,7 +9,7 @@ import java.util.Map;
 /**
  * Fenêtre
  */
-public class Window extends SwingWindow {
+public class Window extends SwingAPI {
     /**
      * Hauteur
      */
@@ -57,19 +58,20 @@ public class Window extends SwingWindow {
      * Initialiser la fenêtre
      */
     private static void init() {
-        initWindow(actual_scene, title);
+        SwingWindow.initWindow(actual_scene, title);
     }
 
     /**
      * Terminer l'exécution de la fenêtre
      */
     public static void stop() {
-        stopWindow();
+        SwingWindow.stopWindow();
     }
 
     /**
      * Ajouter une nouvelle scène
      * @param scene scène
+     * @param name nom de la scène
      */
     public static void addScene(Scene scene, String name) {
         scenes.put(name, scene);

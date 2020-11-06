@@ -5,7 +5,7 @@ import api.SwingRenderer;
 /**
  * Fichier de textures
  */
-public class SpriteSheet extends SwingRenderer {
+public class SpriteSheet {
     /**
      * Lien du fichier
      */
@@ -31,6 +31,9 @@ public class SpriteSheet extends SwingRenderer {
     /**
      * Transférer une texture
      * @param link lien du fichier
+     * @param height hauteur
+     * @param width largeur
+     * @return fichier de texture
      */
     public static SpriteSheet load(String link, int height, int width) {
         if (!SwingRenderer.isTextureLoaded(link)) {
@@ -49,6 +52,7 @@ public class SpriteSheet extends SwingRenderer {
      * Obtenir une partie de la texture
      * @param row ligne
      * @param col colonne
+     * @return texture
      */
     public Sprite getSprite(int row, int col) {
         return sprites[row-1][col-1];
