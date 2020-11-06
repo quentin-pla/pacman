@@ -8,12 +8,17 @@ public class MouseInputOutput implements MouseListener {
     /**
      * Boutons pressés
      */
-    private static ArrayList<Integer> pressed_buttons = new ArrayList<>();
+    private ArrayList<Integer> pressed_buttons = new ArrayList<>();
 
     /**
      * Dernier bouton pressé
      */
-    private static int last_pressed_button;
+    private int last_pressed_button;
+
+    /**
+     * Constructeur privé
+     */
+    protected MouseInputOutput() {}
 
     @Override
     public void mouseClicked(MouseEvent e) {}
@@ -45,7 +50,7 @@ public class MouseInputOutput implements MouseListener {
      * @param code code du bouton
      * @return booléen
      */
-    public static boolean isMouseButtonPressed(int code) {
+    public boolean isMouseButtonPressed(int code) {
         return pressed_buttons.contains(code);
     }
 
@@ -53,17 +58,17 @@ public class MouseInputOutput implements MouseListener {
      * Savoir si la souris n'est pas utilisée
      * @return booléen
      */
-    public static boolean isMouseFree() {
+    public boolean isMouseFree() {
         return pressed_buttons.isEmpty();
     }
 
     // GETTERS //
 
-    public static ArrayList<Integer> getPressedButtons() {
+    public ArrayList<Integer> getPressedButtons() {
         return pressed_buttons;
     }
 
-    public static int getLastPressedButton() {
+    public int getLastPressedButton() {
         return last_pressed_button;
     }
 }
