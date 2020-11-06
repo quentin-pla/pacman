@@ -36,6 +36,7 @@ public class SwingListener {
 
     /**
      * Supprimer un écouteur sur les touches du clavier
+     * @param listener écouteur
      */
     public void removeKeyListener(KeyListener listener) {
         SwingWindow.getWindow().removeKeyListener(listener);
@@ -51,6 +52,7 @@ public class SwingListener {
 
     /**
      * Supprimer un écouteur sur les boutons de souris
+     * @param listener écouteur
      */
     public void removeMouseListener(MouseListener listener) {
         SwingWindow.getWindow().removeMouseListener(listener);

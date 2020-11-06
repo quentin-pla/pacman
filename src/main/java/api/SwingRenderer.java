@@ -86,6 +86,8 @@ public class SwingRenderer {
     /**
      * Charger un fichier de textures
      * @param link lien du fichier
+     * @param sheet_height nombre de textures sur la hauteur
+     * @param sheet_width nombre de textures sur la largeur
      */
     public static void loadSpriteSheet(String link, int sheet_height, int sheet_width) {
         BufferedImage texture = getBufferedImage(link);
@@ -111,14 +113,26 @@ public class SwingRenderer {
      * @return tampon
      */
     private static BufferedImage getBufferedImage(String link) {
+        link = "classes/assets/" + link;
+        if (!isRunningFromJAR()) link = "target/" + link;
         BufferedImage texture = null;
         try {
-            texture = ImageIO.read(new File("target/classes/assets/" + link));
+            texture = ImageIO.read(new File(link));
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
         }
         return texture;
+    }
+
+    /**
+     * Savoir si le programme est exécuté depuis un fichier JAR
+     * @return booléen
+     */
+    private static boolean isRunningFromJAR() {
+        String classLink = SwingRenderer.class.getResource("SwingRenderer.class").toString();
+        classLink = classLink.substring(0,classLink.indexOf(":"));
+        return classLink.equals("jar");
     }
 
     /**
@@ -142,6 +156,7 @@ public class SwingRenderer {
     /**
      * Vérifier si une texture a été chargée
      * @param link lien de la texture
+     * @return booléen
      */
     public static boolean isTextureLoaded(String link) {
         return loaded_textures.containsKey(link);

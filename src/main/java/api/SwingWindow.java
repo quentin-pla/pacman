@@ -52,6 +52,8 @@ public class SwingWindow {
 
     /**
      * Initialiser la fenêtre
+     * @param scene scène
+     * @param title titre
      */
     public static void initWindow(SwingScene scene, String title) {
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
