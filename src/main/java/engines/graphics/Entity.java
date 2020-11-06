@@ -39,7 +39,7 @@ public class Entity extends SwingRenderer {
     /**
      * Texture
      */
-    protected EntityTexture texture;
+    protected Cover texture;
 
     /**
      * Constructeur avec dimensions

@@ -5,7 +5,7 @@ import api.SwingRenderer;
 /**
  * Couleur
  */
-public class Color extends EntityTexture {
+public class Color extends Cover {
     /**
      * Rouge
      */
@@ -34,15 +34,16 @@ public class Color extends EntityTexture {
     }
 
     @Override
-    public void cover(Entity tile) {
-        renderRect(tile.getHeight(), tile.getWidth(), tile.getX(), tile.getY(), getSwingColor());
+    public void cover(Entity entity) {
+        SwingRenderer.renderRect(entity.getHeight(), entity.getWidth(),
+                entity.getX(), entity.getY(), getSwingColor());
     }
 
     @Override
     public void update() {}
 
     @Override
-    public EntityTexture clone() {
+    public Cover clone() {
         return this;
     }
 

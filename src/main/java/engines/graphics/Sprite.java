@@ -1,13 +1,15 @@
 package engines.graphics;
 
+import api.SwingRenderer;
+
 /**
  * Texture issue d'un fichier de textures
  */
-public class Sprite extends EntityTexture {
+public class Sprite extends Cover {
     /**
      * Nom du fichier de textures
      */
-    private SpriteSheet sprite_sheet;
+    private SpriteSheet spriteSheet;
 
     /**
      * Lien vers la partie de la texture
@@ -16,31 +18,32 @@ public class Sprite extends EntityTexture {
 
     /**
      * Constructeur
-     * @param sprite_sheet fichier de textures
+     * @param spriteSheet fichier de textures
      * @param row ligne
      * @param col colonne
      */
-    protected Sprite(SpriteSheet sprite_sheet, int row, int col) {
-        this.sprite_sheet = sprite_sheet;
-        this.link = sprite_sheet.getLink() + row + col;
+    protected Sprite(SpriteSheet spriteSheet, int row, int col) {
+        this.spriteSheet = spriteSheet;
+        this.link = spriteSheet.getLink() + row + col;
     }
 
     @Override
     protected void cover(Entity entity) {
-        renderTexturedRect(entity.height, entity.width, entity.x, entity.y, link);
+        SwingRenderer.renderTexturedRect(entity.height, entity.width,
+                entity.x, entity.y, link);
     }
 
     @Override
     protected void update() {}
 
     @Override
-    public EntityTexture clone() {
+    public Cover clone() {
         return this;
     }
 
     // GETTERS //
 
-    public SpriteSheet getSpriteSheet() { return sprite_sheet; }
+    public SpriteSheet getSpriteSheet() { return spriteSheet; }
 
     public String getLink() { return link; }
 }

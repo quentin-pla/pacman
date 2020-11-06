@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Texture
  */
-public class Texture extends EntityTexture {
+public class Texture extends Cover {
     /**
      * Textures transférées
      */
@@ -30,6 +30,7 @@ public class Texture extends EntityTexture {
     /**
      * Transférer une texture
      * @param link lien du fichier
+     * @return texture
      */
     public static Texture load(String link) {
         if (!SwingRenderer.isTextureLoaded(link)) {
@@ -56,14 +57,15 @@ public class Texture extends EntityTexture {
 
     @Override
     protected void cover(Entity entity) {
-        renderTexturedRect(entity.getHeight(), entity.getWidth(), entity.getX(), entity.getY(), link);
+        SwingRenderer.renderTexturedRect(entity.getHeight(), entity.getWidth(),
+                entity.getX(), entity.getY(), link);
     }
 
     @Override
     protected void update() {}
 
     @Override
-    public EntityTexture clone() {
+    public Cover clone() {
         return this;
     }
 

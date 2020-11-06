@@ -1,11 +1,13 @@
 package engines.graphics;
 
+import api.SwingRenderer;
+
 import java.util.ArrayList;
 
 /**
  * Animation depuis un fichier de textures
  */
-public class SpriteAnimation extends EntityTexture {
+public class SpriteAnimation extends Cover {
     /**
      * Image de départ
      */
@@ -44,13 +46,16 @@ public class SpriteAnimation extends EntityTexture {
     /**
      * Fichier de texture
      */
-    private SpriteSheet sprite_sheet;
+    private SpriteSheet spriteSheet;
 
     /**
      * Constructeur
+     * @param spriteSheet fichier de texture
+     * @param speed vitesse
+     * @param looping en boucle
      */
-    public SpriteAnimation(SpriteSheet sprite_sheet, int speed, boolean looping) {
-        this.sprite_sheet = sprite_sheet;
+    public SpriteAnimation(SpriteSheet spriteSheet, int speed, boolean looping) {
+        this.spriteSheet = spriteSheet;
         this.speed = speed;
         this.looping = looping;
     }
@@ -60,7 +65,7 @@ public class SpriteAnimation extends EntityTexture {
      * @param clone clone
      */
     private SpriteAnimation(SpriteAnimation clone) {
-        this(clone.sprite_sheet, clone.speed, clone.looping);
+        this(clone.spriteSheet, clone.speed, clone.looping);
         this.actual_frame = clone.actual_frame;
         this.frames = new ArrayList<>(clone.frames);
         this.add_substract = clone.add_substract;
@@ -74,7 +79,7 @@ public class SpriteAnimation extends EntityTexture {
      * @param col colonne
      */
     public void addFrame(int row, int col) {
-        frames.add(sprite_sheet.getSprite(row, col));
+        frames.add(spriteSheet.getSprite(row, col));
     }
 
     /**
@@ -92,7 +97,8 @@ public class SpriteAnimation extends EntityTexture {
 
     @Override
     protected void cover(Entity entity) {
-        renderTexturedRect(entity.height, entity.width, entity.x, entity.y, frames.get(actual_frame).getLink());
+        SwingRenderer.renderTexturedRect(entity.height, entity.width,
+                entity.x, entity.y, frames.get(actual_frame).getLink());
     }
 
     @Override
@@ -122,7 +128,7 @@ public class SpriteAnimation extends EntityTexture {
 
     public Sprite getFrame() { return frames.get(actual_frame); }
 
-    public SpriteSheet getSpriteSheet() { return sprite_sheet; }
+    public SpriteSheet getSpriteSheet() { return spriteSheet; }
 
     public ArrayList<Sprite> getFrames() { return frames; }
 
