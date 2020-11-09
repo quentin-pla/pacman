@@ -2,47 +2,86 @@ package engines.physics;
 
 import engines.kernel.Entity;
 
-import java.util.ArrayList;
 import java.util.Set;
 
+/**
+ * Moteur physique
+ */
 public class PhysicsEngine {
 
-    private ArrayList<PhysicsObject> objects;
+    private Set<PhysicsEntity> objects;
     private Entity[][] matrix;
 
-    public PhysicsEngine(ArrayList<PhysicsObject> objects, Entity[][] matrix) {
+    /**
+     * Constructeur
+     */
+    public PhysicsEngine(Set<PhysicsEntity> objects, Entity[][] matrix) {
         this.objects = objects;
         this.matrix = matrix;
     }
 
-    public boolean isCollision(PhysicsObject o1, PhysicsObject o2) {
+    /**
+     * Vérifier s'il y a une collision
+     * @param o1 entité physique 1
+     * @param o2 entité physique 2
+     * @return booléen
+     */
+    public boolean isCollision(PhysicsEntity o1, PhysicsEntity o2) {
         return o1.getX() == o2.getX() && o1.getY() == o2.getY();
     }
 
-    public boolean isCollision(int x1, int y1, int x2, int y2) {
-        return x1 == x2 && y1 == y2;
-    }
 
-
+    /**
+     * Vérifier qu'il n'y a pas d'objet à la position (x,y)
+     * @param x Position x à vérifier
+     * @param y Position y à vérifier
+     * @return booléen
+     */
     public boolean isCollision(int x, int y) {
-        if (this.matrix[x][y] > -1) return true;
+        return  this.matrix[x][y].getId() > -1;
     }
 
-    public void goUp(PhysicsObject o, int mul) {
-
-        if (!isCollision(o.getX(), o.getY()-mul))
+    /**
+     * Déplacement vers le haut
+     * @param o entité physique
+     * @param mul multiplicateur
+     */
+    public void goUp(PhysicsEntity o, int mul) {
+        // S'il n'y a pas d'objets à la position où l'on souhaite se déplacer
+        if (!isCollision(o.getX(),o.getY() - mul))
             o.setY(o.getY() - mul);
     }
 
-    public void goRight(PhysicsObject o, int mul) {
-        o.setX(o.getX() + mul);
+    /**
+     * Déplacement vers la droite
+     * @param o entité physique
+     * @param mul multiplicateur
+     */
+    public void goRight(PhysicsEntity o, int mul) {
+        // S'il n'y a pas d'objets à la position où l'on souhaite se déplacer
+        if (!isCollision(o.getX() + mul,o.getY()))
+            o.setX(o.getX() + mul);
     }
 
-    public void goLeft(PhysicsObject o, int mul) {
-        o.setX(o.getX() - mul);
+    /**
+     * Déplacement vers la gauche
+     * @param o entité physique
+     * @param mul multiplicateur
+     */
+    public void goLeft(PhysicsEntity o, int mul) {
+        // S'il n'y a pas d'objets à la position où l'on souhaite se déplacer
+        if (!isCollision(o.getX() - mul,o.getY()))
+            o.setX(o.getX() - mul);
     }
 
-    public void goDown(PhysicsObject o, int mul) {
-        o.setY(o.getY() + mul);
+    /**
+     * Déplacement vers le bas
+     * @param o entité physique
+     * @param mul multiplicateur
+     */
+    public void goDown(PhysicsEntity o, int mul) {
+        // S'il n'y a pas d'objets à la position où l'on souhaite se déplacer
+        if (!isCollision(o.getX(),o.getY() + mul))
+            o.setY(o.getY() + mul);
     }
 }
