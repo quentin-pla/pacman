@@ -20,6 +20,10 @@ public class Main {
         //Niveau
         Level level = new Level(10,10, floor);
 
+        //Carreau 0 0
+        Entity carreau00 = level.getMatrix()[0][0];
+        carreau00.bindColor(255,0,0);
+
         //Création d'un joueur
         Player pacman = new Player(30,30,2,pacman_skin);
 

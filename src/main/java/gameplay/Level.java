@@ -112,4 +112,26 @@ public class Level extends Entity {
         //Mise à jour des limites de déplacement pour le joueur
         if (player != null) player.addMoveBounds(getBounds());
     }
+
+    // GETTERS //
+
+    public Entity[][] getMatrix() {
+        return matrix;
+    }
+
+    public ArrayList<Entity> getLevel_entities() {
+        return level_entities;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public float getTimer() {
+        return timer;
+    }
+
+    public int getActual_score() {
+        return actual_score;
+    }
 }
