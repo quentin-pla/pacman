@@ -1,15 +1,15 @@
 package engines.kernel;
 
-import engines.sound.SoundEngine;
 import engines.sound.SoundEntity;
+import engines.sound.SoundObject;
 
 /**
  * Décorateur entité audio
  */
-public interface SoundDecorator extends SoundEngine {
+public interface SoundDecorator extends SoundEntity {
     /**
      * Obtenir l'entité audio
      * @return instance
      */
-    SoundEntity getAudio();
+    SoundObject getAudio();
 }

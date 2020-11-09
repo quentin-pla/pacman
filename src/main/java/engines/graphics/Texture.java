@@ -56,9 +56,9 @@ public class Texture extends Cover {
     }
 
     @Override
-    protected void cover(Entity entity) {
-        SwingRenderer.renderTexturedRect(entity.getHeight(), entity.getWidth(),
-                entity.getX(), entity.getY(), link);
+    protected void cover(GraphicsObject graphicsObject) {
+        SwingRenderer.renderTexturedRect(graphicsObject.height, graphicsObject.width,
+                graphicsObject.x, graphicsObject.y, link);
     }
 
     @Override

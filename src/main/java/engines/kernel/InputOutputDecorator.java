@@ -1,19 +1,19 @@
 package engines.kernel;
 
-import engines.input_output.InputOutputEngine;
 import engines.input_output.InputOutputEntity;
+import engines.input_output.InputOutputObject;
 import engines.input_output.KeyboardInputOutput;
 import engines.input_output.MouseInputOutput;
 
 /**
  * Décorateur entité entrées/sorties
  */
-public interface InputOutputDecorator extends InputOutputEngine {
+public interface InputOutputDecorator extends InputOutputEntity {
     /**
      * Obtenir l'entité entrées/sorties
      * @return instance
      */
-    InputOutputEntity getInputOutput();
+    InputOutputObject getInputOutput();
 
     @Override
     default void enableKeyboardInputOutput(boolean value) {

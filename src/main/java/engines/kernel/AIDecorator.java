@@ -1,15 +1,15 @@
 package engines.kernel;
 
-import engines.AI.AIEngine;
 import engines.AI.AIEntity;
+import engines.AI.AIObject;
 
 /**
  * Décorateur entité intelligence artificielle
  */
-public interface AIDecorator extends AIEngine {
+public interface AIDecorator extends AIEntity {
     /**
      * Obtenir l'entité intelligence artificielle
      * @return instance
      */
-    AIEntity getAI();
+    AIObject getAI();
 }

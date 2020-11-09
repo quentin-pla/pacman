@@ -3,17 +3,12 @@ package engines.physics;
 /**
  * Entité physique
  */
-public class PhysicsEntity implements PhysicsEngine {
+public interface PhysicsEntity {
     /**
-     * Constructeur
+     * Générer une nouvelle entité
+     * @return entité physique
      */
-    protected PhysicsEntity() {}
-
-    /**
-     * Cloner l'entité
-     * @return
-     */
-    public PhysicsEntity clone() {
-        return new PhysicsEntity();
+    static PhysicsObject generateEntity() {
+        return new PhysicsObject();
     }
 }

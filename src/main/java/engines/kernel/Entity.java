@@ -1,20 +1,20 @@
 package engines.kernel;
 
 
-import engines.AI.AIEngine;
 import engines.AI.AIEntity;
-import engines.UI.UIEngine;
+import engines.AI.AIObject;
 import engines.UI.UIEntity;
-import engines.graphics.GraphicsEngine;
+import engines.UI.UIObject;
 import engines.graphics.GraphicsEntity;
-import engines.input_output.InputOutputEngine;
+import engines.graphics.GraphicsObject;
 import engines.input_output.InputOutputEntity;
-import engines.network.NetworkEngine;
+import engines.input_output.InputOutputObject;
 import engines.network.NetworkEntity;
-import engines.physics.PhysicsEngine;
+import engines.network.NetworkObject;
 import engines.physics.PhysicsEntity;
-import engines.sound.SoundEngine;
+import engines.physics.PhysicsObject;
 import engines.sound.SoundEntity;
+import engines.sound.SoundObject;
 
 /**
  * Entité globale
@@ -22,39 +22,39 @@ import engines.sound.SoundEntity;
 public class Entity implements AIDecorator, GraphicsDecorator, InputOutputDecorator, NetworkDecorator,
         PhysicsDecorator, SoundDecorator, UIDecorator {
     /**
-     * Entité d'intelligence artificielle
+     * Objet d'intelligence artificielle
      */
-    private AIEntity artificialIntelligence;
+    private AIObject artificialIntelligence;
 
     /**
-     * Entité graphique
+     * Objet graphique
      */
-    private GraphicsEntity graphics;
+    private GraphicsObject graphics;
 
     /**
-     * Entité d'entrée/sortie
+     * Objet d'entrée/sortie
      */
-    private InputOutputEntity inputOutput;
+    private InputOutputObject inputOutput;
 
     /**
-     * Entité réseau
+     * Objet réseau
      */
-    private NetworkEntity network;
+    private NetworkObject network;
 
     /**
-     * Entité physique
+     * Objet physique
      */
-    private PhysicsEntity physics;
+    private PhysicsObject physics;
 
     /**
-     * Entité son
+     * Objet son
      */
-    private SoundEntity sound;
+    private SoundObject sound;
 
     /**
-     * Entité interface utilisateur
+     * Objet interface utilisateur
      */
-    private UIEntity userInterface;
+    private UIObject userInterface;
 
     /**
      * Constructeur
@@ -89,44 +89,44 @@ public class Entity implements AIDecorator, GraphicsDecorator, InputOutputDecora
     public Entity clone() { return new Entity(this); }
 
     @Override
-    public AIEntity getAI() {
-        if (artificialIntelligence == null) artificialIntelligence = AIEngine.generateEntity();
+    public AIObject getAI() {
+        if (artificialIntelligence == null) artificialIntelligence = AIEntity.generateEntity();
         return artificialIntelligence;
     }
 
     @Override
-    public GraphicsEntity getGraphics() {
-        if (graphics == null) graphics = GraphicsEngine.generateEntity();
+    public GraphicsObject getGraphics() {
+        if (graphics == null) graphics = GraphicsEntity.generateEntity();
         return graphics;
     }
 
     @Override
-    public InputOutputEntity getInputOutput() {
-        if (inputOutput == null) inputOutput = InputOutputEngine.generateEntity();
+    public InputOutputObject getInputOutput() {
+        if (inputOutput == null) inputOutput = InputOutputEntity.generateEntity();
         return inputOutput;
     }
 
     @Override
-    public NetworkEntity getNetwork() {
-        if (network == null) network = NetworkEngine.generateEntity();
+    public NetworkObject getNetwork() {
+        if (network == null) network = NetworkEntity.generateEntity();
         return network;
     }
 
     @Override
-    public PhysicsEntity getPhysics() {
-        if (physics == null) physics = PhysicsEngine.generateEntity();
+    public PhysicsObject getPhysics() {
+        if (physics == null) physics = PhysicsEntity.generateEntity();
         return physics;
     }
 
     @Override
-    public SoundEntity getAudio() {
-        if (sound == null) sound = SoundEngine.generateEntity();
+    public SoundObject getAudio() {
+        if (sound == null) sound = SoundEntity.generateEntity();
         return sound;
     }
 
     @Override
-    public UIEntity getUI() {
-        if (userInterface == null) userInterface = UIEngine.generateEntity();
+    public UIObject getUI() {
+        if (userInterface == null) userInterface = UIEntity.generateEntity();
         return userInterface;
     }
 }

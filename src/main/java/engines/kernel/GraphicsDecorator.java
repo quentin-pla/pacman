@@ -5,12 +5,12 @@ import engines.graphics.*;
 /**
  * Décorateur entité graphique
  */
-public interface GraphicsDecorator extends GraphicsEngine {
+public interface GraphicsDecorator extends GraphicsEntity {
     /**
      * Obtenir l'entité graphique
      * @return instance
      */
-    GraphicsEntity getGraphics();
+    GraphicsObject getGraphics();
 
     @Override
     default void draw() { getGraphics().draw(); }

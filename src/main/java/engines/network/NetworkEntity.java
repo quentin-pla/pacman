@@ -3,17 +3,12 @@ package engines.network;
 /**
  * Entité réseau
  */
-public class NetworkEntity implements NetworkEngine {
+public interface NetworkEntity {
     /**
-     * Constructeur
+     * Générer une nouvelle entité
+     * @return entité réseau
      */
-    protected NetworkEntity() {}
-
-    /**
-     * Cloner l'entité
-     * @return clone
-     */
-    public NetworkEntity clone() {
-        return new NetworkEntity();
+    static NetworkObject generateEntity() {
+        return new NetworkObject();
     }
 }

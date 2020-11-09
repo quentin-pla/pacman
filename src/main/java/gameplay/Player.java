@@ -48,9 +48,8 @@ public class Player extends Entity {
      * @param default_texture texture par défaut
      */
     public Player(int height, int width, int move_speed, Cover default_texture) {
-        this.initGraphics(height, width);
-        this.initInputOutput();
-        this.getInputOutput().enableKeyboardInputOutput(true);
+        this.resize(height, width);
+        this.enableKeyboardInputOutput(true);
         this.move_speed = move_speed;
         this.default_texture = default_texture;
     }

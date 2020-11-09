@@ -1,15 +1,15 @@
 package engines.kernel;
 
-import engines.network.NetworkEngine;
 import engines.network.NetworkEntity;
+import engines.network.NetworkObject;
 
 /**
  * Décorateur entité réseau
  */
-public interface NetworkDecorator extends NetworkEngine {
+public interface NetworkDecorator extends NetworkEntity {
     /**
      * Obtenir l'entité réseau
      * @return instance
      */
-    NetworkEntity getNetwork();
+    NetworkObject getNetwork();
 }

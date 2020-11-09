@@ -32,21 +32,21 @@ public class Scene extends SwingScene {
 
     /**
      * Ajouter une entité à la scène
-     * @param graphicsEntity entité
+     * @param entity entité
      * @param x position horizontale
      * @param y position verticale
      */
-    public void addEntity(GraphicsEntity graphicsEntity, int x, int y) {
-        entities.add(graphicsEntity);
-        graphicsEntity.setScene(this);
-        graphicsEntity.move(x, y);
+    public void addEntity(GraphicsEntity entity, int x, int y) {
+        entities.add(entity);
+        entity.setScene(this);
+        entity.move(x, y);
     }
 
     /**
      * Supprimer une entité présente sur la scène
      * @param entity entité
      */
-    public void removeEntity(Entity entity) {
+    public void removeEntity(GraphicsEntity entity) {
         entities.remove(entity);
     }
 
@@ -60,12 +60,12 @@ public class Scene extends SwingScene {
     }
 
     @Override
-    protected void paintComponent(Graphics g) {
+    protected void paintComponent(java.awt.Graphics g) {
         super.paintComponent(g);
         graphics = (Graphics2D) g;
-        for (GraphicsEntity graphicsEntity : entities) {
-            graphicsEntity.update();
-            graphicsEntity.draw();
+        for (GraphicsEntity entity : entities) {
+            entity.update();
+            entity.draw();
         }
     }
 

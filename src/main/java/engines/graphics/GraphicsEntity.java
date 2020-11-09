@@ -3,157 +3,90 @@ package engines.graphics;
 /**
  * Entité graphique
  */
-public class GraphicsEntity implements GraphicsEngine {
+public interface GraphicsEntity {
     /**
-     * Scène
+     * Générer une nouvelle entité
+     * @return entité graphique
      */
-    protected Scene scene;
-
-    /**
-     * Hateur en pixels
-     */
-    protected int height;
-
-    /**
-     * Largeur en pixels
-     */
-    protected int width;
-
-    /**
-     * Position horizontale
-     */
-    protected int x;
-
-    /**
-     * Position verticale
-     */
-    protected int y;
-
-    /**
-     * Couleur
-     */
-    protected Color color;
-
-    /**
-     * Texture
-     */
-    protected Cover texture;
-
-    /**
-     * Constructeur par défaut
-     */
-    protected GraphicsEntity() {
-        this.height = 0;
-        this.width = 0;
-        this.x = 0;
-        this.y = 0;
+    static GraphicsObject generateEntity() {
+        return new GraphicsObject();
     }
 
     /**
-     * Constructeur avec dimensions
+     * Dessiner l'entité
+     */
+    void draw();
+
+    /**
+     * Mettre à jour l'entité
+     */
+    void update();
+
+    /**
+     * Effacer l'entité
+     */
+    void erase();
+
+    /**
+     * Translater l'entité
+     * @param x nombre à additionner à la position horizontale
+     * @param y nombre à additionner à la position verticale
+     */
+    void translate(int x, int y);
+
+    /**
+     * Déplacer l'entité
+     * @param x nouvelle position horizontale
+     * @param y nouvelle position verticale
+     */
+    void move(int x, int y);
+
+    /**
+     * Redimensionner l'entité
      * @param height hauteur
      * @param width largeur
      */
-    protected GraphicsEntity(int height, int width) {
-        this.height = height;
-        this.width = width;
-        this.x = 0;
-        this.y = 0;
-    }
+    void resize(int height, int width);
 
     /**
-     * Constructeur par clonage
-     * @param clone clone
+     * Attacher une couleur
+     * @param red intensité rouge
+     * @param green intensité vert
+     * @param blue intensité bleu
      */
-    private GraphicsEntity(GraphicsEntity clone) {
-        this(clone.height, clone.width);
-        this.x = 0;
-        this.y = 0;
-        this.scene = null;
-        this.color = clone.color;
-        if (clone.texture != null)
-            this.texture = clone.texture.clone();
-    }
+    void bindColor(int red, int green, int blue);
 
     /**
-     * Cloner l'entité
-     * @return clone
+     * Détacher la couleur
      */
-    public GraphicsEntity clone() {
-        return new GraphicsEntity(this);
-    }
+    void unbindColor();
 
-    @Override
-    public void draw() {
-        if (color != null) color.cover(this);
-        if (texture != null) texture.cover(this);
-    }
+    /**
+     * Attacher une texture
+     * @param texture texture
+     */
+    void bindTexture(Cover texture);
 
-    @Override
-    public void update() {
-        if (texture != null) texture.update();
-    }
-
-    @Override
-    public void erase() {
-        scene.removeEntity(this);
-    }
-
-    @Override
-    public void translate(int x, int y) {
-        this.x = this.x + x;
-        this.y = this.y + y;
-    }
-
-    @Override
-    public void move(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    @Override
-    public void resize(int height, int width) {
-        this.height = height;
-        this.width = width;
-    }
-
-    @Override
-    public void bindColor(int red, int green, int blue) {
-        color = new Color(red, green, blue);
-    }
-
-    @Override
-    public void unbindColor() { color = null; }
-
-    @Override
-    public void bindTexture(Cover texture) { this.texture = texture; }
-
-    @Override
-    public void unbindTexture() { texture = null; }
+    /**
+     * Détacher la texture
+     */
+    void unbindTexture();
 
     // GETTERS & SETTERS //
 
-    @Override
-    public Scene getScene() { return scene; }
+    Scene getScene();
 
-    @Override
-    public void setScene(Scene scene) { this.scene = scene; }
+    void setScene(Scene scene);
 
-    @Override
-    public int getHeight() { return height; }
+    int getHeight();
 
-    @Override
-    public int getWidth() { return width; }
+    int getWidth();
 
-    @Override
-    public int getX() { return x; }
+    int getX();
 
-    @Override
-    public int getY() { return y; }
+    int getY();
 
-    @Override
-    public Color getColor() { return color; }
+    Color getColor();
 
-    @Override
-    public Cover getTexture() { return texture; }
+    Cover getTexture();
 }

@@ -40,7 +40,7 @@ public class Level extends Entity {
      * @param floor sol par défaut
      */
     public Level(int rows, int cols, Entity floor) {
-        this.initGraphics((rows - 1) * floor.getHeight(), (cols - 1) * floor.getWidth());
+        this.resize((rows - 1) * floor.getHeight(), (cols - 1) * floor.getWidth());
         this.matrix = new Entity[rows][cols];
         fill(floor);
     }

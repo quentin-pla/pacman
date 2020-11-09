@@ -1,16 +1,12 @@
 package engines.sound;
 
-public class SoundEntity implements SoundEngine {
+/**
+ * Entité audio
+ */
+public interface SoundEntity {
     /**
-     * Constructeur
+     * Générer une nouvelle entité
+     * @return entité audio
      */
-    protected SoundEntity() {}
-
-    /**
-     * Cloner l'entité
-     * @return clone
-     */
-    public SoundEntity clone() {
-        return new SoundEntity();
-    }
+    static SoundObject generateEntity() { return new SoundObject(); }
 }

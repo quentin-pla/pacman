@@ -14,7 +14,7 @@ public class Main {
 
         //Sol du niveau
         Entity floor = new Entity();
-        floor.initGraphics(30,30);
+        floor.resize(30,30);
         floor.bindColor(0,0,255);
 
         //Niveau

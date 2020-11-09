@@ -1,19 +1,14 @@
 package engines.AI;
 
 /**
- * Entité intelligence artificielle
+ * Entité intelligence artificelle
  */
-public class AIEntity implements AIEngine {
+public interface AIEntity {
     /**
-     * Constructeur
+     * Générer une nouvelle entité
+     * @return entité intelligence artificielle
      */
-    protected AIEntity() {}
-
-    /**
-     * Cloner l'entité
-     * @return clone
-     */
-    public AIEntity clone() {
-        return new AIEntity();
+    static AIObject generateEntity() {
+        return new AIObject();
     }
 }
