@@ -8,9 +8,9 @@ import api.SwingAPI;
 public abstract class Cover extends SwingAPI {
     /**
      * Recouvrir une entité graphique
-     * @param graphicsObject carreau
+     * @param graphicEntity carreau
      */
-    protected abstract void cover(GraphicsObject graphicsObject);
+    protected abstract void cover(GraphicEntity graphicEntity);
 
     /**
      * Mettre à jour l'élément graphique

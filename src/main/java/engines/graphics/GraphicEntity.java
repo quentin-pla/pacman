@@ -1,9 +1,9 @@
 package engines.graphics;
 
 /**
- * Objet graphique
+ * Entité graphique
  */
-public class GraphicsObject implements GraphicsEntity {
+public class GraphicEntity {
     /**
      * Scène
      */
@@ -42,7 +42,7 @@ public class GraphicsObject implements GraphicsEntity {
     /**
      * Constructeur par défaut
      */
-    protected GraphicsObject() {
+    public GraphicEntity() {
         this.height = 0;
         this.width = 0;
         this.x = 0;
@@ -54,7 +54,7 @@ public class GraphicsObject implements GraphicsEntity {
      * @param height hauteur
      * @param width largeur
      */
-    protected GraphicsObject(int height, int width) {
+    protected GraphicEntity(int height, int width) {
         this.height = height;
         this.width = width;
         this.x = 0;
@@ -65,7 +65,7 @@ public class GraphicsObject implements GraphicsEntity {
      * Constructeur par clonage
      * @param clone clone
      */
-    private GraphicsObject(GraphicsObject clone) {
+    private GraphicEntity(GraphicEntity clone) {
         this(clone.height, clone.width);
         this.x = 0;
         this.y = 0;
@@ -79,81 +79,103 @@ public class GraphicsObject implements GraphicsEntity {
      * Cloner l'entité
      * @return clone
      */
-    public GraphicsObject clone() {
-        return new GraphicsObject(this);
+    public GraphicEntity clone() {
+        return new GraphicEntity(this);
     }
 
-    @Override
+    /**
+     * Dessiner l'entité
+     */
     public void draw() {
         if (color != null) color.cover(this);
         if (texture != null) texture.cover(this);
     }
 
-    @Override
+    /**
+     * Mettre à jour l'entité
+     */
     public void update() {
         if (texture != null) texture.update();
     }
 
-    @Override
+    /**
+     * Effacer l'entité
+     */
     public void erase() {
         scene.removeEntity(this);
     }
 
-    @Override
+    /**
+     * Translater l'entité
+     * @param x nombre à additionner à la position horizontale
+     * @param y nombre à additionner à la position verticale
+     */
     public void translate(int x, int y) {
         this.x = this.x + x;
         this.y = this.y + y;
     }
 
-    @Override
+    /**
+     * Déplacer l'entité
+     * @param x nouvelle position horizontale
+     * @param y nouvelle position verticale
+     */
     public void move(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
-    @Override
+    /**
+     * Redimensionner l'entité
+     * @param height hauteur
+     * @param width largeur
+     */
     public void resize(int height, int width) {
         this.height = height;
         this.width = width;
     }
 
-    @Override
+    /**
+     * Attacher une couleur
+     * @param red intensité rouge
+     * @param green intensité vert
+     * @param blue intensité bleu
+     */
     public void bindColor(int red, int green, int blue) {
         color = new Color(red, green, blue);
     }
 
-    @Override
+    /**
+     * Détacher la couleur
+     */
     public void unbindColor() { color = null; }
 
-    @Override
+    /**
+     * Attacher une texture
+     * @param texture texture
+     */
     public void bindTexture(Cover texture) { this.texture = texture; }
 
-    @Override
+    /**
+     * Détacher la texture
+     */
     public void unbindTexture() { texture = null; }
 
     // GETTERS & SETTERS //
 
-    @Override
     public Scene getScene() { return scene; }
 
-    @Override
     public void setScene(Scene scene) { this.scene = scene; }
 
-    @Override
     public int getHeight() { return height; }
 
-    @Override
     public int getWidth() { return width; }
 
-    @Override
     public int getX() { return x; }
 
-    @Override
     public int getY() { return y; }
 
-    @Override
     public Color getColor() { return color; }
 
-    @Override
     public Cover getTexture() { return texture; }
 }

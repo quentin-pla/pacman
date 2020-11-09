@@ -3,10 +3,17 @@ package engines.sound;
 /**
  * Entité audio
  */
-public interface SoundEntity {
+public class SoundEntity {
     /**
-     * Générer une nouvelle entité
-     * @return entité audio
+     * Constructeur
      */
-    static SoundObject generateEntity() { return new SoundObject(); }
+    protected SoundEntity() {}
+
+    /**
+     * Cloner l'entité
+     * @return clone
+     */
+    public SoundEntity clone() {
+        return new SoundEntity();
+    }
 }

@@ -28,9 +28,9 @@ public class Sprite extends Cover {
     }
 
     @Override
-    protected void cover(GraphicsObject graphicsObject) {
-        SwingRenderer.renderTexturedRect(graphicsObject.height, graphicsObject.width,
-                graphicsObject.x, graphicsObject.y, link);
+    protected void cover(GraphicEntity graphicEntity) {
+        SwingRenderer.renderTexturedRect(graphicEntity.height, graphicEntity.width,
+                graphicEntity.x, graphicEntity.y, link);
     }
 
     @Override

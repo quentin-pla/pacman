@@ -3,10 +3,17 @@ package engines.UI;
 /**
  * Entité interface utilisateur
  */
-public interface UIEntity {
+public class UIEntity {
     /**
-     * Générer une nouvelle entité
-     * @return entité interface utilisateur
+     * Constructeur
      */
-    static UIObject generateEntity() { return new UIObject(); }
+    protected UIEntity() {}
+
+    /**
+     * Cloner l'entité
+     * @return clone
+     */
+    public UIEntity clone() {
+        return null;
+    }
 }
