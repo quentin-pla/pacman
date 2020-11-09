@@ -1,30 +1,65 @@
 package engines.input_output;
 
+import api.SwingAPI;
+
 /**
- * Entité entrée/sortie
+ * Entité entrées / sorties
  */
-public interface InputOutputEntity {
+public class InputOutputEntity extends SwingAPI implements InputOutputEngine {
+    /**
+     * Constructeur
+     */
+    protected InputOutputEntity() {}
+
+    /**
+     * Écouteur actions utilisateur clavier
+     */
+    private KeyboardInputOutput keyboardInputOutput = new KeyboardInputOutput();
+
+    /**
+     * Écouteur actions utilisateur souris
+     */
+    private MouseInputOutput mouseInputOutput = new MouseInputOutput();
+
     /**
      * Activer / désactiver les entrées/sorties clavier
      * @param value valeur
      */
-    void enableKeyboardInputOutput(boolean value);
+    public void enableKeyboardInputOutput(boolean value) {
+        if (value) SwingAPI.getListenerMethods().addKeyListener(keyboardInputOutput);
+        else SwingAPI.getListenerMethods().removeKeyListener(keyboardInputOutput);
+    }
 
     /**
      * Activer / désactiver les entrées/sorties souris
      * @param value valeur
      */
-    void enableMouseInputOutput(boolean value);
+    public void enableMouseInputOutput(boolean value) {
+        if (value) SwingAPI.getListenerMethods().addMouseListener(mouseInputOutput);
+        else SwingAPI.getListenerMethods().removeMouseListener(mouseInputOutput);
+    }
 
     /**
      * Obtenir le clavier
      * @return clavier
      */
-    KeyboardInputOutput getKeyboard();
+    public KeyboardInputOutput getKeyboard() {
+        return keyboardInputOutput;
+    }
 
     /**
      * Obtenir la souris
      * @return souris
      */
-    MouseInputOutput getMouse();
+    public MouseInputOutput getMouse() {
+        return mouseInputOutput;
+    }
+
+    /**
+     * Cloner l'entité
+     * @return clone
+     */
+    public InputOutputEntity clone() {
+        return new InputOutputEntity();
+    }
 }
