@@ -1,14 +1,11 @@
 package engines.kernel;
 
-import engines.graphics.Color;
-import engines.graphics.Cover;
-import engines.graphics.GraphicsEntity;
-import engines.graphics.Scene;
+import engines.graphics.*;
 
 /**
  * Décorateur entité graphique
  */
-public interface GraphicsDecorator extends GraphicsEntity {
+public interface GraphicsDecorator extends GraphicsEngine {
     /**
      * Obtenir l'entité graphique
      * @return instance

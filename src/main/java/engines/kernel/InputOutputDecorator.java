@@ -1,5 +1,6 @@
 package engines.kernel;
 
+import engines.input_output.InputOutputEngine;
 import engines.input_output.InputOutputEntity;
 import engines.input_output.KeyboardInputOutput;
 import engines.input_output.MouseInputOutput;
@@ -7,7 +8,7 @@ import engines.input_output.MouseInputOutput;
 /**
  * Décorateur entité entrées/sorties
  */
-public interface InputOutputDecorator extends InputOutputEntity {
+public interface InputOutputDecorator extends InputOutputEngine {
     /**
      * Obtenir l'entité entrées/sorties
      * @return instance
