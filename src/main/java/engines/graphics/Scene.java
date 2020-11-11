@@ -17,36 +17,31 @@ public class Scene extends SwingScene {
     /**
      * Liste des entités présentes dans la scène
      */
-    private ArrayList<GraphicEntity> entities = new ArrayList<>();
+    private final ArrayList<GraphicEntity> entities = new ArrayList<>();
 
     /**
      * Consctructeur par défaut
      * @param height hateur
      * @param width largeur
-     * @param background_color couleur de fond
      */
-    public Scene(int height, int width, Color background_color) {
+    protected Scene(int height, int width) {
         super(height, width);
-        setBackgroundColor(background_color);
     }
 
     /**
      * Ajouter une entité à la scène
      * @param entity entité
-     * @param x position horizontale
-     * @param y position verticale
      */
-    public void addEntity(GraphicEntity entity, int x, int y) {
+    protected void addEntity(GraphicEntity entity) {
         entities.add(entity);
         entity.setScene(this);
-        entity.move(x, y);
     }
 
     /**
      * Supprimer une entité présente sur la scène
      * @param entity entité
      */
-    public void removeEntity(GraphicEntity entity) {
+    protected void removeEntity(int entity) {
         entities.remove(entity);
     }
 
@@ -54,7 +49,7 @@ public class Scene extends SwingScene {
      * Définir la couleur de fond
      * @param color couleur
      */
-    public void setBackgroundColor(Color color) {
+    protected void setBackgroundColor(Color color) {
         super.setBackgroundColor(color.getRed(), color.getGreen(), color.getBlue());
         background_color = color;
     }
@@ -64,8 +59,8 @@ public class Scene extends SwingScene {
         super.paintComponent(g);
         graphics = (Graphics2D) g;
         for (GraphicEntity entity : entities) {
-            entity.update();
-            entity.draw();
+            GraphicsEngine.update(entity.getId());
+            GraphicsEngine.draw(entity.getId());
         }
     }
 

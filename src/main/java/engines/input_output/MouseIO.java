@@ -4,7 +4,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
-public class MouseInputOutput implements MouseListener {
+/**
+ * Écouteur entrées / sorties souris
+ */
+public class MouseIO implements MouseListener {
     /**
      * Boutons pressés
      */
@@ -18,7 +21,7 @@ public class MouseInputOutput implements MouseListener {
     /**
      * Constructeur privé
      */
-    protected MouseInputOutput() {}
+    protected MouseIO() {}
 
     @Override
     public void mouseClicked(MouseEvent e) {}
@@ -44,23 +47,6 @@ public class MouseInputOutput implements MouseListener {
 
     @Override
     public void mouseExited(MouseEvent e) {}
-
-    /**
-     * Savoir si un bouton souris est pressée
-     * @param code code du bouton
-     * @return booléen
-     */
-    public boolean isMouseButtonPressed(int code) {
-        return pressed_buttons.contains(code);
-    }
-
-    /**
-     * Savoir si la souris n'est pas utilisée
-     * @return booléen
-     */
-    public boolean isMouseFree() {
-        return pressed_buttons.isEmpty();
-    }
 
     // GETTERS //
 

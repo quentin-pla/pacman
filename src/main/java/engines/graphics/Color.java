@@ -27,7 +27,7 @@ public class Color extends Cover {
      * @param green vert
      * @param blue bleu
      */
-    public Color(int red, int green, int blue) {
+    protected Color(int red, int green, int blue) {
         this.red = red;
         this.green = green;
         this.blue= blue;

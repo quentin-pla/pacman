@@ -54,7 +54,7 @@ public class SpriteAnimation extends Cover {
      * @param speed vitesse
      * @param looping en boucle
      */
-    public SpriteAnimation(SpriteSheet spriteSheet, int speed, boolean looping) {
+    protected SpriteAnimation(SpriteSheet spriteSheet, int speed, boolean looping) {
         this.spriteSheet = spriteSheet;
         this.speed = speed;
         this.looping = looping;
@@ -78,19 +78,19 @@ public class SpriteAnimation extends Cover {
      * @param row ligne
      * @param col colonne
      */
-    public void addFrame(int row, int col) {
+    protected void addFrame(int row, int col) {
         frames.add(spriteSheet.getSprite(row, col));
     }
 
     /**
      * Jouer / Mettre en pause l'animation
      */
-    public void playPause() { playing = !playing; }
+    protected void playPause() { playing = !playing; }
 
     /**
      * Réinitialiser l'animation
      */
-    public void reset() {
+    protected void reset() {
         actual_frame = 0;
         time = 0;
     }

@@ -3,9 +3,6 @@ package engines.graphics;
 import api.SwingAPI;
 import api.SwingWindow;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Fenêtre
  */
@@ -31,11 +28,6 @@ public class Window extends SwingAPI {
     private static String title = "";
 
     /**
-     * Scènes liées à la fenêtre
-     */
-    private static Map<String, Scene> scenes = new HashMap<>();
-
-    /**
      * Scène affichée
      */
     private static Scene actual_scene;
@@ -43,9 +35,9 @@ public class Window extends SwingAPI {
     /**
      * Afficher la fenêtre
      */
-    public static void show() {
+    protected static void show() {
         try {
-            if (scenes.isEmpty())
+            if (actual_scene == null)
                 throw new Exception("Aucune scène spécifiée");
         } catch (Exception e) {
             e.printStackTrace();
@@ -64,34 +56,15 @@ public class Window extends SwingAPI {
     /**
      * Terminer l'exécution de la fenêtre
      */
-    public static void stop() {
+    protected static void stop() {
         SwingWindow.stopWindow();
     }
 
     /**
-     * Ajouter une nouvelle scène
-     * @param scene scène
-     * @param name nom de la scène
-     */
-    public static void addScene(Scene scene, String name) {
-        scenes.put(name, scene);
-        if (actual_scene == null) bindScene(name);
-    }
-
-    /**
      * Attacher une scène
-     * @param name nom de la scène
+     * @param scene scène
      */
-    public static void bindScene(String name) {
-        if (!scenes.containsKey(name)) {
-            try {
-                throw new Exception("Scène introuvable");
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.exit(1);
-            }
-        }
-        Scene scene = scenes.get(name);
+    protected static void bindScene(Scene scene) {
         Window.actual_scene = scene;
         Window.height = scene.getHeight();
         Window.width = scene.getWidth();
@@ -119,8 +92,6 @@ public class Window extends SwingAPI {
     public static int getHeight() { return height; }
 
     public static int getWidth() { return width; }
-
-    public static Map<String, Scene> getScenes() { return scenes; }
 
     public static Scene getActualScene() { return actual_scene; }
 }

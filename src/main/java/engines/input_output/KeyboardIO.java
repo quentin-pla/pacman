@@ -4,7 +4,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 
-public class KeyboardInputOutput implements KeyListener {
+/**
+ * Écouteur entrées / sorties clavier
+ */
+public class KeyboardIO implements KeyListener {
     /**
      * Touches préssées
      */
@@ -18,7 +21,7 @@ public class KeyboardInputOutput implements KeyListener {
     /**
      * Constructeur
      */
-    protected KeyboardInputOutput() {}
+    protected KeyboardIO() {}
 
     @Override
     public void keyTyped(KeyEvent e) {}
@@ -37,23 +40,6 @@ public class KeyboardInputOutput implements KeyListener {
         int key = e.getKeyCode();
         if (pressed_keys.contains(key))
             pressed_keys.remove((Integer) key);
-    }
-
-    /**
-     * Savoir si une touche clavier est pressée
-     * @param code code de la touche
-     * @return booléen
-     */
-    public boolean isKeyPressed(int code) {
-        return pressed_keys.contains(code);
-    }
-
-    /**
-     * Savoir si le clavier n'est pas utilisé
-     * @return booléen
-     */
-    public boolean isKeyboardFree() {
-        return pressed_keys.isEmpty();
     }
 
     // GETTERS //
