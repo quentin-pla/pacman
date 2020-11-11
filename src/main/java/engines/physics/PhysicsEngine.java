@@ -93,4 +93,30 @@ public class PhysicsEngine {
     public void setSpeed(PhysicsEntity o, int speed) {
         o.setSpeed(speed);
     }
+
+    /**
+     * Ajout d'une nouvelle entité physique à la liste des objets physiques
+     * @param o entité physique
+     */
+    public void addNewPhysicalEntity(PhysicsEntity o) {
+        this.objects.add(o);
+    }
+
+    /**
+     * Ajout d'une nouvelle entité physique à la liste des objets physiques
+     * @param objects Liste d'entités physiques
+     */
+    public void addNewPhysicalEntity(Set<PhysicsEntity> objects) {
+        this.objects.addAll(objects);
+    }
+
+    /**
+     * Ajout d'une nouvelle entité physique à la liste des objets physiques
+     * @param x position x de l'entité
+     * @param y position y de l'entité
+     * @param speed vitesse de déplacement de l'entité
+     */
+    public void addNewPhysicalEntity(int x, int y, int speed) {
+        this.objects.add(new PhysicsEntity(x, y, speed));
+    }
 }
