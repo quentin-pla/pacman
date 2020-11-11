@@ -1,8 +1,7 @@
 package engines.kernel;
 
-
 /**
- * Entité globale
+ * Entité abtraite
  */
 public class Entity {
     /**
@@ -10,5 +9,9 @@ public class Entity {
      */
     private int id;
 
-    public int getId() { return this.id; }
+    /**
+     * Récupérer l'identifiant de l'entité
+     * @return identifiant
+     */
+    public int getId() { return id; }
 }
