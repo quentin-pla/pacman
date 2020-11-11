@@ -12,14 +12,15 @@ import java.util.Set;
 public class PhysicsEngine {
 
     private Set<PhysicsEntity> objects;
+    private HashMap<Integer, PhysicsEntity> id_objects;
     private Entity[][] matrix;
-    private HashMap<Integer, GraphicEntity> id_objects;
 
     /**
      * Constructeur
      */
-    public PhysicsEngine(Set<PhysicsEntity> objects, Entity[][] matrix) {
-        this.objects = objects;
+    public PhysicsEngine(HashMap<Integer, PhysicsEntity> id_objects, Entity[][] matrix) {
+        this.id_objects = id_objects;
+        this.objects.addAll(this.id_objects.values());
         this.matrix = matrix;
     }
 
@@ -29,9 +30,12 @@ public class PhysicsEngine {
      * @param o2 entité physique 2
      * @return booléen
      */
-    public boolean isCollision(PhysicsEntity o1, PhysicsEntity o2) {
+
+    /*public boolean isCollision(int id1, int id2) {
+        PhysicsEntity o1 = this.id_objects.get(id1);
+        PhysicsEntity o2 = this.id_objects.get(id2);
         return o1.getX() == o2.getX() && o1.getY() == o2.getY();
-    }
+    }*/
 
     /**
      * Vérifier qu'il n'y a pas d'objet à la position (x,y)
@@ -45,21 +49,23 @@ public class PhysicsEngine {
 
     /**
      * Déplacement vers le haut
-     * @param o entité physique
+     * @param id identifiant de l'entité physique
      * @param mul multiplicateur
      */
-    public void goUp(PhysicsEntity o, int mul) {
+    public void goUp(int id, int mul) {
         // S'il n'y a pas d'objets à la position où l'on souhaite se déplacer
+        PhysicsEntity o = this.id_objects.get(id);
         if (!isCollision(o.getX(),o.getY() - mul))
             o.setY(o.getY() - mul);
     }
 
     /**
      * Déplacement vers la droite
-     * @param o entité physique
+     * @param id identifiant de l'entité physique
      * @param mul multiplicateur
      */
-    public void goRight(PhysicsEntity o, int mul) {
+    public void goRight(int id, int mul) {
+        PhysicsEntity o = this.id_objects.get(id);
         // S'il n'y a pas d'objets à la position où l'on souhaite se déplacer
         if (!isCollision(o.getX() + mul,o.getY()))
             o.setX(o.getX() + mul);
@@ -67,10 +73,11 @@ public class PhysicsEngine {
 
     /**
      * Déplacement vers la gauche
-     * @param o entité physique
+     * @param id identifiant de l'entité physique
      * @param mul multiplicateur
      */
-    public void goLeft(PhysicsEntity o, int mul) {
+    public void goLeft(int id, int mul) {
+        PhysicsEntity o = this.id_objects.get(id);
         // S'il n'y a pas d'objets à la position où l'on souhaite se déplacer
         if (!isCollision(o.getX() - mul,o.getY()))
             o.setX(o.getX() - mul);
@@ -78,10 +85,11 @@ public class PhysicsEngine {
 
     /**
      * Déplacement vers le bas
-     * @param o entité physique
+     * @param id identifiant de l'entité physique
      * @param mul multiplicateur
      */
-    public void goDown(PhysicsEntity o, int mul) {
+    public void goDown(int id, int mul) {
+        PhysicsEntity o = this.id_objects.get(id);
         // S'il n'y a pas d'objets à la position où l'on souhaite se déplacer
         if (!isCollision(o.getX(),o.getY() + mul))
             o.setY(o.getY() + mul);
@@ -90,21 +98,23 @@ public class PhysicsEngine {
 
     /**
      * Déplacement de l'entité physique à la position indiquée
-     * @param o entité physique
+     * @param id identifiant de l'entité physique
      * @param x position x
      * @param y position y
      */
-    public void goTo(PhysicsEntity o, int x, int y) {
+    public void goTo(int id, int x, int y) {
+        PhysicsEntity o = this.id_objects.get(id);
         o.setX(x);
         o.setY(y);
     }
 
     /**
      * Modification de la  vitesse de déplacement
-     * @param o entité physique
+     * @param id identifiant de l'entité physique
      * @param speed vitesse
      */
-    public void setSpeed(PhysicsEntity o, int speed) {
+    public void setSpeed(int id, int speed) {
+        PhysicsEntity o = this.id_objects.get(id);
         o.setSpeed(speed);
     }
 
