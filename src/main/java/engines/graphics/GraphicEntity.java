@@ -1,9 +1,11 @@
 package engines.graphics;
 
+import engines.kernel.Entity;
+
 /**
  * Entité graphique
  */
-public class GraphicEntity {
+public class GraphicEntity extends Entity {
     /**
      * Scène
      */
@@ -42,21 +44,9 @@ public class GraphicEntity {
     /**
      * Constructeur par défaut
      */
-    public GraphicEntity() {
+    protected GraphicEntity() {
         this.height = 0;
         this.width = 0;
-        this.x = 0;
-        this.y = 0;
-    }
-
-    /**
-     * Constructeur avec dimensions
-     * @param height hauteur
-     * @param width largeur
-     */
-    protected GraphicEntity(int height, int width) {
-        this.height = height;
-        this.width = width;
         this.x = 0;
         this.y = 0;
     }
@@ -65,8 +55,9 @@ public class GraphicEntity {
      * Constructeur par clonage
      * @param clone clone
      */
-    public GraphicEntity(GraphicEntity clone) {
-        this(clone.height, clone.width);
+    private GraphicEntity(GraphicEntity clone) {
+        this.height = clone.height;
+        this.width = clone.width;
         this.x = 0;
         this.y = 0;
         this.scene = null;
@@ -83,101 +74,61 @@ public class GraphicEntity {
         return new GraphicEntity(this);
     }
 
-    /**
-     * Dessiner l'entité
-     */
-    public void draw() {
-        if (color != null) color.cover(this);
-        if (texture != null) texture.cover(this);
+    // GETTERS & SETTERS //
+
+    public Scene getScene() {
+        return scene;
     }
 
-    /**
-     * Mettre à jour l'entité
-     */
-    public void update() {
-        if (texture != null) texture.update();
+    protected void setScene(Scene scene) {
+        this.scene = scene;
     }
 
-    /**
-     * Effacer l'entité
-     */
-    public void erase() {
-        scene.removeEntity(this);
+    public int getHeight() {
+        return height;
     }
 
-    /**
-     * Translater l'entité
-     * @param x nombre à additionner à la position horizontale
-     * @param y nombre à additionner à la position verticale
-     */
-    public void translate(int x, int y) {
-        this.x = this.x + x;
-        this.y = this.y + y;
-    }
-
-    /**
-     * Déplacer l'entité
-     * @param x nouvelle position horizontale
-     * @param y nouvelle position verticale
-     */
-    public void move(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    /**
-     * Redimensionner l'entité
-     * @param height hauteur
-     * @param width largeur
-     */
-    public void resize(int height, int width) {
+    protected void setHeight(int height) {
         this.height = height;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    protected void setWidth(int width) {
         this.width = width;
     }
 
-    /**
-     * Attacher une couleur
-     * @param red intensité rouge
-     * @param green intensité vert
-     * @param blue intensité bleu
-     */
-    public void setColor(int red, int green, int blue) {
-        color = new Color(red, green, blue);
+    public int getX() {
+        return x;
     }
 
+    protected void setX(int x) {
+        this.x = x;
+    }
 
-    public void setColor(Color color) { this.color = color; }
+    public int getY() {
+        return y;
+    }
 
-    /**
-     * Détacher la couleur
-     */
-    public void unbindColor() { color = null; }
+    protected void setY(int y) {
+        this.y = y;
+    }
 
-    /**
-     * Attacher une texture
-     * @param texture texture
-     */
-    public void setTexture(Cover texture) { this.texture = texture; }
+    public Color getColor() {
+        return color;
+    }
 
-    /**
-     * Détacher la texture
-     */
-    public void unbindTexture() { texture = null; }
+    protected void setColor(Color color) {
+        this.color = color;
+    }
 
-    // GETTERS & SETTERS //
+    public Cover getTexture() {
+        return texture;
+    }
 
-
-    public void setScene(Scene scene) { this.scene = scene; }
-
-    public int getHeight() { return height; }
-
-    public int getWidth() { return width; }
-
-    public Color getColor() { return color; }
-
-    public void setWidth(int w) { this.width = w; }
-
-    public void setHeight(int h) { this.height = h; }
-
-    public Cover getTexture() { return texture; }
+    protected void setTexture(Cover texture) {
+        this.texture = texture;
+    }
 }

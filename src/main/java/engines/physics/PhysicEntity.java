@@ -1,13 +1,25 @@
 package engines.physics;
 
+import engines.kernel.Entity;
+
 /**
  * Entité physique
  */
-public class PhysicsEntity {
+public class PhysicEntity extends Entity {
     /**
      * Position
      */
     private int x, y;
+
+    /**
+     * Largeur
+     */
+    private int width;
+
+    /**
+     * Hauteur
+     */
+    private int height;
 
     /**
      * Vitesse de déplacement
@@ -17,18 +29,31 @@ public class PhysicsEntity {
     /**
      * Constructeur
      */
-    protected PhysicsEntity(int x, int y, int speed) {
+    protected PhysicEntity() {}
+
+    /**
+     * Constructeur
+     */
+    protected PhysicEntity(int x, int y, int speed) {
         this.x = x;
         this.y = y;
         this.speed = speed;
     }
 
     /**
-     * Cloner l'entité
-     * @return
+     * Constructeur par clonage
+     * @param physicEntity entité physique
      */
-    public PhysicsEntity clone() {
-        return new PhysicsEntity(this.x, this.y, this.speed);
+    private PhysicEntity(PhysicEntity physicEntity) {
+        this(physicEntity.x, physicEntity.y, physicEntity.speed);
+    }
+
+    /**
+     * Cloner l'entité
+     * @return clone
+     */
+    public PhysicEntity clone() {
+        return new PhysicEntity(this);
     }
 
     // GETTERS & SETTERS //
@@ -57,5 +82,5 @@ public class PhysicsEntity {
         this.speed = speed;
     }
 
-
+    public int[] getBounds() { return new int[]{x, y, x + width, y + height}; }
 }
