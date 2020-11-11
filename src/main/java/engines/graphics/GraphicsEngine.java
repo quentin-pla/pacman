@@ -16,10 +16,11 @@ public class GraphicsEngine {
         this.scene = scene;
     }
 
-    public GraphicsEngine(Scene scene, Set<GraphicEntity> objects, Entity[][] matrix) {
+    public GraphicsEngine(Scene scene, HashMap<Integer, GraphicEntity> id_objects,  Entity[][] matrix) {
         this.scene = scene;
-        this.objects = objects;
+        this.id_objects = id_objects;
         this.matrix = matrix;
+        this.objects.addAll(this.id_objects.values());
     }
 
     public Set<GraphicEntity> getObjects() {
@@ -36,6 +37,17 @@ public class GraphicsEngine {
 
     public void setMatrix(Entity[][] matrix) {
         this.matrix = matrix;
+    }
+
+    public Scene getScene() { return this.scene;
+    }
+
+    public void setScene(Scene scene) { this.scene = scene; }
+
+    public HashMap<Integer, GraphicEntity> getId_objects() {return this.id_objects; }
+
+    public void setId_objects(HashMap<Integer, GraphicEntity> id_objects) {
+        this.id_objects = id_objects;
     }
 
     public GraphicEntity clone(int id) {
@@ -87,6 +99,16 @@ public class GraphicsEngine {
     public void unbindColor(int id) {
         GraphicEntity o = this.id_objects.get(id);
         o.setColor(null);
+    }
+
+    public void bindTexture(int id, Cover texture) {
+        GraphicEntity o = this.id_objects.get(id);
+        o.setTexture(texture);
+    }
+
+    public void unbindTexture(int id) {
+        GraphicEntity o = this.id_objects.get(id);
+        o.setTexture(null);
     }
 
 }

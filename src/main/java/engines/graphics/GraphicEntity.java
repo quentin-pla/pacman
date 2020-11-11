@@ -157,7 +157,7 @@ public class GraphicEntity {
      * Attacher une texture
      * @param texture texture
      */
-    public void bindTexture(Cover texture) { this.texture = texture; }
+    public void setTexture(Cover texture) { this.texture = texture; }
 
     /**
      * Détacher la texture
@@ -166,17 +166,12 @@ public class GraphicEntity {
 
     // GETTERS & SETTERS //
 
-    public Scene getScene() { return scene; }
 
     public void setScene(Scene scene) { this.scene = scene; }
 
     public int getHeight() { return height; }
 
     public int getWidth() { return width; }
-
-    public int getX() { return x; }
-
-    public int getY() { return y; }
 
     public Color getColor() { return color; }
 

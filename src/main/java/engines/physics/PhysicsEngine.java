@@ -1,7 +1,9 @@
 package engines.physics;
 
+import engines.graphics.GraphicEntity;
 import engines.kernel.Entity;
 
+import java.util.HashMap;
 import java.util.Set;
 
 /**
@@ -11,6 +13,7 @@ public class PhysicsEngine {
 
     private Set<PhysicsEntity> objects;
     private Entity[][] matrix;
+    private HashMap<Integer, GraphicEntity> id_objects;
 
     /**
      * Constructeur
@@ -82,6 +85,18 @@ public class PhysicsEngine {
         // S'il n'y a pas d'objets à la position où l'on souhaite se déplacer
         if (!isCollision(o.getX(),o.getY() + mul))
             o.setY(o.getY() + mul);
+    }
+
+
+    /**
+     * Déplacement de l'entité physique à la position indiquée
+     * @param o entité physique
+     * @param x position x
+     * @param y position y
+     */
+    public void goTo(PhysicsEntity o, int x, int y) {
+        o.setX(x);
+        o.setY(y);
     }
 
     /**
