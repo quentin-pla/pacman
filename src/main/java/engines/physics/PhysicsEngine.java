@@ -30,7 +30,6 @@ public class PhysicsEngine {
         return o1.getX() == o2.getX() && o1.getY() == o2.getY();
     }
 
-
     /**
      * Vérifier qu'il n'y a pas d'objet à la position (x,y)
      * @param x Position x à vérifier
@@ -38,7 +37,7 @@ public class PhysicsEngine {
      * @return booléen
      */
     public boolean isCollision(int x, int y) {
-        return  this.matrix[x][y].getId() > -1;
+        return this.matrix[x][y].getId() > -1;
     }
 
     /**
@@ -83,5 +82,15 @@ public class PhysicsEngine {
         // S'il n'y a pas d'objets à la position où l'on souhaite se déplacer
         if (!isCollision(o.getX(),o.getY() + mul))
             o.setY(o.getY() + mul);
+    }
+
+
+    /**
+     * Modification de la  vitesse de déplacement
+     * @param o entité physique
+     * @param speed vitesse
+     */
+    public void setSpeed(PhysicsEntity o, int speed) {
+        o.setSpeed(speed);
     }
 }
