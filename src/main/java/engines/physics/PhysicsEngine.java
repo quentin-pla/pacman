@@ -84,7 +84,6 @@ public class PhysicsEngine {
             o.setY(o.getY() + mul);
     }
 
-
     /**
      * Modification de la  vitesse de déplacement
      * @param o entité physique

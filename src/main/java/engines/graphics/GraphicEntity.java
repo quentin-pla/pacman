@@ -65,7 +65,7 @@ public class GraphicEntity {
      * Constructeur par clonage
      * @param clone clone
      */
-    private GraphicEntity(GraphicEntity clone) {
+    public GraphicEntity(GraphicEntity clone) {
         this(clone.height, clone.width);
         this.x = 0;
         this.y = 0;
@@ -141,9 +141,12 @@ public class GraphicEntity {
      * @param green intensité vert
      * @param blue intensité bleu
      */
-    public void bindColor(int red, int green, int blue) {
+    public void setColor(int red, int green, int blue) {
         color = new Color(red, green, blue);
     }
+
+
+    public void setColor(Color color) { this.color = color; }
 
     /**
      * Détacher la couleur
@@ -176,6 +179,10 @@ public class GraphicEntity {
     public int getY() { return y; }
 
     public Color getColor() { return color; }
+
+    public void setWidth(int w) { this.width = w; }
+
+    public void setHeight(int h) { this.height = h; }
 
     public Cover getTexture() { return texture; }
 }
