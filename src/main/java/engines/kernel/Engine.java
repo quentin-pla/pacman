@@ -11,7 +11,7 @@ public interface Engine<T> {
      *
      * @param id identifiant de l'entité
      */
-    void createEntity(int id);
+    T createEntity(int id);
 
     /**
      * Récupérer les entités liées au moteur
