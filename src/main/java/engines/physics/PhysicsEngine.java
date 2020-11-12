@@ -1,5 +1,6 @@
 package engines.physics;
 
+import engines.graphics.GraphicEntity;
 import engines.kernel.Engine;
 
 import java.util.HashMap;
@@ -60,6 +61,24 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
         return matrix[x][y] == null;
     }
 
+    /**
+     * Teste de collision entre les hitbox des entités id1 et id2
+     * @param id1 identifiant de l'entité 1
+     * @param id2 identifiant de l'entité 2
+     * @return s'il y a collision ou non
+     */
+    public static boolean isCollision(int id1, int id2) {
+        PhysicEntity o1 = entities.get(id1);
+        PhysicEntity o2 = entities.get(id2);
+
+        if((o2.getX() >= o1.getX() +  o1.getWidth())      // trop à droite
+                || (o2.getX() + o2.getWidth() <= o1.getX()) // trop à gauche
+                || (o2.getY() >= o1.getY() + o1.getHeight()) // trop en bas
+                || (o2.getY() + o2.getHeight() <= o1.getHeight()))  // trop en haut
+            return false;
+        else
+            return true;
+    }
     /**
      * Déplacement vers le haut
      * @param id identifiant de l'entité physique

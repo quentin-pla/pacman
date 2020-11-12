@@ -87,4 +87,20 @@ public class PhysicEntity extends Entity {
     }
 
     public int[] getBounds() { return new int[]{x, y, x + width, y + height}; }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
 }
