@@ -18,6 +18,7 @@ public class Main {
         int mainScene = GraphicsEngine.generateScene(300, 300);
         GraphicsEngine.setSceneBackgroundColor(mainScene,0,0,0);
         GraphicsEngine.bindScene(mainScene);
+        GraphicsEngine.addToCurrentScene(floor);
 
         //Démarrage du jeu
         KernelEngine.start();
