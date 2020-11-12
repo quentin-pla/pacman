@@ -12,22 +12,7 @@ import java.util.Collections;
  */
 public class KernelEngine {
     /**
-     * Moteur graphique
-     */
-    private static GraphicsEngine graphicsEngine = new GraphicsEngine();
-
-    /**
-     * Moteur entrées / sorties
-     */
-    private static IOEngine ioEngine = new IOEngine();
-
-    /**
-     * Moteur physique
-     */
-    private static PhysicsEngine physicsEngine = new PhysicsEngine();
-
-    /**
-     * Liste des entités générées
+     * Liste des identifiants générés pour les entités
      */
     private static ArrayList<Integer> entities = new ArrayList<>();
 
@@ -47,15 +32,15 @@ public class KernelEngine {
      * @param id identifiant
      */
     private static void initEntity(int id) {
-        graphicsEngine.createEntity(id);
-        ioEngine.createEntity(id);
-        physicsEngine.createEntity(id);
+        GraphicsEngine.getInstance().createEntity(id);
+        IOEngine.getInstance().createEntity(id);
+        PhysicsEngine.getInstance().createEntity(id);
     }
 
     /**
      * Exécuter le jeu
      */
     public static void start() {
-        graphicsEngine.showWindow();
+        GraphicsEngine.showWindow();
     }
 }
