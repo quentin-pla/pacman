@@ -20,6 +20,25 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
     private static PhysicEntity[][] matrix;
 
     /**
+     * Instance unique
+     */
+    private static PhysicsEngine instance;
+
+    /**
+     * Constructeur privé
+     */
+    private PhysicsEngine() {}
+
+    /**
+     * Récupérer l'instance
+     * @return instance
+     */
+    public static PhysicsEngine getInstance() {
+        if (instance == null) instance = new PhysicsEngine();
+        return instance;
+    }
+
+    /**
      * Vérifier s'il y a une collision
      * @param o1 entité physique 1
      * @param o2 entité physique 2
@@ -38,7 +57,7 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
      * @return booléen
      */
     public static boolean isEntityPresent(int x, int y) {
-        return matrix[x][y].getId() > 0;
+        return matrix[x][y] == null;
     }
 
     /**
@@ -112,9 +131,19 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
         o.setSpeed(speed);
     }
 
+    /**
+     * Obtenir les limites
+     * @param id identifiant
+     */
+    public static int[] getBounds(int id) {
+        return entities.get(id).getBounds();
+    }
+
     @Override
-    public void createEntity(int id) {
-        entities.put(id, new PhysicEntity());
+    public PhysicEntity createEntity(int id) {
+        PhysicEntity entity = new PhysicEntity(id);
+        entities.put(id, entity);
+        return entity;
     }
 
     // GETTERS //

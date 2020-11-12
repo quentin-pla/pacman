@@ -36,6 +36,24 @@ public class GraphicsEngine implements Engine<GraphicEntity> {
      */
     private static final Map<Integer,SpriteAnimation> animations = new HashMap<>();
 
+    /**
+     * Instance unique
+     */
+    private static GraphicsEngine instance;
+
+    /**
+     * Constructeur privé
+     */
+    private GraphicsEngine() {}
+
+    /**
+     * Récupérer l'instance
+     * @return instance
+     */
+    public static GraphicsEngine getInstance() {
+        if (instance == null) instance = new GraphicsEngine();
+        return instance;
+    }
 
     //-----------------------------------------------//
     //--------- MÉTHODES ENTITÉS GRAPHIQUES ---------//
@@ -163,6 +181,16 @@ public class GraphicsEngine implements Engine<GraphicEntity> {
     public static void bindTexture(int id, int spriteSheetID, int row, int col) {
         GraphicEntity o = entities.get(id);
         o.setTexture(spriteSheets.get(spriteSheetID).getSprite(row, col));
+    }
+
+    /**
+     * Attache une animation à une entité graphique
+     * @param id identifiant
+     * @param animationID identifiant de l'animation
+     */
+    public static void bindAnimation(int id, int animationID) {
+        GraphicEntity o = entities.get(id);
+        o.setTexture(animations.get(animationID));
     }
 
     /**
@@ -317,20 +345,22 @@ public class GraphicsEngine implements Engine<GraphicEntity> {
     /**
      * Afficher la fenêtre
      */
-    public void showWindow() {
+    public static void showWindow() {
         Window.show();
     }
 
     /**
      * Arrêter la fenêtre
      */
-    public void stopWindow() {
+    public static void stopWindow() {
         Window.stop();
     }
 
     @Override
-    public void createEntity(int id) {
-        entities.put(id, new GraphicEntity());
+    public GraphicEntity createEntity(int id) {
+        GraphicEntity entity = new GraphicEntity(id);
+        entities.put(id, entity);
+        return entity;
     }
 
     // GETTERS & SETTERS //

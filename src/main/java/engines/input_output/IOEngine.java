@@ -14,17 +14,36 @@ public class IOEngine extends SwingAPI implements Engine<IOEntity> {
     /**
      * Liste des entités entrées / sorties
      */
-    public static Map<Integer, IOEntity> entities = new HashMap<>();
+    public static final Map<Integer, IOEntity> entities = new HashMap<>();
 
     /**
      * Écouteur actions utilisateur clavier
      */
-    private KeyboardIO keyboardIO = new KeyboardIO();
+    private static final KeyboardIO keyboardIO = new KeyboardIO();
 
     /**
      * Écouteur actions utilisateur souris
      */
-    private MouseIO mouseIO = new MouseIO();
+    private static final MouseIO mouseIO = new MouseIO();
+
+    /**
+     * Instance unique
+     */
+    private static IOEngine instance;
+
+    /**
+     * Constructeur privé
+     */
+    private IOEngine() {}
+
+    /**
+     * Récupérer l'instance
+     * @return instance
+     */
+    public static IOEngine getInstance() {
+        if (instance == null) instance = new IOEngine();
+        return instance;
+    }
 
     //------------------------------//
     //----------- CLAVIER -----------//
@@ -33,14 +52,14 @@ public class IOEngine extends SwingAPI implements Engine<IOEntity> {
     /**
      * Activer les entrées/sorties clavier
      */
-    public void enableKeyboardIO() {
+    public static void enableKeyboardIO() {
         SwingAPI.getListenerMethods().addKeyListener(keyboardIO);
     }
 
     /**
      * Désactiver les entrées/sorties clavier
      */
-    public void disableKeyboardIO() {
+    public static void disableKeyboardIO() {
         SwingAPI.getListenerMethods().removeKeyListener(keyboardIO);
     }
 
@@ -49,7 +68,7 @@ public class IOEngine extends SwingAPI implements Engine<IOEntity> {
      * @param code code de la touche
      * @return booléen
      */
-    public boolean isKeyPressed(int code) {
+    public static boolean isKeyPressed(int code) {
         return keyboardIO.getPressedKeys().contains(code);
     }
 
@@ -57,7 +76,7 @@ public class IOEngine extends SwingAPI implements Engine<IOEntity> {
      * Savoir si le clavier n'est pas utilisé
      * @return booléen
      */
-    public boolean isKeyboardFree() {
+    public static boolean isKeyboardFree() {
         return keyboardIO.getPressedKeys().isEmpty();
     }
 
@@ -65,7 +84,7 @@ public class IOEngine extends SwingAPI implements Engine<IOEntity> {
      * Récupérer la dernière touche pressée au clavier
      * @return code de la touche
      */
-    public int lastPressedKey() { return keyboardIO.getLastPressedKey(); }
+    public static int lastPressedKey() { return keyboardIO.getLastPressedKey(); }
 
     /**
      * Relier une méthode à une touche clavier
@@ -73,7 +92,7 @@ public class IOEngine extends SwingAPI implements Engine<IOEntity> {
      * @param method méthode
      * @param keyCode touche du clavier
      */
-    public void bindMethodToKey(int id, Consumer<Integer> method, int keyCode) {
+    public static void bindMethodToKey(int id, Consumer<Void> method, int keyCode) {
         entities.get(id).getBindedMethods().put(keyCode, method);
     }
 
@@ -84,14 +103,14 @@ public class IOEngine extends SwingAPI implements Engine<IOEntity> {
     /**
      * Activer les entrées/sorties souris
      */
-    public void enableMouseIO() {
+    public static void enableMouseIO() {
         SwingAPI.getListenerMethods().addMouseListener(mouseIO);
     }
 
     /**
      * Désactiver les entrées/sorties souris
      */
-    public void disableMouseIO(boolean value) {
+    public static void disableMouseIO(boolean value) {
         SwingAPI.getListenerMethods().removeMouseListener(mouseIO);
     }
 
@@ -100,7 +119,7 @@ public class IOEngine extends SwingAPI implements Engine<IOEntity> {
      * @param code code du bouton
      * @return booléen
      */
-    public boolean isMouseButtonPressed(int code) {
+    public static boolean isMouseButtonPressed(int code) {
         return mouseIO.getPressedButtons().contains(code);
     }
 
@@ -108,7 +127,7 @@ public class IOEngine extends SwingAPI implements Engine<IOEntity> {
      * Savoir si la souris n'est pas utilisée
      * @return booléen
      */
-    public boolean isMouseFree() {
+    public static boolean isMouseFree() {
         return mouseIO.getPressedButtons().isEmpty();
     }
 
@@ -116,7 +135,7 @@ public class IOEngine extends SwingAPI implements Engine<IOEntity> {
      * Récupérer le dernier bouton pressé depuis la souris
      * @return code du bouton
      */
-    public int lastPressedButton() { return mouseIO.getLastPressedButton(); }
+    public static int lastPressedButton() { return mouseIO.getLastPressedButton(); }
 
     /**
      * Relier une méthode à un bouton de la souris
@@ -124,13 +143,15 @@ public class IOEngine extends SwingAPI implements Engine<IOEntity> {
      * @param method méthode
      * @param buttonCode bouton de la souris
      */
-    public void bindMethodToButton(int id, Consumer<Integer> method, int buttonCode) {
+    public static void bindMethodToButton(int id, Consumer<Void> method, int buttonCode) {
         entities.get(id).getBindedMethods().put(buttonCode, method);
     }
 
     @Override
-    public void createEntity(int id) {
-        entities.put(id, new IOEntity());
+    public IOEntity createEntity(int id) {
+        IOEntity entity = new IOEntity(id);
+        entities.put(id, entity);
+        return entity;
     }
 
     // GETTERS //
