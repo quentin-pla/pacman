@@ -2,6 +2,7 @@ package engines.graphics;
 
 import api.SwingRenderer;
 import engines.kernel.Engine;
+import engines.kernel.Entity;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -117,7 +118,7 @@ public class GraphicsEngine implements Engine<GraphicEntity> {
      */
     public static void resizeHeight(int id, int h) {
         GraphicEntity o = entities.get(id);
-        o.setHeight(h);
+        o.getParent().setHeight(h);
     }
 
     /**
@@ -127,7 +128,7 @@ public class GraphicsEngine implements Engine<GraphicEntity> {
      */
     public static void resizeWidth(int id, int w) {
         GraphicEntity o = entities.get(id);
-        o.setWidth(w);
+        o.getParent().setWidth(w);
     }
 
     /**
@@ -350,6 +351,11 @@ public class GraphicsEngine implements Engine<GraphicEntity> {
     }
 
     /**
+     * Rafraichir la fenêtre
+     */
+    public static void refreshWindow() { Window.refresh(); }
+
+    /**
      * Arrêter la fenêtre
      */
     public static void stopWindow() {
@@ -357,9 +363,9 @@ public class GraphicsEngine implements Engine<GraphicEntity> {
     }
 
     @Override
-    public GraphicEntity createEntity(int id) {
-        GraphicEntity entity = new GraphicEntity(id);
-        entities.put(id, entity);
+    public GraphicEntity createEntity(Entity parent) {
+        GraphicEntity entity = new GraphicEntity(parent);
+        entities.put(parent.getId(), entity);
         return entity;
     }
 

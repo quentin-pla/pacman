@@ -185,9 +185,9 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
     }
 
     @Override
-    public PhysicEntity createEntity(int id) {
-        PhysicEntity entity = new PhysicEntity(id);
-        entities.put(id, entity);
+    public PhysicEntity createEntity(Entity parent) {
+        PhysicEntity entity = new PhysicEntity(parent);
+        entities.put(parent.getId(), entity);
         return entity;
     }
 

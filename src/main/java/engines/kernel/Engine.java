@@ -9,9 +9,9 @@ public interface Engine<T> {
     /**
      * Créer une entité avec son identifiant
      *
-     * @param id identifiant de l'entité
+     * @param parent entité parentes
      */
-    T createEntity(int id);
+    T createEntity(Entity parent);
 
     /**
      * Récupérer les entités liées au moteur

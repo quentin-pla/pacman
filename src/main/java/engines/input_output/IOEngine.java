@@ -148,13 +148,11 @@ public class IOEngine extends SwingAPI implements Engine<IOEntity> {
     }
 
     @Override
-    public IOEntity createEntity(int id) {
-        IOEntity entity = new IOEntity(id);
-        entities.put(id, entity);
+    public IOEntity createEntity(Entity parent) {
+        IOEntity entity = new IOEntity(parent);
+        entities.put(parent.getId(), entity);
         return entity;
     }
-
-    // GETTERS //
 
     @Override
     public Map<Integer, IOEntity> getEntities() {
