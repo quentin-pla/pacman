@@ -1,5 +1,6 @@
 import engines.graphics.GraphicsEngine;
 import engines.kernel.KernelEngine;
+import gameplay.Player;
 
 /**
  * Main
@@ -7,19 +8,16 @@ import engines.kernel.KernelEngine;
 public class Main {
     public static void main(String[] args) {
         //Transfert des textures
-        GraphicsEngine.loadSpriteSheet("sprite_sheet.png", 11, 11);
+        int spriteSheet = GraphicsEngine.loadSpriteSheet("sprite_sheet.png", 11, 11);
 
-        //Sol du niveau
-        int floor = KernelEngine.generateEntity();
-        GraphicsEngine.resize(floor, 30, 30);
-        GraphicsEngine.bindColor(floor, 0, 0, 255);
+        Player player = new Player(30, 30, 2, spriteSheet, 1, 3);
 
         //Scène principale
 
         int mainScene = GraphicsEngine.generateScene(300, 300);
         GraphicsEngine.setSceneBackgroundColor(mainScene,0,0,0);
         GraphicsEngine.bindScene(mainScene);
-        GraphicsEngine.addToCurrentScene(floor);
+        GraphicsEngine.addToCurrentScene(player.getId());
 
         //Démarrage du jeu
         KernelEngine.start();
