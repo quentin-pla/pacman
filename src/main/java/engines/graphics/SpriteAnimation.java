@@ -97,8 +97,8 @@ public class SpriteAnimation extends Cover {
 
     @Override
     protected void cover(GraphicEntity graphicEntity) {
-        SwingRenderer.renderTexturedRect(graphicEntity.height, graphicEntity.width,
-                graphicEntity.x, graphicEntity.y, frames.get(actual_frame).getLink());
+        SwingRenderer.renderTexturedRect(graphicEntity.getHeight(), graphicEntity.getWidth(),
+                graphicEntity.getX(), graphicEntity.getY(), getFrame().getLink());
     }
 
     @Override

@@ -35,8 +35,8 @@ public class Color extends Cover {
 
     @Override
     public void cover(GraphicEntity graphicEntity) {
-        SwingRenderer.renderRect(graphicEntity.height, graphicEntity.width,
-                graphicEntity.x, graphicEntity.y, getSwingColor());
+        SwingRenderer.renderRect(graphicEntity.getHeight(), graphicEntity.getWidth(),
+                graphicEntity.getX(), graphicEntity.getY(), getSwingColor());
     }
 
     @Override
