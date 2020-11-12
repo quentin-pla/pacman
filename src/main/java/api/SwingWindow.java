@@ -2,7 +2,6 @@ package api;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
 
 /**
  * Fenêtre JFrame (bibliothèque Swing)
@@ -30,25 +29,7 @@ public class SwingWindow {
     /**
      * Fenêtre
      */
-    private static JFrame window = new JFrame();
-
-    /**
-     * Délai de rafraichissement
-     */
-    private static int delay = 1000/60;
-
-    /**
-     * Évènement pour repeindre la scène courante
-     */
-    private static ActionListener taskPerformer = evt -> {
-        getCurrentScene().revalidate();
-        getCurrentScene().repaint();
-    };
-
-    /**
-     * Temps de rafraichissement 60 images par seconde
-     */
-    private static Timer timer = new Timer(delay, taskPerformer);
+    private static final JFrame window = new JFrame();
 
     /**
      * Initialiser la fenêtre
@@ -61,7 +42,6 @@ public class SwingWindow {
         window.setResizable(false);
         window.setTitle(title);
         window.setVisible(true);
-        timer.start();
     }
 
     /**
@@ -77,6 +57,14 @@ public class SwingWindow {
      */
     public static void stopWindow() {
         window.dispose();
+    }
+
+    /**
+     * Rafraichir la fenêtre
+     */
+    public static void refreshWindow() {
+        getCurrentScene().revalidate();
+        getCurrentScene().repaint();
     }
 
     /**

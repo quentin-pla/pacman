@@ -2,10 +2,12 @@ package engines.kernel;
 
 import engines.graphics.GraphicsEngine;
 import engines.input_output.IOEngine;
-import engines.physics.PhysicsEngine;
 
-import java.util.ArrayList;
+import javax.swing.*;
+import java.awt.event.ActionListener;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Moteur noyau
@@ -14,33 +16,50 @@ public class KernelEngine {
     /**
      * Liste des identifiants générés pour les entités
      */
-    private static ArrayList<Integer> entities = new ArrayList<>();
+    private static final Map<Integer,Entity> entities = new HashMap<>();
+
+    /**
+     * Délai de rafraichissement du jeu : 60fps
+     */
+    private static int delay = 1000/60;
+
+    /**
+     * Temps de rafraichissement 60 images par seconde
+     */
+    private static Timer timer;
 
     /**
      * Générer un nouvel id pour une entité
      * @return id généré
      */
     public static int generateEntity() {
-        int id = entities.isEmpty() ? 1 : Collections.max(entities) + 1;
-        entities.add(id);
-        initEntity(id);
-        return id;
+        Entity entity = new Entity();
+        entities.put(entity.getId(), entity);
+        return entity.getId();
     }
 
     /**
-     * Initialiser une entité
-     * @param id identifiant
+     * Générer un nouvel ID
+     * @return nouvel identifiant
      */
-    private static void initEntity(int id) {
-        GraphicsEngine.getInstance().createEntity(id);
-        IOEngine.getInstance().createEntity(id);
-        PhysicsEngine.getInstance().createEntity(id);
+    protected static int generateNewID() {
+        return entities.isEmpty() ? 1 : Collections.max(entities.keySet()) + 1;
     }
+
+    /**
+     * Rafraichir le jeu
+     */
+    private static final ActionListener refresh = evt -> {
+        IOEngine.updateEntities();
+        GraphicsEngine.refreshWindow();
+    };
 
     /**
      * Exécuter le jeu
      */
     public static void start() {
         GraphicsEngine.showWindow();
+        timer = new Timer(delay, refresh);
+        timer.start();
     }
 }

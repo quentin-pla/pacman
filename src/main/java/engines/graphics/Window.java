@@ -54,6 +54,11 @@ public class Window extends SwingAPI {
     }
 
     /**
+     * Rafraichir la fenêtre
+     */
+    protected static void refresh() { SwingWindow.refreshWindow(); }
+
+    /**
      * Terminer l'exécution de la fenêtre
      */
     protected static void stop() {
