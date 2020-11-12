@@ -1,17 +1,30 @@
 package engines.kernel;
 
 /**
- * Entité abtraite
+ * Entité
  */
-public class Entity {
+public abstract class Entity {
     /**
-     * ID de l'entité
+     * Identifiant de l'entité
      */
-    private int id;
+    protected int id;
 
     /**
-     * Récupérer l'identifiant de l'entité
-     * @return identifiant
+     * Constructeur
      */
+    protected Entity() {}
+
+    /**
+     * Constructeur surchargé
+     * @param id identifiant
+     */
+    protected Entity(int id) {
+        this.id = id;
+    }
+
+    // GETTERS & SETTERS //
+
     public int getId() { return id; }
+
+    public void setId(int id) { this.id = id; }
 }

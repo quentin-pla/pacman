@@ -13,24 +13,34 @@ public class IOEntity extends Entity {
     /**
      * Liste des méthodes attachées au touches / boutons
      */
-    private Map<Integer,Consumer<Integer>> bindedMethods = new HashMap<>();
+    private Map<Integer,Consumer<Void>> bindedMethods = new HashMap<>();
 
     /**
      * Constructeur
      */
-    protected IOEntity() {}
+    protected IOEntity(int id) {
+        super(id);
+    }
+
+    /**
+     * Constructeur par clonage
+     * @param clone clone
+     */
+    private IOEntity(IOEntity clone) {
+        this.bindedMethods = clone.bindedMethods;
+    }
 
     /**
      * Cloner l'entité
      * @return clone
      */
     public IOEntity clone() {
-        return new IOEntity();
+        return new IOEntity(this);
     }
 
     // GETTERS //
 
-    public Map<Integer, Consumer<Integer>> getBindedMethods() {
+    public Map<Integer, Consumer<Void>> getBindedMethods() {
         return bindedMethods;
     }
 }

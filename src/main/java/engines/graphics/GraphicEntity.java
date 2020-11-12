@@ -44,7 +44,8 @@ public class GraphicEntity extends Entity {
     /**
      * Constructeur par défaut
      */
-    protected GraphicEntity() {
+    protected GraphicEntity(int id) {
+        super(id);
         this.height = 0;
         this.width = 0;
         this.x = 0;

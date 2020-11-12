@@ -29,23 +29,27 @@ public class PhysicEntity extends Entity {
     /**
      * Constructeur
      */
-    protected PhysicEntity() {}
+    protected PhysicEntity(int id) {
+        super(id);
+    }
 
     /**
      * Constructeur
      */
-    protected PhysicEntity(int x, int y, int speed) {
+    protected PhysicEntity(int x, int y, int height, int width, int speed) {
         this.x = x;
         this.y = y;
+        this.height = height;
+        this.width = width;
         this.speed = speed;
     }
 
     /**
      * Constructeur par clonage
-     * @param physicEntity entité physique
+     * @param clone entité physique
      */
-    private PhysicEntity(PhysicEntity physicEntity) {
-        this(physicEntity.x, physicEntity.y, physicEntity.speed);
+    private PhysicEntity(PhysicEntity clone) {
+        this(clone.x, clone.y, clone.height, clone.width, clone.speed);
     }
 
     /**
