@@ -1,35 +1,16 @@
 package engines.graphics;
 
+import engines.kernel.EngineEntity;
 import engines.kernel.Entity;
 
 /**
  * Entité graphique
  */
-public class GraphicEntity extends Entity {
+public class GraphicEntity extends EngineEntity {
     /**
      * Scène
      */
     protected Scene scene;
-
-    /**
-     * Hateur en pixels
-     */
-    protected int height;
-
-    /**
-     * Largeur en pixels
-     */
-    protected int width;
-
-    /**
-     * Position horizontale
-     */
-    protected int x;
-
-    /**
-     * Position verticale
-     */
-    protected int y;
 
     /**
      * Couleur
@@ -43,13 +24,10 @@ public class GraphicEntity extends Entity {
 
     /**
      * Constructeur par défaut
+     * @param parent parent
      */
-    protected GraphicEntity(int id) {
-        super(id);
-        this.height = 0;
-        this.width = 0;
-        this.x = 0;
-        this.y = 0;
+    protected GraphicEntity(Entity parent) {
+        super(parent);
     }
 
     /**
@@ -57,10 +35,6 @@ public class GraphicEntity extends Entity {
      * @param clone clone
      */
     private GraphicEntity(GraphicEntity clone) {
-        this.height = clone.height;
-        this.width = clone.width;
-        this.x = 0;
-        this.y = 0;
         this.scene = null;
         this.color = clone.color;
         if (clone.texture != null)
@@ -77,44 +51,18 @@ public class GraphicEntity extends Entity {
 
     // GETTERS & SETTERS //
 
+    @Override
+    public Entity getParent() { return parent; }
+
+    @Override
+    public void setParent(Entity parent) { this.parent = parent; }
+
     public Scene getScene() {
         return scene;
     }
 
     protected void setScene(Scene scene) {
         this.scene = scene;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    protected void setHeight(int height) {
-        this.height = height;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    protected void setWidth(int width) {
-        this.width = width;
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    protected void setX(int x) {
-        this.x = x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    protected void setY(int y) {
-        this.y = y;
     }
 
     public Color getColor() {

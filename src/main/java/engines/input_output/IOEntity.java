@@ -1,5 +1,6 @@
 package engines.input_output;
 
+import engines.kernel.EngineEntity;
 import engines.kernel.Entity;
 
 import java.util.HashMap;
@@ -9,17 +10,22 @@ import java.util.function.Consumer;
 /**
  * Entité entrées / sorties
  */
-public class IOEntity extends Entity {
+public class IOEntity extends EngineEntity {
     /**
-     * Liste des méthodes attachées au touches / boutons
+     * Liste des méthodes exécutées lors d'une pression sur une touche ou un bouton
      */
-    private Map<Integer,Consumer<Void>> bindedMethods = new HashMap<>();
+    private Map<Integer,Consumer<Void>> onPressMethods = new HashMap<>();
+
+    /**
+     * Liste des méthodes exécutées en fonction de la dernière touche / bouton pressé(e)
+     */
+    private Map<Integer,Consumer<Void>> onLastMethods = new HashMap<>();
 
     /**
      * Constructeur
      */
-    protected IOEntity(int id) {
-        super(id);
+    protected IOEntity(Entity parent) {
+        super(parent);
     }
 
     /**
@@ -27,7 +33,8 @@ public class IOEntity extends Entity {
      * @param clone clone
      */
     private IOEntity(IOEntity clone) {
-        this.bindedMethods = clone.bindedMethods;
+        this.onPressMethods = clone.onPressMethods;
+        this.onLastMethods = clone.onLastMethods;
     }
 
     /**
@@ -40,7 +47,12 @@ public class IOEntity extends Entity {
 
     // GETTERS //
 
-    public Map<Integer, Consumer<Void>> getBindedMethods() {
-        return bindedMethods;
+    @Override
+    public Entity getParent() { return parent; }
+
+    public Map<Integer, Consumer<Void>> getOnPressMethods() {
+        return onPressMethods;
     }
+
+    public Map<Integer, Consumer<Void>> getOnLastMethods() { return onLastMethods; }
 }
