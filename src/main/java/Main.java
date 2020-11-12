@@ -15,6 +15,7 @@ public class Main {
         GraphicsEngine.bindColor(floor, 0, 0, 255);
 
         //Scène principale
+
         int mainScene = GraphicsEngine.generateScene(300, 300);
         GraphicsEngine.setSceneBackgroundColor(mainScene,0,0,0);
         GraphicsEngine.bindScene(mainScene);
@@ -22,5 +23,6 @@ public class Main {
 
         //Démarrage du jeu
         KernelEngine.start();
+
     }
 }

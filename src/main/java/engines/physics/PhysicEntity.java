@@ -5,6 +5,7 @@ import engines.kernel.Entity;
 /**
  * Entité physique
  */
+
 public class PhysicEntity extends Entity {
     /**
      * Position

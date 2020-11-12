@@ -3,6 +3,7 @@ package engines.physics;
 import engines.graphics.GraphicEntity;
 import engines.kernel.Engine;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,7 +19,7 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
     /**
      * Matrice
      */
-    private static PhysicEntity[][] matrix;
+    private static Integer[][] matrix = new Integer[300][300];
 
     /**
      * Instance unique
@@ -57,6 +58,7 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
      * @param y Position y à vérifier
      * @return booléen
      */
+
     public static boolean isEntityPresent(int x, int y) {
         return matrix[x][y] == null;
     }
@@ -67,6 +69,7 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
      * @param id2 identifiant de l'entité 2
      * @return s'il y a collision ou non
      */
+
     public static boolean isCollision(int id1, int id2) {
         PhysicEntity o1 = entities.get(id1);
         PhysicEntity o2 = entities.get(id2);
@@ -75,10 +78,33 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
                 || (o2.getX() + o2.getWidth() <= o1.getX()) // trop à gauche
                 || (o2.getY() >= o1.getY() + o1.getHeight()) // trop en bas
                 || (o2.getY() + o2.getHeight() <= o1.getHeight()))  // trop en haut
+        {
+
             return false;
+        }
+
         else
             return true;
     }
+
+    public ArrayList<Integer> checkPath(int id, int x, int y, int mul, String dir) {
+
+        ArrayList<Integer> path = new ArrayList<>();
+        switch (dir) {
+            case "UP":
+                int posy = y-mul;
+                for (int i = x; i < x + entities.get(id).getWidth(); i++) {
+                    for (int j = y; j < posy; j++ ) {
+                        path.add(matrix[i][j]);
+                    }
+                }
+                
+            case "DOWN":
+            case "LEFT":
+            case "RIGHT":
+        }
+    }
+
     /**
      * Déplacement vers le haut
      * @param id identifiant de l'entité physique
