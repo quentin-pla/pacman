@@ -11,7 +11,7 @@ public class KeyboardIO implements KeyListener {
     /**
      * Touches préssées
      */
-    private ArrayList<Integer> pressed_keys = new ArrayList<>();
+    private final ArrayList<Integer> pressed_keys = new ArrayList<>();
 
     /**
      * Dernière touche pressée

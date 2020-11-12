@@ -1,7 +1,7 @@
 package engines.physics;
 
-import engines.graphics.GraphicEntity;
 import engines.kernel.Engine;
+import engines.kernel.Entity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -88,7 +88,6 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
     }
 
     public ArrayList<Integer> checkPath(int id, int x, int y, int mul, String dir) {
-
         ArrayList<Integer> path = new ArrayList<>();
         switch (dir) {
             case "UP":
@@ -103,6 +102,7 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
             case "LEFT":
             case "RIGHT":
         }
+        return null;
     }
 
     /**
@@ -113,8 +113,8 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
     public static void goUp(int id, int mul) {
         // S'il n'y a pas d'objets à la position où l'on souhaite se déplacer
         PhysicEntity o = entities.get(id);
-        if (!isEntityPresent(o.getX(),o.getY() - mul))
-            o.setY(o.getY() - mul);
+        //if (!isEntityPresent(o.getX(),o.getY() - mul))
+        o.setY(o.getY() - mul);
     }
 
     /**
@@ -125,8 +125,8 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
     public static void goRight(int id, int mul) {
         PhysicEntity o = entities.get(id);
         // S'il n'y a pas d'objets à la position où l'on souhaite se déplacer
-        if (!isEntityPresent(o.getX() + mul,o.getY()))
-            o.setX(o.getX() + mul);
+        //if (!isEntityPresent(o.getX() + mul,o.getY()))
+        o.setX(o.getX() + mul);
     }
 
     /**
@@ -137,8 +137,8 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
     public static void goLeft(int id, int mul) {
         PhysicEntity o = entities.get(id);
         // S'il n'y a pas d'objets à la position où l'on souhaite se déplacer
-        if (!isEntityPresent(o.getX() - mul,o.getY()))
-            o.setX(o.getX() - mul);
+        //if (!isEntityPresent(o.getX() - mul,o.getY()))
+        o.setX(o.getX() - mul);
     }
 
     /**
@@ -149,8 +149,8 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
     public static void goDown(int id, int mul) {
         PhysicEntity o = entities.get(id);
         // S'il n'y a pas d'objets à la position où l'on souhaite se déplacer
-        if (!isEntityPresent(o.getX(),o.getY() + mul))
-            o.setY(o.getY() + mul);
+        //if (!isEntityPresent(o.getX(),o.getY() + mul))
+        o.setY(o.getY() + mul);
     }
 
 
@@ -164,6 +164,18 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
         PhysicEntity o = entities.get(id);
         o.setX(x);
         o.setY(y);
+    }
+
+    /**
+     * Translater une entité physique
+     * @param id identifiant
+     * @param x position horizontale
+     * @param y position verticale
+     */
+    public static void translate(int id, int x, int y) {
+        PhysicEntity o = entities.get(id);
+        o.setX(o.getX() + x);
+        o.setY(o.getY() + y);
     }
 
     /**
