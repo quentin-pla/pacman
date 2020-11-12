@@ -1,64 +1,70 @@
-//package gameplay;
-//
-//import engines.kernel.Entity;
-//
-//import java.util.ArrayList;
-//
-///**
-// * Niveau de jeu
-// */
-//public class Level {
-//    /**
-//     * Matrice d'entités graphiques
-//     */
-//    private Entity[][] matrix;
-//
-//    /**
-//     * Entités présentes sur le niveau
-//     */
-//    private ArrayList<Entity> level_entities = new ArrayList<>();
+package gameplay;
+
+import engines.graphics.GraphicsEngine;
+import engines.kernel.KernelEngine;
+import engines.physics.PhysicsEngine;
+
+import java.util.ArrayList;
+
+/**
+ * Niveau de jeu
+ */
+public class Level {
+    /**
+     * Identifiant
+     */
+    private int id;
+
+    /**
+     * Matrice d'entités graphiques
+     */
+    private int[][] matrix;
+
+    /**
+     * Entités présentes sur le niveau
+     */
+    private ArrayList<Integer> level_entities = new ArrayList<>();
 //
 //    /**
 //     * Joueur
 //     */
 //    private Player player;
-//
-//    /**
-//     * Chronomètre
-//     */
-//    private float timer;
-//
-//    /**
-//     * Score actuel
-//     */
-//    private int actual_score;
-//
-//    /**
-//     * Constructeur surchargé
-//     * @param rows nombre de lignes
-//     * @param cols nombre de colonnes
-//     * @param floor sol par défaut
-//     */
-//    public Level(int rows, int cols, Entity floor) {
-//        this.resize((rows - 1) * floor.getHeight(), (cols - 1) * floor.getWidth());
-//        this.matrix = new Entity[rows][cols];
-//        fill(floor);
-//    }
-//
-//    /**
-//     * Remplir la matrice
-//     * @param entity entité
-//     */
-//    public void fill(Entity entity) {
-//        for (int row = 0; row < matrix.length; row++) {
-//            for (int col = 0; col < matrix[row].length; col++) {
-//                matrix[row][col] = entity.clone();
-//                matrix[row][col].move((entity.getWidth() * col),(entity.getHeight() * row));
-//                level_entities.add(matrix[row][col]);
-//            }
-//        }
-//    }
-//
+
+    /**
+     * Chronomètre
+     */
+    private float timer;
+
+    /**
+     * Score actuel
+     */
+    private int actual_score;
+
+    /**
+     * Constructeur surchargé
+     * @param rows nombre de lignes
+     * @param cols nombre de colonnes
+     */
+    public Level(int rows, int cols) {
+        this.id = KernelEngine.generateEntity();
+        GraphicsEngine.resize(id,(rows - 1) * 30, (cols - 1) * 30);
+        this.matrix = new int[rows][cols];
+        fill();
+    }
+
+    /**
+     * Remplir la matrice
+     */
+    public void fill() {
+        for (int row = 0; row < matrix.length; row++) {
+            for (int col = 0; col < matrix[row].length; col++) {
+                matrix[row][col] = KernelEngine.generateEntity();
+                PhysicsEngine.goTo(matrix[row][col],(30 * col),(30 * row));
+                level_entities.add(matrix[row][col]);
+            }
+        }
+    }
+
 //    /**
 //     * Faire apparaitre le joueur à un endroit
 //     * @param player joueur
@@ -72,15 +78,15 @@
 //        this.player = player;
 //        level_entities.add(player);
 //    }
-//
-//    /**
-//     * Récupérer les limites du niveau
-//     * @return limites
-//     */
-//    public int[] getBounds() {
-//        return new int[]{getX(), getY(), getX() + getWidth(), getY() + getHeight()};
-//    }
-//
+
+    /**
+     * Récupérer les limites du niveau
+     * @return limites
+     */
+    public int[] getBounds() {
+        return PhysicsEngine.getBounds(id);
+    }
+
 //    @Override
 //    public void draw() {
 //        super.draw();
@@ -134,4 +140,4 @@
 //    public int getActual_score() {
 //        return actual_score;
 //    }
-//}
+}
