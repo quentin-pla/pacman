@@ -91,16 +91,36 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
         ArrayList<Integer> path = new ArrayList<>();
         switch (dir) {
             case "UP":
-                int posy = y-mul;
                 for (int i = x; i < x + entities.get(id).getWidth(); i++) {
-                    for (int j = y; j < posy; j++ ) {
-                        path.add(matrix[i][j]);
+                    for (int j = y; j > (y-mul); j-- ) {
+                        if (!path.contains(matrix[i][j]))
+                            path.add(matrix[i][j]);
                     }
                 }
-                
             case "DOWN":
+                int posy = y+entities.get(id).getHeight();
+                for (int i = x; i < x + entities.get(id).getWidth(); i++) {
+                    for (int j = posy ; j < (posy+mul); j++ ) {
+                        if (!path.contains(matrix[i][j]))
+                            path.add(matrix[i][j]);
+                    }
+                }
             case "LEFT":
+                for (int j = y; j < y + entities.get(id).getHeight(); j++) {
+                    for (int i = x; i > (x-mul); i-- ) {
+                        if (!path.contains(matrix[i][j]))
+                            path.add(matrix[i][j]);
+                    }
+                }
             case "RIGHT":
+                int posx = x+entities.get(id).getWidth();
+                for (int j = y; j < y + entities.get(id).getHeight(); j++) {
+                    for (int i = posx ; i < (posx+mul); i++ ) {
+                        if (!path.contains(matrix[i][j]))
+                            path.add(matrix[i][j]);
+                    }
+                }
+
         }
         return null;
     }
