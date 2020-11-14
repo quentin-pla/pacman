@@ -58,33 +58,42 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
      * @param y Position y à vérifier
      * @return booléen
      */
-
     public static boolean isEntityPresent(int x, int y) {
         return matrix[x][y] == null;
     }
 
     /**
-     * Teste de collision entre les hitbox des entités id1 et id2
+     * Vérifier s'il y a une collision entre deux entités
      * @param id1 identifiant de l'entité 1
      * @param id2 identifiant de l'entité 2
-     * @return s'il y a collision ou non
+     * @return s'il y a collision
      */
-
     public static boolean isCollision(int id1, int id2) {
         PhysicEntity o1 = entities.get(id1);
         PhysicEntity o2 = entities.get(id2);
+        return ((o1.getX() + o1.getWidth() >= o2.getX() && o1.getY() + o1.getHeight() >= o2.getY())
+            || (o1.getX() <= o2.getX() + o2.getWidth() && o1.getY() + o1.getHeight() <= o2.getY())
+            || (o1.getX() <= o2.getX() + o2.getWidth() && o1.getY() <= o2.getY() + o2.getHeight())
+            || (o1.getX() + o1.getWidth() >= o2.getX() && o1.getY() >= o2.getY() + o2.getHeight()));
+    }
 
-        if((o2.getX() >= o1.getX() +  o1.getWidth())      // trop à droite
-                || (o2.getX() + o2.getWidth() <= o1.getX()) // trop à gauche
-                || (o2.getY() >= o1.getY() + o1.getHeight()) // trop en bas
-                || (o2.getY() + o2.getHeight() <= o1.getHeight()))  // trop en haut
-        {
-
-            return false;
-        }
-
-        else
-            return true;
+    /**
+     * Vérifier si une entité est comprise dans une autre entité
+     * @param childID identifiant de l'entité enfant
+     * @param parentID identifiant de l'entité parente
+     * @return si l'enfant est dans le parent
+     */
+    public static boolean isInside(int childID, int parentID) {
+        PhysicEntity child = entities.get(childID);
+        PhysicEntity parent = entities.get(parentID);
+        return ((child.getX() > parent.getX()
+                && child.getY() > parent.getY())
+            && ((child.getX() + child.getWidth() < parent.getX() + parent.getWidth()
+                && child.getY() > parent.getY()))
+            && ((child.getX() > parent.getX()
+                && child.getY() + child.getHeight() < parent.getY() + parent.getHeight()))
+            && ((child.getX() + child.getWidth() < parent.getX() + parent.getWidth()
+                && child.getY() + child.getHeight() < parent.getY() + parent.getHeight())));
     }
 
     public ArrayList<Integer> checkPath(int id, int x, int y, int mul, String dir) {
@@ -180,7 +189,7 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
      * @param x position x
      * @param y position y
      */
-    public static void goTo(int id, int x, int y) {
+    public static void move(int id, int x, int y) {
         PhysicEntity o = entities.get(id);
         o.setX(x);
         o.setY(y);
