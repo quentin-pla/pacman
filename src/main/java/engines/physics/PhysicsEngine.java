@@ -122,7 +122,7 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
                 }
 
         }
-        return null;
+        return path;
     }
 
     /**
