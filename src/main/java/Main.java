@@ -1,5 +1,6 @@
 import engines.graphics.GraphicsEngine;
 import engines.kernel.KernelEngine;
+import engines.physics.PhysicsEngine;
 import gameplay.Player;
 
 /**
@@ -12,12 +13,20 @@ public class Main {
 
         Player player = new Player(30, 30, 2, spriteSheet, 1, 3);
 
-        //Scène principale
+        int object = KernelEngine.generateEntity();
+        PhysicsEngine.move(object,135,115);
+        GraphicsEngine.resize(object,30,30);
+        GraphicsEngine.bindColor(object,255,0,0);
 
+        //Ajout des collisions
+        //PhysicsEngine.addCollisions(player.getEntityID(), object);
+
+        //Scène principale
         int mainScene = GraphicsEngine.generateScene(300, 300);
         GraphicsEngine.setSceneBackgroundColor(mainScene,0,0,0);
         GraphicsEngine.bindScene(mainScene);
-        GraphicsEngine.addToCurrentScene(player.getId());
+        GraphicsEngine.addToCurrentScene(object);
+        GraphicsEngine.addToCurrentScene(player.getEntityID());
 
         //Démarrage du jeu
         KernelEngine.start();

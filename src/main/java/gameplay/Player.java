@@ -2,7 +2,7 @@ package gameplay;
 
 import engines.graphics.GraphicsEngine;
 import engines.input_output.IOEngine;
-import engines.kernel.Entity;
+import engines.kernel.KernelEngine;
 import engines.physics.PhysicsEngine;
 
 import java.awt.event.KeyEvent;
@@ -12,7 +12,12 @@ import java.util.Map;
 /**
  * Joueur
  */
-public class Player extends Entity {
+public class Player {
+    /**
+     * Identifiant entité liée
+     */
+    int entityID;
+
     /**
      * Directions de déplacement
      */
@@ -48,11 +53,11 @@ public class Player extends Entity {
      * @param col colonne
      */
     public Player(int height, int width, int moveSpeed, int spriteSheetID, int row, int col) {
-        super();
+        this.entityID = KernelEngine.generateEntity();
         this.moveSpeed = moveSpeed;
         this.defaultTexture = new int[]{spriteSheetID, row, col};
-        GraphicsEngine.resize(id, height, width);
-        PhysicsEngine.setSpeed(id, moveSpeed);
+        GraphicsEngine.resize(entityID, height, width);
+        PhysicsEngine.setSpeed(entityID, moveSpeed);
         IOEngine.enableKeyboardIO();
         initAnimations(spriteSheetID);
     }
@@ -93,28 +98,32 @@ public class Player extends Entity {
      * Déplacer le joueur
      */
     private void bindAnimations() {
-        IOEngine.bindMethodToLastKey(id, (v)-> {
-            PhysicsEngine.goUp(id, moveSpeed);
-            GraphicsEngine.bindAnimation(id, animations.get(MoveDirection.UP.name()));
+        IOEngine.bindMethodToLastKey(entityID, (v)-> {
+            PhysicsEngine.goUp(entityID, moveSpeed);
+            GraphicsEngine.bindAnimation(entityID, animations.get(MoveDirection.UP.name()));
         }, KeyEvent.VK_UP);
 
-        IOEngine.bindMethodToLastKey(id, (v)-> {
-            PhysicsEngine.goRight(id, moveSpeed);
-            GraphicsEngine.bindAnimation(id, animations.get(MoveDirection.RIGHT.name()));
+        IOEngine.bindMethodToLastKey(entityID, (v)-> {
+            PhysicsEngine.goRight(entityID, moveSpeed);
+            GraphicsEngine.bindAnimation(entityID, animations.get(MoveDirection.RIGHT.name()));
         }, KeyEvent.VK_RIGHT);
 
-        IOEngine.bindMethodToLastKey(id, (v)-> {
-            PhysicsEngine.goDown(id, moveSpeed);
-            GraphicsEngine.bindAnimation(id, animations.get(MoveDirection.DOWN.name()));
+        IOEngine.bindMethodToLastKey(entityID, (v)-> {
+            PhysicsEngine.goDown(entityID, moveSpeed);
+            GraphicsEngine.bindAnimation(entityID, animations.get(MoveDirection.DOWN.name()));
         }, KeyEvent.VK_DOWN);
 
-        IOEngine.bindMethodToLastKey(id, (v)-> {
-            PhysicsEngine.goLeft(id, moveSpeed);
-            GraphicsEngine.bindAnimation(id, animations.get(MoveDirection.LEFT.name()));
+        IOEngine.bindMethodToLastKey(entityID, (v)-> {
+            PhysicsEngine.goLeft(entityID, moveSpeed);
+            GraphicsEngine.bindAnimation(entityID, animations.get(MoveDirection.LEFT.name()));
         }, KeyEvent.VK_LEFT);
 
-        IOEngine.bindMethodToKeyboardFree(id, (v)-> {
-            GraphicsEngine.bindTexture(id, defaultTexture[0], defaultTexture[1], defaultTexture[2]);
+        IOEngine.bindMethodToKeyboardFree(entityID, (v)-> {
+            GraphicsEngine.bindTexture(entityID, defaultTexture[0], defaultTexture[1], defaultTexture[2]);
         });
+    }
+
+    public int getEntityID() {
+        return entityID;
     }
 }
