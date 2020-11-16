@@ -2,6 +2,8 @@ package engines.physics;
 
 import engines.kernel.Engine;
 import engines.kernel.Entity;
+import engines.kernel.Event;
+import engines.kernel.KernelEngine;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +17,9 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
      * Liste des entités physiques
      */
     private static final HashMap<Integer, PhysicEntity> entities = new HashMap<>();
+
+
+    private static final Map<int[], String> events = new HashMap<>();
 
     /**
      * Matrice
@@ -56,6 +61,20 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
      */
     public static void addBoundLimits(int id, int x1, int y1, int x2, int y2) {
         entities.get(id).setBoundLimits(new int[]{x1,y1,x2,y2});
+    }
+
+    public static void bindEventOnCollision(int id1, int id2, String eventName) {
+        events.put(new int[]{id1, id2}, eventName);
+    }
+
+    public static void updateEntites() {
+        for (Map.Entry<int[],String> event: events.entrySet()) {
+
+            if (isCollision(event.getKey()[0], event.getKey()[1])) {
+                KernelEngine.notifyEvent(event.getValue());
+            }
+
+        }
     }
 
     /**
@@ -196,8 +215,10 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
     public static void goRight(int id, int mul) {
         PhysicEntity o = entities.get(id);
         o.setX(o.getX() + mul);
-        if (isInCollision(id) || !isInBounds(id))
-            o.setX(o.getX() - mul);
+        //updateEntites();
+        if (isInCollision(id) || !isInBounds(id)) {
+            o.setX(o.getX() - mul - 5);
+        }
     }
 
     /**

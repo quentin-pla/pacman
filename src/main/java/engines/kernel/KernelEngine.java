@@ -2,6 +2,7 @@ package engines.kernel;
 
 import engines.graphics.GraphicsEngine;
 import engines.input_output.IOEngine;
+import engines.physics.PhysicsEngine;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
@@ -55,6 +56,7 @@ public class KernelEngine {
      */
     private static final ActionListener refresh = evt -> {
         IOEngine.updateEntities();
+        PhysicsEngine.updateEntites();
         GraphicsEngine.refreshWindow();
     };
 

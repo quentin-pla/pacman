@@ -47,6 +47,14 @@ public class Gameplay {
                 PhysicsEngine.goRight(player.getEntityID(), player.getMoveSpeed());
                 GraphicsEngine.bindAnimation(player.getEntityID(), player.getAnimations().get(Player.MoveDirection.RIGHT.name()));
             }
+        }),
+
+        ResizePlayer(new Event() {
+            @Override
+            public void run() {
+                //System.out.println("coucoucocucoucocu");
+                GraphicsEngine.resize(player.getEntityID(), 60, 60);
+            }
         });
 
         Event event;
@@ -101,11 +109,13 @@ public class Gameplay {
         KernelEngine.addEvent("GoLeft", EVENTS.GoLeft.getEvent());
         IOEngine.bindEventOnLastKey(KeyEvent.VK_LEFT, "GoLeft");
 
+
         //Objet simple
         int object = KernelEngine.generateEntity();
         PhysicsEngine.move(object,135,135);
         GraphicsEngine.resize(object,30,30);
         GraphicsEngine.bindColor(object,255,0,0);
+
 
         //Ajout des collisions
         PhysicsEngine.addCollisions(player.getEntityID(), object);
