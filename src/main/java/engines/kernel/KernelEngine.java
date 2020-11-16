@@ -5,6 +5,7 @@ import engines.input_output.IOEngine;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,6 +18,9 @@ public class KernelEngine {
      * Liste des identifiants générés pour les entités
      */
     private static final Map<Integer,Entity> entities = new HashMap<>();
+
+
+    private static Map<String, Event> events = new HashMap<>();
 
     /**
      * Délai de rafraichissement du jeu : 60fps
@@ -53,6 +57,15 @@ public class KernelEngine {
         IOEngine.updateEntities();
         GraphicsEngine.refreshWindow();
     };
+
+
+    public static void addEvent(String name, Event event) {
+        events.put(name, event);
+    }
+
+    public static void notifyEvent(String eventName) {
+        events.get(eventName).run();
+    }
 
     /**
      * Exécuter le jeu

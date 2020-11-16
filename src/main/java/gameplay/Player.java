@@ -13,10 +13,14 @@ import java.util.Map;
  * Joueur
  */
 public class Player {
+
+
     /**
      * Identifiant entité liée
      */
-    int entityID;
+    private int entityID;
+
+
 
     /**
      * Directions de déplacement
@@ -60,6 +64,7 @@ public class Player {
         PhysicsEngine.setSpeed(entityID, moveSpeed);
         IOEngine.enableKeyboardIO();
         initAnimations(spriteSheetID);
+        GraphicsEngine.bindTexture(entityID, defaultTexture[0], defaultTexture[1], defaultTexture[2]);
     }
 
     /**
@@ -91,13 +96,13 @@ public class Player {
         GraphicsEngine.addFrameToAnimation(moveLEFT,1,5);
         animations.put(MoveDirection.LEFT.name(), moveLEFT);
 
-        bindAnimations();
+        //bindAnimations();
     }
 
     /**
      * Déplacer le joueur
      */
-    private void bindAnimations() {
+    /*private void bindAnimations() {
         IOEngine.bindMethodToLastKey(entityID, (v)-> {
             PhysicsEngine.goUp(entityID, moveSpeed);
             GraphicsEngine.bindAnimation(entityID, animations.get(MoveDirection.UP.name()));
@@ -121,9 +126,18 @@ public class Player {
         IOEngine.bindMethodToKeyboardFree(entityID, (v)-> {
             GraphicsEngine.bindTexture(entityID, defaultTexture[0], defaultTexture[1], defaultTexture[2]);
         });
-    }
+    }*/
 
     public int getEntityID() {
         return entityID;
+    }
+
+    public int getMoveSpeed() {
+        return moveSpeed;
+    }
+
+
+    public Map<String, Integer> getAnimations() {
+        return animations;
     }
 }
