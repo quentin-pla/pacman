@@ -1,7 +1,6 @@
 package api;
 
 import javax.swing.*;
-import java.awt.*;
 
 /**
  * Fenêtre JFrame (bibliothèque Swing)
@@ -33,12 +32,10 @@ public class SwingWindow {
 
     /**
      * Initialiser la fenêtre
-     * @param scene scène
      * @param title titre
      */
-    public static void initWindow(SwingScene scene, String title) {
+    public static void initWindow(String title) {
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        window.setSize(new Dimension(scene.width, scene.height));
         window.setResizable(false);
         window.setTitle(title);
         window.setVisible(true);
@@ -77,8 +74,8 @@ public class SwingWindow {
             window.getContentPane().remove(0);
         //Ajout de la nouvelle scène
         window.getContentPane().add(scene);
-        //Définition des dimensions
-        window.setSize(new Dimension(scene.width, scene.height));
+        //Dimensionnement de la fenêtre à la scène
+        window.pack();
     }
 
     /**
