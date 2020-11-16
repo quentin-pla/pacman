@@ -4,6 +4,7 @@ import api.SwingAPI;
 import engines.kernel.Engine;
 import engines.kernel.Entity;
 
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -179,6 +180,12 @@ public class IOEngine extends SwingAPI implements Engine<IOEntity> {
      * @return code du bouton
      */
     public static int lastPressedButton() { return mouseIO.getLastPressedButton(); }
+
+    /**
+     * Récupérer les coordonnées du dernier click
+     * @return coordonnées dernier click
+     */
+    public static Point lastClickCoordinates() { return mouseIO.getClickCoords(); }
 
     /**
      * Relier une méthode à un bouton de la souris

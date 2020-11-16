@@ -1,5 +1,6 @@
 package engines.input_output;
 
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -11,12 +12,17 @@ public class MouseIO implements MouseListener {
     /**
      * Boutons pressés
      */
-    private ArrayList<Integer> pressed_buttons = new ArrayList<>();
+    private ArrayList<Integer> pressedButtons = new ArrayList<>();
 
     /**
      * Dernier bouton pressé
      */
-    private int last_pressed_button;
+    private int lastPressedButton;
+
+    /**
+     * Coordonnées du click
+     */
+    private Point clickCoords = new Point();
 
     /**
      * Constructeur privé
@@ -24,22 +30,24 @@ public class MouseIO implements MouseListener {
     protected MouseIO() {}
 
     @Override
-    public void mouseClicked(MouseEvent e) {}
+    public void mouseClicked(MouseEvent e) {
+        clickCoords = e.getPoint();
+    }
 
     @Override
     public void mousePressed(MouseEvent e) {
         int key = e.getButton();
-        if (!pressed_buttons.contains(key)) {
-            pressed_buttons.add(key);
-            last_pressed_button = key;
+        if (!pressedButtons.contains(key)) {
+            pressedButtons.add(key);
+            lastPressedButton = key;
         }
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
         int key = e.getButton();
-        if (pressed_buttons.contains(key))
-            pressed_buttons.remove((Integer) key);
+        if (pressedButtons.contains(key))
+            pressedButtons.remove((Integer) key);
     }
 
     @Override
@@ -51,10 +59,12 @@ public class MouseIO implements MouseListener {
     // GETTERS //
 
     public ArrayList<Integer> getPressedButtons() {
-        return pressed_buttons;
+        return pressedButtons;
     }
 
     public int getLastPressedButton() {
-        return last_pressed_button;
+        return lastPressedButton;
     }
+
+    public Point getClickCoords() { return clickCoords; }
 }
