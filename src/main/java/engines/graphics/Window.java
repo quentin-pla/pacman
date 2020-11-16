@@ -50,7 +50,7 @@ public class Window extends SwingAPI {
      * Initialiser la fenêtre
      */
     private static void init() {
-        SwingWindow.initWindow(actual_scene, title);
+        SwingWindow.initWindow(title);
     }
 
     /**
