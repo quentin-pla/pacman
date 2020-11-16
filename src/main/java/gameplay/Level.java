@@ -59,7 +59,7 @@ public class Level {
         for (int row = 0; row < matrix.length; row++) {
             for (int col = 0; col < matrix[row].length; col++) {
                 matrix[row][col] = KernelEngine.generateEntity();
-                PhysicsEngine.goTo(matrix[row][col],(30 * col),(30 * row));
+                PhysicsEngine.move(matrix[row][col],(30 * col),(30 * row));
                 level_entities.add(matrix[row][col]);
             }
         }
