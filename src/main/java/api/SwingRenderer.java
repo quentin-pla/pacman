@@ -4,7 +4,6 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.VolatileImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -113,26 +112,14 @@ public class SwingRenderer {
      * @return tampon
      */
     private static BufferedImage getBufferedImage(String link) {
-        link = "classes/assets/" + link;
-        if (!isRunningFromJAR()) link = "target/" + link;
         BufferedImage texture = null;
         try {
-            texture = ImageIO.read(new File(link));
+            texture = ImageIO.read(SwingRenderer.class.getResourceAsStream("/" + link));
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
         }
         return texture;
-    }
-
-    /**
-     * Savoir si le programme est exécuté depuis un fichier JAR
-     * @return booléen
-     */
-    private static boolean isRunningFromJAR() {
-        String classLink = SwingRenderer.class.getResource("SwingRenderer.class").toString();
-        classLink = classLink.substring(0,classLink.indexOf(":"));
-        return classLink.equals("jar");
     }
 
     /**
