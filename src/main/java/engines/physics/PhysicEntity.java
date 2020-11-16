@@ -3,11 +3,22 @@ package engines.physics;
 import engines.kernel.EngineEntity;
 import engines.kernel.Entity;
 
+import java.util.ArrayList;
+
 /**
  * Entité physique
  */
-
 public class PhysicEntity extends EngineEntity {
+    /**
+     * Liste des entités en collision avec celle-ci
+     */
+    private ArrayList<Integer> collisions = new ArrayList<>();
+
+    /**
+     * Limites de déplacement
+     */
+    private int[] boundLimits = new int[4];
+
     /**
      * Vitesse de déplacement
      */
@@ -25,6 +36,7 @@ public class PhysicEntity extends EngineEntity {
      * @param clone entité physique
      */
     private PhysicEntity(PhysicEntity clone) {
+        this.collisions = clone.collisions;
         this.speed = clone.speed;
     }
 
@@ -46,4 +58,10 @@ public class PhysicEntity extends EngineEntity {
     public void setSpeed(int speed) { this.speed = speed; }
 
     public int[] getBounds() { return new int[]{getX(), getY(), getX() + getWidth(), getY() + getHeight()}; }
+
+    public ArrayList<Integer> getCollisions() { return collisions; }
+
+    public int[] getBoundLimits() { return boundLimits; }
+
+    public void setBoundLimits(int[] boundLimits) { this.boundLimits = boundLimits; }
 }

@@ -41,16 +41,22 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
     }
 
     /**
-     * Vérifier s'il y a une collision
-     * @param o1 entité physique 1
-     * @param o2 entité physique 2
-     * @return booléen
+     * Ajouter des collisions entre deux entités
+     * @param id1 identifiant entité 1
+     * @param id2 identifiant entité 2
      */
-    /*public boolean isCollision(int id1, int id2) {
-        PhysicsEntity o1 = id_objects.get(id1);
-        PhysicsEntity o2 = id_objects.get(id2);
-        return o1.getX() == o2.getX() && o1.getY() == o2.getY();
-    }*/
+    public static void addCollisions(int id1, int id2) {
+        entities.get(id1).getCollisions().add(id2);
+        entities.get(id2).getCollisions().add(id1);
+    }
+
+    /**
+     * Ajouter des limites de déplacement
+     * @param id identifiant de l'entité
+     */
+    public static void addBoundLimits(int id, int x1, int y1, int x2, int y2) {
+        entities.get(id).setBoundLimits(new int[]{x1,y1,x2,y2});
+    }
 
     /**
      * Vérifier qu'il n'y a pas d'objet à la position (x,y)
@@ -63,6 +69,19 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
     }
 
     /**
+     * Vérifier si une entité est en collision
+     * @param id identifiant de l'entité
+     * @return s'il y a une collision
+     */
+    public static boolean isInCollision(int id) {
+        PhysicEntity o = entities.get(id);
+        for (int collisionID : o.getCollisions())
+            if (isCollision(id,collisionID))
+                return true;
+        return false;
+    }
+
+    /**
      * Vérifier s'il y a une collision entre deux entités
      * @param id1 identifiant de l'entité 1
      * @param id2 identifiant de l'entité 2
@@ -71,10 +90,10 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
     public static boolean isCollision(int id1, int id2) {
         PhysicEntity o1 = entities.get(id1);
         PhysicEntity o2 = entities.get(id2);
-        return ((o1.getX() + o1.getWidth() >= o2.getX() && o1.getY() + o1.getHeight() >= o2.getY())
-            || (o1.getX() <= o2.getX() + o2.getWidth() && o1.getY() + o1.getHeight() <= o2.getY())
-            || (o1.getX() <= o2.getX() + o2.getWidth() && o1.getY() <= o2.getY() + o2.getHeight())
-            || (o1.getX() + o1.getWidth() >= o2.getX() && o1.getY() >= o2.getY() + o2.getHeight()));
+        return o1.getX() + o1.getWidth() > o2.getX()
+            && o1.getY() + o1.getHeight() > o2.getY()
+            && o1.getX() < o2.getX() + o2.getWidth()
+            && o1.getY() < o2.getY() + o2.getHeight();
     }
 
     /**
@@ -96,6 +115,29 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
                 && child.getY() + child.getHeight() < parent.getY() + parent.getHeight())));
     }
 
+    /**
+     * Vérifier si une entité est bien dans ses limites de déplacement
+     * @param id identifiant
+     * @return si l'entité respecte ses limites de déplacement
+     */
+    public static boolean isInBounds(int id) {
+        PhysicEntity entity = entities.get(id);
+        int[] boundLimits = entity.getBoundLimits();
+        return entity.getX() >= boundLimits[0]
+            && entity.getX() + entity.getWidth() <= boundLimits[2]
+            && entity.getY() >= boundLimits[1]
+            && entity.getY() + entity.getHeight() <= boundLimits[3];
+    }
+
+    /**
+     * ?
+     * @param id identifiant
+     * @param x position horizontale
+     * @param y position verticale
+     * @param mul multiplicateur
+     * @param dir direction
+     * @return
+     */
     public ArrayList<Integer> checkPath(int id, int x, int y, int mul, String dir) {
         ArrayList<Integer> path = new ArrayList<>();
         switch (dir) {
@@ -140,10 +182,10 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
      * @param mul multiplicateur
      */
     public static void goUp(int id, int mul) {
-        // S'il n'y a pas d'objets à la position où l'on souhaite se déplacer
         PhysicEntity o = entities.get(id);
-        //if (!isEntityPresent(o.getX(),o.getY() - mul))
         o.setY(o.getY() - mul);
+        if (isInCollision(id) || !isInBounds(id))
+            o.setY(o.getY() + mul);
     }
 
     /**
@@ -153,9 +195,9 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
      */
     public static void goRight(int id, int mul) {
         PhysicEntity o = entities.get(id);
-        // S'il n'y a pas d'objets à la position où l'on souhaite se déplacer
-        //if (!isEntityPresent(o.getX() + mul,o.getY()))
         o.setX(o.getX() + mul);
+        if (isInCollision(id) || !isInBounds(id))
+            o.setX(o.getX() - mul);
     }
 
     /**
@@ -165,9 +207,9 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
      */
     public static void goLeft(int id, int mul) {
         PhysicEntity o = entities.get(id);
-        // S'il n'y a pas d'objets à la position où l'on souhaite se déplacer
-        //if (!isEntityPresent(o.getX() - mul,o.getY()))
         o.setX(o.getX() - mul);
+        if (isInCollision(id) || !isInBounds(id))
+            o.setX(o.getX() + mul);
     }
 
     /**
@@ -177,11 +219,10 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
      */
     public static void goDown(int id, int mul) {
         PhysicEntity o = entities.get(id);
-        // S'il n'y a pas d'objets à la position où l'on souhaite se déplacer
-        //if (!isEntityPresent(o.getX(),o.getY() + mul))
         o.setY(o.getY() + mul);
+        if (isInCollision(id) || !isInBounds(id))
+            o.setY(o.getY() - mul);
     }
-
 
     /**
      * Déplacement de l'entité physique à la position indiquée
