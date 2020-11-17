@@ -95,7 +95,7 @@ public class GraphicsEngine implements Engine<GraphicEntity> {
     public static void erase(int id) {
         GraphicEntity entity = entities.get(id);
         Scene scene = entity.getScene();
-        scene.removeEntity(id);
+        scene.removeEntity(entity);
     }
 
     /**
@@ -377,9 +377,11 @@ public class GraphicsEngine implements Engine<GraphicEntity> {
     @Override
     public GraphicEntity getEntity(int id) { return entities.get(id); }
 
-    protected static Texture getTexture(int id) { return textures.get(id); }
+    public static Texture getTexture(int id) { return textures.get(id); }
 
-    protected static Scene getScene(int id) { return scenes.get(id); }
+    public static SpriteAnimation getAnimation(int id) { return animations.get(id); }
 
-    protected static Map<Integer, Scene> getScenes() { return scenes; }
+    public static Scene getScene(int id) { return scenes.get(id); }
+
+    public static Map<Integer, Scene> getScenes() { return scenes; }
 }
