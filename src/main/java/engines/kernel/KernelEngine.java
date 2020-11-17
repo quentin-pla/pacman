@@ -6,7 +6,6 @@ import engines.physics.PhysicsEngine;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +19,9 @@ public class KernelEngine {
      */
     private static final Map<Integer,Entity> entities = new HashMap<>();
 
-
+    /**
+     * Liste des évènements du jeu
+     */
     private static Map<String, Event> events = new HashMap<>();
 
     /**
@@ -34,7 +35,7 @@ public class KernelEngine {
     private static Timer timer;
 
     /**
-     * Générer un nouvel id pour une entité
+     * Générer une nouvelle entité
      * @return id généré
      */
     public static int generateEntity() {
@@ -60,11 +61,19 @@ public class KernelEngine {
         GraphicsEngine.refreshWindow();
     };
 
-
+    /**
+     * Ajouter un évènement au jeu
+     * @param name nom de l'évènement
+     * @param event évènement
+     */
     public static void addEvent(String name, Event event) {
         events.put(name, event);
     }
 
+    /**
+     * Exécuter un évènement spécifique
+     * @param eventName nom de l'évènement
+     */
     public static void notifyEvent(String eventName) {
         events.get(eventName).run();
     }
