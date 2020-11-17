@@ -41,7 +41,7 @@ public class Scene extends SwingScene {
      * Supprimer une entité présente sur la scène
      * @param entity entité
      */
-    protected void removeEntity(int entity) {
+    protected void removeEntity(GraphicEntity entity) {
         entities.remove(entity);
     }
 
