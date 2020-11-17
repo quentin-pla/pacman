@@ -2,10 +2,8 @@ package engines.physics;
 
 import engines.kernel.Engine;
 import engines.kernel.Entity;
-import engines.kernel.Event;
 import engines.kernel.KernelEngine;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,13 +16,15 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
      */
     private static final HashMap<Integer, PhysicEntity> entities = new HashMap<>();
 
-
-    private static final Map<int[], String> events = new HashMap<>();
+    /**
+     * Liste des évènements liés aux collisions en entrée
+     */
+    private static final Map<Integer[], String> collisionsEvents = new HashMap<>();
 
     /**
-     * Matrice
+     * Liste des évènements lorsque deux entités sont centrées
      */
-    private static Integer[][] matrix = new Integer[300][300];
+    private static final Map<Integer[], String> centeredEvents = new HashMap<>();
 
     /**
      * Instance unique
@@ -46,6 +46,31 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
     }
 
     /**
+     * Mettre à jour les entités physiques
+     */
+    public static void updateEntites() {
+        for (PhysicEntity entity : entities.values()) {
+            if (isInCollision(entity.getId()) || !isInBounds(entity.getId())) {
+                PhysicsEngine.move(entity.getId(), entity.getLastX(), entity.getLastY());
+                entity.setColliding(true);
+            }
+            else entity.setColliding(false);
+        }
+        for (Map.Entry<Integer[],String> event : collisionsEvents.entrySet()) {
+            PhysicEntity e1 = entities.get(event.getKey()[0]);
+            PhysicEntity e2 = event.getKey()[1] == null ? null : entities.get(event.getKey()[1]);
+            if ((e2 == null && e1.isColliding())
+                    || (e2 != null && e1.isColliding() && e2.isColliding())
+                    || (e2 != null && isInCollision(event.getKey()[0], event.getKey()[1])))
+                KernelEngine.notifyEvent(event.getValue());
+        }
+        for (Map.Entry<Integer[],String> event : centeredEvents.entrySet()) {
+            if (isCentered(event.getKey()[0],event.getKey()[1]))
+                KernelEngine.notifyEvent(event.getValue());
+        }
+    }
+
+    /**
      * Ajouter des collisions entre deux entités
      * @param id1 identifiant entité 1
      * @param id2 identifiant entité 2
@@ -63,28 +88,33 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
         entities.get(id).setBoundLimits(new int[]{x1,y1,x2,y2});
     }
 
-    public static void bindEventOnCollision(int id1, int id2, String eventName) {
-        events.put(new int[]{id1, id2}, eventName);
-    }
-
-    public static void updateEntites() {
-        for (Map.Entry<int[],String> event: events.entrySet()) {
-
-            if (isCollision(event.getKey()[0], event.getKey()[1])) {
-                KernelEngine.notifyEvent(event.getValue());
-            }
-
-        }
+    /**
+     * Attacher un évènement lorsqu'une entité entre en collision
+     * @param id identifiant de l'entité
+     * @param eventName nom de l'évènement
+     */
+    public static void bindEventOnCollision(int id, String eventName) {
+        collisionsEvents.put(new Integer[]{id, null}, eventName);
     }
 
     /**
-     * Vérifier qu'il n'y a pas d'objet à la position (x,y)
-     * @param x Position x à vérifier
-     * @param y Position y à vérifier
-     * @return booléen
+     * Attacher un évènement lorsque deux entités entrent en collision
+     * @param id1 identifiant de l'entité 1
+     * @param id2 identifiant de l'entité 2
+     * @param eventName nom de l'évènement
      */
-    public static boolean isEntityPresent(int x, int y) {
-        return matrix[x][y] == null;
+    public static void bindEventOnCollision(int id1, int id2, String eventName) {
+        collisionsEvents.put(new Integer[]{id1, id2}, eventName);
+    }
+
+    /**
+     * Attacher un évènement à lorsque deux entités sont sur la même position
+     * @param id1 identifiant de l'entité 1
+     * @param id2 identifiant de l'entité 2
+     * @param eventName nom de l'évènement
+     */
+    public static void bindEventOnSameLocation(int id1, int id2, String eventName) {
+        centeredEvents.put(new Integer[]{id1, id2}, eventName);
     }
 
     /**
@@ -95,7 +125,7 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
     public static boolean isInCollision(int id) {
         PhysicEntity o = entities.get(id);
         for (int collisionID : o.getCollisions())
-            if (isCollision(id,collisionID))
+            if (isInCollision(id,collisionID))
                 return true;
         return false;
     }
@@ -106,7 +136,7 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
      * @param id2 identifiant de l'entité 2
      * @return s'il y a collision
      */
-    public static boolean isCollision(int id1, int id2) {
+    public static boolean isInCollision(int id1, int id2) {
         PhysicEntity o1 = entities.get(id1);
         PhysicEntity o2 = entities.get(id2);
         return o1.getX() + o1.getWidth() > o2.getX()
@@ -142,57 +172,23 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
     public static boolean isInBounds(int id) {
         PhysicEntity entity = entities.get(id);
         int[] boundLimits = entity.getBoundLimits();
-        return entity.getX() >= boundLimits[0]
+        return boundLimits == null || entity.getX() >= boundLimits[0]
             && entity.getX() + entity.getWidth() <= boundLimits[2]
             && entity.getY() >= boundLimits[1]
             && entity.getY() + entity.getHeight() <= boundLimits[3];
     }
 
     /**
-     * ?
-     * @param id identifiant
-     * @param x position horizontale
-     * @param y position verticale
-     * @param mul multiplicateur
-     * @param dir direction
-     * @return
+     * Vérifier si deux entités sont à la même position
+     * @param id1 identifiant entité 1
+     * @param id2 identifiant entité 2
+     * @return si les entités sont à la même position
      */
-    public ArrayList<Integer> checkPath(int id, int x, int y, int mul, String dir) {
-        ArrayList<Integer> path = new ArrayList<>();
-        switch (dir) {
-            case "UP":
-                for (int i = x; i < x + entities.get(id).getWidth(); i++) {
-                    for (int j = y; j > (y-mul); j-- ) {
-                        if (!path.contains(matrix[i][j]))
-                            path.add(matrix[i][j]);
-                    }
-                }
-            case "DOWN":
-                int posy = y+entities.get(id).getHeight();
-                for (int i = x; i < x + entities.get(id).getWidth(); i++) {
-                    for (int j = posy ; j < (posy+mul); j++ ) {
-                        if (!path.contains(matrix[i][j]))
-                            path.add(matrix[i][j]);
-                    }
-                }
-            case "LEFT":
-                for (int j = y; j < y + entities.get(id).getHeight(); j++) {
-                    for (int i = x; i > (x-mul); i-- ) {
-                        if (!path.contains(matrix[i][j]))
-                            path.add(matrix[i][j]);
-                    }
-                }
-            case "RIGHT":
-                int posx = x+entities.get(id).getWidth();
-                for (int j = y; j < y + entities.get(id).getHeight(); j++) {
-                    for (int i = posx ; i < (posx+mul); i++ ) {
-                        if (!path.contains(matrix[i][j]))
-                            path.add(matrix[i][j]);
-                    }
-                }
-
-        }
-        return path;
+    public static boolean isCentered(int id1, int id2) {
+        PhysicEntity e1 = entities.get(id1);
+        PhysicEntity e2 = entities.get(id2);
+        return (e1.getX() + e1.getWidth()) / 2 == (e2.getX() + e2.getWidth()) / 2
+            && (e1.getY() + e1.getHeight()) / 2 == (e2.getY() + e2.getHeight()) / 2;
     }
 
     /**
@@ -201,10 +197,7 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
      * @param mul multiplicateur
      */
     public static void goUp(int id, int mul) {
-        PhysicEntity o = entities.get(id);
-        o.setY(o.getY() - mul);
-        if (isInCollision(id) || !isInBounds(id))
-            o.setY(o.getY() + mul);
+        PhysicsEngine.translate(id, 0, -mul);
     }
 
     /**
@@ -213,12 +206,7 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
      * @param mul multiplicateur
      */
     public static void goRight(int id, int mul) {
-        PhysicEntity o = entities.get(id);
-        o.setX(o.getX() + mul);
-        //updateEntites();
-        if (isInCollision(id) || !isInBounds(id)) {
-            o.setX(o.getX() - mul - 5);
-        }
+        PhysicsEngine.translate(id, mul, 0);
     }
 
     /**
@@ -227,10 +215,7 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
      * @param mul multiplicateur
      */
     public static void goLeft(int id, int mul) {
-        PhysicEntity o = entities.get(id);
-        o.setX(o.getX() - mul);
-        if (isInCollision(id) || !isInBounds(id))
-            o.setX(o.getX() + mul);
+        PhysicsEngine.translate(id, -mul, 0);
     }
 
     /**
@@ -239,10 +224,7 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
      * @param mul multiplicateur
      */
     public static void goDown(int id, int mul) {
-        PhysicEntity o = entities.get(id);
-        o.setY(o.getY() + mul);
-        if (isInCollision(id) || !isInBounds(id))
-            o.setY(o.getY() - mul);
+        PhysicsEngine.translate(id, 0, mul);
     }
 
     /**
@@ -253,6 +235,8 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
      */
     public static void move(int id, int x, int y) {
         PhysicEntity o = entities.get(id);
+        o.setLastX(o.getX());
+        o.setLastY(o.getY());
         o.setX(x);
         o.setY(y);
     }
@@ -265,6 +249,8 @@ public class PhysicsEngine implements Engine<PhysicEntity> {
      */
     public static void translate(int id, int x, int y) {
         PhysicEntity o = entities.get(id);
+        o.setLastX(o.getX());
+        o.setLastY(o.getY());
         o.setX(o.getX() + x);
         o.setY(o.getY() + y);
     }
