@@ -3,7 +3,6 @@ package engines.input_output;
 import api.SwingAPI;
 import engines.kernel.Engine;
 import engines.kernel.Entity;
-import engines.kernel.Event;
 import engines.kernel.KernelEngine;
 
 import java.awt.*;
@@ -20,9 +19,14 @@ public class IOEngine extends SwingAPI implements Engine<IOEntity> {
      */
     public static final Map<Integer, IOEntity> entities = new HashMap<>();
 
-
+    /**
+     * Liste des évènements attachés à une touche ou un bouton
+     */
     public static final Map<Integer, String> bindedEvents = new HashMap<>();
 
+    /**
+     * Liste des évènements attachés à la dernière touche / bouton
+     */
     public static final Map<Integer, String> bindedEventsOnLastKey = new HashMap<>();
     /**
      * Écouteur actions utilisateur clavier
@@ -63,27 +67,12 @@ public class IOEngine extends SwingAPI implements Engine<IOEntity> {
      * Mettre à jour les entités en fonction des touches pressées
      */
     public static void updateEntities() {
-        /*for (IOEntity entity : entities.values()) {
-            for (Map.Entry<Integer, Consumer<Void>> bind : entity.getOnPressMethods().entrySet()) {
-                if (bind.getKey() == null && isKeyboardFree())
-                    if (isKeyboardFree()) bind.getValue().accept(null);
-                else if (bind.getKey() != null && isKeyPressed(bind.getKey()))
-                    bind.getValue().accept(null);
-            }
-            for (Map.Entry<Integer, Consumer<Void>> bind : entity.getOnLastMethods().entrySet()) {
-                if (lastPressedKey() == bind.getKey())
-                    bind.getValue().accept(null);
-            }
-        }*/
-        for (Map.Entry<Integer,String> event: bindedEvents.entrySet()) {
-            if(isKeyPressed(event.getKey())) KernelEngine.notifyEvent(event.getValue());
-        }
-
-        for (Map.Entry<Integer,String> event: bindedEventsOnLastKey.entrySet()) {
-            if(lastPressedKey() == event.getKey()) KernelEngine.notifyEvent(event.getValue());
-        }
-
-
+        for (Map.Entry<Integer,String> event : bindedEvents.entrySet())
+            if ((event.getKey() == -1 && isKeyboardFree()) || isKeyPressed(event.getKey()))
+                KernelEngine.notifyEvent(event.getValue());
+        for (Map.Entry<Integer,String> event: bindedEventsOnLastKey.entrySet())
+            if(lastPressedKey() == event.getKey())
+                KernelEngine.notifyEvent(event.getValue());
     }
 
     //-------------------------------//
@@ -155,12 +144,30 @@ public class IOEngine extends SwingAPI implements Engine<IOEntity> {
         entities.get(id).getOnLastMethods().put(keyCode, method);
     }
 
-    public static void bindEvent(int key_id, String eventName) {
-        bindedEvents.put(key_id, eventName);
+    /**
+     * Attacher un évènement à une touche clavier
+     * @param keyCode code de la touche
+     * @param eventName nom de l'évènement
+     */
+    public static void bindEvent(Integer keyCode, String eventName) {
+        bindedEvents.put(keyCode, eventName);
     }
 
-    public static void bindEventOnLastKey(int key_id, String eventName) {
-        bindedEventsOnLastKey.put(key_id, eventName);
+    /**
+     * Attacher un évènement à la dernière touche pressée
+     * @param keyCode code de la touche
+     * @param eventName nom de l'évènement
+     */
+    public static void bindEventOnLastKey(int keyCode, String eventName) {
+        bindedEventsOnLastKey.put(keyCode, eventName);
+    }
+
+    /**
+     * Attacher un évènement lorsqu'aucune touche est pressée
+     * @param eventName nom de l'évènement
+     */
+    public static void bindEventKeyboardFree(String eventName) {
+        bindedEvents.put(-1, eventName);
     }
 
     //------------------------------//
@@ -255,5 +262,13 @@ public class IOEngine extends SwingAPI implements Engine<IOEntity> {
     @Override
     public IOEntity getEntity(int id) {
         return entities.get(id);
+    }
+
+    public static KeyboardIO getKeyboardIO() {
+        return keyboardIO;
+    }
+
+    public static MouseIO getMouseIO() {
+        return mouseIO;
     }
 }
