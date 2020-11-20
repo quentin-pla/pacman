@@ -6,7 +6,6 @@ import engines.physics.PhysicsEngine;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,9 +14,9 @@ import java.util.Map;
  */
 public class KernelEngine {
     /**
-     * Liste des identifiants générés pour les entités
+     * Dernier id généré
      */
-    private static final Map<Integer,Entity> entities = new HashMap<>();
+    private static int lastID = 0;
 
     /**
      * Liste des évènements du jeu
@@ -27,21 +26,14 @@ public class KernelEngine {
     /**
      * Délai de rafraichissement du jeu : 60fps
      */
-    private static int delay = 1000/60;
-
-    /**
-     * Temps de rafraichissement 60 images par seconde
-     */
-    private static Timer timer;
+    private final static int delay = 1000/60;
 
     /**
      * Générer une nouvelle entité
      * @return id généré
      */
-    public static int generateEntity() {
-        Entity entity = new Entity();
-        entities.put(entity.getId(), entity);
-        return entity.getId();
+    public static Entity generateEntity() {
+        return new Entity();
     }
 
     /**
@@ -49,7 +41,8 @@ public class KernelEngine {
      * @return nouvel identifiant
      */
     protected static int generateNewID() {
-        return entities.isEmpty() ? 1 : Collections.max(entities.keySet()) + 1;
+        ++lastID;
+        return lastID;
     }
 
     /**
@@ -79,11 +72,11 @@ public class KernelEngine {
     }
 
     /**
-     * Exécuter le jeu
+     * Exécuter le moteur noyau
      */
     public static void start() {
         GraphicsEngine.showWindow();
-        timer = new Timer(delay, refresh);
-        timer.start();
+        //Rafraichissement 60 images par seconde
+        new Timer(delay, refresh).start();
     }
 }

@@ -1,7 +1,6 @@
 package engines.graphics;
 
 import api.SwingRenderer;
-import engines.kernel.Engine;
 import engines.kernel.Entity;
 
 import java.util.Collections;
@@ -11,7 +10,7 @@ import java.util.Map;
 /**
  * Moteur graphique
  */
-public class GraphicsEngine implements Engine<GraphicEntity> {
+public class GraphicsEngine {
     /**
      * Liste des entités graphiques
      */
@@ -62,153 +61,110 @@ public class GraphicsEngine implements Engine<GraphicEntity> {
 
     /**
      * Cloner une entité graphique
-     * @param id identifiant de l'entité à cloner
+     * @param entity entité à cloner
      * @return clone
      */
-    public static GraphicEntity clone(int id) {
-        return entities.get(id).clone();
+    public static GraphicEntity clone(GraphicEntity entity) {
+        return entity.clone();
     }
 
     /**
      * Dessine une entité graphique
-     * @param id identifiant de l'entité à dessiner
+     * @param entity entité à dessiner
      */
-    public static void draw(int id) {
-        GraphicEntity entity = entities.get(id);
+    public static void draw(GraphicEntity entity) {
         if (entity.getColor() != null) entity.getColor().cover(entity);
         if (entity.getTexture() != null) entity.getTexture().cover(entity);
     }
 
     /**
      * Met à jour une entité graphique
-     * @param id identifiant de l'entité à mettre à jour
+     * @param entity entité à mettre à jour
      */
-    public static void update(int id) {
-        GraphicEntity o = entities.get(id);
-        if (o.getTexture() != null) o.getTexture().update();
+    public static void update(GraphicEntity entity) {
+        if (entity.getTexture() != null) entity.getTexture().update();
     }
 
     /**
      * Supprime une entité graphique de sa scène
-     * @param id identifiant de l'entité à supprimer
+     * @param entity entité à supprimer
      */
-    public static void erase(int id) {
-        GraphicEntity entity = entities.get(id);
+    public static void erase(GraphicEntity entity) {
         Scene scene = entity.getScene();
         scene.removeEntity(entity);
     }
 
     /**
-     * Redimensionne une entité graphique
-     *
-     * @param id identifiant de l'entité à redimensionner
-     * @param w largeur
-     * @param h hauteur
-     */
-    public static void resize(int id, int w, int h) {
-        GraphicEntity o = entities.get(id);
-        o.setWidth(w);
-        o.setHeight(h);
-    }
-
-    /**
-     * Redimensionne en hauteur d'une entité graphique
-     * @param id identifiant de l'entité à redimensionner
-     * @param h hauteur
-     */
-    public static void resizeHeight(int id, int h) {
-        GraphicEntity o = entities.get(id);
-        o.getParent().setHeight(h);
-    }
-
-    /**
-     * Redimensionne en largeur d'une entité graphique
-     * @param id identifiant de l'entité à redimensionner
-     * @param w largeur
-     */
-    public static void resizeWidth(int id, int w) {
-        GraphicEntity o = entities.get(id);
-        o.getParent().setWidth(w);
-    }
-
-    /**
      * Ajoute une couleur à une entité graphique
-     * @param id identifiant de l'entité à colorer
+     * @param entity entité à colorer
      * @param r intensité de rouge
      * @param g intensité de vert
      * @param b intensité de bleu
      */
-    public static void bindColor(int id, int r, int g, int b) {
-        GraphicEntity o = entities.get(id);
-        o.setColor(new Color(r,g,b));
+    public static void bindColor(GraphicEntity entity, int r, int g, int b) {
+        entity.setColor(new Color(r,g,b));
     }
 
     /**
      * Ajoute une couleur à une entité graphique
-     * @param id identifiant de l'entité à colorer
+     * @param entity entité à colorer
      * @param color couleur à ajouter
      */
-    public static void bindColor(int id, Color color) {
-        GraphicEntity o = entities.get(id);
-        o.setColor(color);
+    public static void bindColor(GraphicEntity entity, Color color) {
+        entity.setColor(color);
     }
 
     /**
      * Suppression de la couleur d'une entité graphique
-     * @param id identifiant de l'entité à décolorer
+     * @param entity entité à décolorer
      */
-    public static void unbindColor(int id) {
-        GraphicEntity o = entities.get(id);
-        o.setColor(null);
+    public static void unbindColor(GraphicEntity entity) {
+        entity.setColor(null);
     }
 
     /**
      * Ajoute une texture à une entité graphique
-     * @param id identifiant de l'entité à texturer
+     * @param entity entité à texturer
      * @param textureID identifiant de la texture
      */
-    public static void bindTexture(int id, int textureID) {
-        GraphicEntity o = entities.get(id);
-        o.setTexture(textures.get(textureID));
+    public static void bindTexture(GraphicEntity entity, int textureID) {
+        entity.setTexture(textures.get(textureID));
     }
 
     /**
      * Ajoute une texture à une entité graphique depuis un fichier de textures
-     * @param id identifiant de l'entité à texturer
+     * @param entity entité à texturer
      * @param spriteSheetID identifiant du fichier de textures
      * @param row ligne
      * @param col colonne
      */
-    public static void bindTexture(int id, int spriteSheetID, int row, int col) {
-        GraphicEntity o = entities.get(id);
-        o.setTexture(spriteSheets.get(spriteSheetID).getSprite(row, col));
+    public static void bindTexture(GraphicEntity entity, int spriteSheetID, int row, int col) {
+        entity.setTexture(spriteSheets.get(spriteSheetID).getSprite(row, col));
     }
 
     /**
      * Attache une animation à une entité graphique
-     * @param id identifiant
+     * @param entity entité
      * @param animationID identifiant de l'animation
      */
-    public static void bindAnimation(int id, int animationID) {
-        GraphicEntity o = entities.get(id);
-        o.setTexture(animations.get(animationID));
+    public static void bindAnimation(GraphicEntity entity, int animationID) {
+        entity.setTexture(animations.get(animationID));
     }
 
     /**
      * Suppression de la texture d'une entité graphique
-     * @param id identifiant de l'entité à détexturer
+     * @param entity entité à détexturer
      */
-    public static void unbindTexture(int id) {
-        GraphicEntity o = entities.get(id);
-        o.setTexture(null);
+    public static void unbindTexture(GraphicEntity entity) {
+        entity.setTexture(null);
     }
 
     /**
      * Ajouter une entité à la scène courante
-     * @param id id de l'entité
+     * @param entity entité
      */
-    public static void addToCurrentScene(int id) {
-        Window.getActualScene().addEntity(entities.get(id));
+    public static void addToCurrentScene(GraphicEntity entity) {
+        Window.getActualScene().addEntity(entity);
     }
 
     //-----------------------------------------------//
@@ -362,7 +318,11 @@ public class GraphicsEngine implements Engine<GraphicEntity> {
         Window.stop();
     }
 
-    @Override
+    /**
+     * Créer une nouvelle entité
+     * @param parent entité parente
+     * @return entité graphique
+     */
     public GraphicEntity createEntity(Entity parent) {
         GraphicEntity entity = new GraphicEntity(parent);
         entities.put(parent.getId(), entity);
@@ -370,12 +330,6 @@ public class GraphicsEngine implements Engine<GraphicEntity> {
     }
 
     // GETTERS & SETTERS //
-
-    @Override
-    public Map<Integer,GraphicEntity> getEntities() { return entities; }
-
-    @Override
-    public GraphicEntity getEntity(int id) { return entities.get(id); }
 
     public static Texture getTexture(int id) { return textures.get(id); }
 

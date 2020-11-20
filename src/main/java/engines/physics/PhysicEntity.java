@@ -10,9 +10,29 @@ import java.util.ArrayList;
  */
 public class PhysicEntity extends EngineEntity {
     /**
+     * Position x
+     */
+    private int x;
+
+    /**
+     * Position y
+     */
+    private int y;
+
+    /**
+     * Hauteur
+     */
+    private int height;
+
+    /**
+     * Largeur
+     */
+    private int width;
+
+    /**
      * Liste des entités pouvant être en collision avec celle-ci
      */
-    private ArrayList<Integer> collisions = new ArrayList<>();
+    private ArrayList<PhysicEntity> collisions = new ArrayList<>();
 
     /**
      * Entité en collision ou pas
@@ -44,6 +64,10 @@ public class PhysicEntity extends EngineEntity {
      */
     protected PhysicEntity(Entity parent) {
         super(parent);
+        x = 0;
+        y = 0;
+        height = 0;
+        width = 0;
     }
 
     /**
@@ -55,44 +79,57 @@ public class PhysicEntity extends EngineEntity {
         this.collisions = clone.collisions;
         this.boundLimits = clone.boundLimits;
         this.speed = clone.speed;
-        this.lastX = getX();
-        this.lastY = getY();
+        this.lastX = clone.x;
+        this.lastY = clone.y;
     }
 
     /**
      * Cloner l'entité
      * @return clone
      */
-    public PhysicEntity clone() {
+    protected PhysicEntity clone() {
         return new PhysicEntity(this);
     }
 
     // GETTERS & SETTERS //
 
-    @Override
-    public Entity getParent() { return parent; }
-
     public int getSpeed() { return speed; }
 
-    public void setSpeed(int speed) { this.speed = speed; }
+    protected void setSpeed(int speed) { this.speed = speed; }
 
-    public int[] getBounds() { return new int[]{getX(), getY(), getX() + getWidth(), getY() + getHeight()}; }
+    public int[] getBounds() { return new int[]{x, y, x + width, y + height}; }
 
-    public ArrayList<Integer> getCollisions() { return collisions; }
+    public ArrayList<PhysicEntity> getCollisions() { return collisions; }
 
     public int[] getBoundLimits() { return boundLimits; }
 
-    public void setBoundLimits(int[] boundLimits) { this.boundLimits = boundLimits; }
+    protected void setBoundLimits(int[] boundLimits) { this.boundLimits = boundLimits; }
+
+    public int getX() { return x; }
+
+    protected void setX(int x) { this.x = x; }
+
+    public int getY() { return y; }
+
+    protected void setY(int y) { this.y = y; }
+
+    public int getHeight() { return height; }
+
+    protected void setHeight(int height) { this.height = height; }
+
+    public int getWidth() { return width; }
+
+    protected void setWidth(int width) { this.width = width; }
 
     public int getLastX() { return lastX; }
 
+    protected void setLastX(int lastX) { this.lastX = lastX; }
+
     public int getLastY() { return lastY; }
 
-    public void setLastX(int lastX) { this.lastX = lastX; }
-
-    public void setLastY(int lastY) { this.lastY = lastY; }
+    protected void setLastY(int lastY) { this.lastY = lastY; }
 
     public boolean isColliding() { return isColliding; }
 
-    public void setColliding(boolean colliding) { isColliding = colliding; }
+    protected void setColliding(boolean colliding) { isColliding = colliding; }
 }

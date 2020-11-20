@@ -41,14 +41,11 @@ public class IOEntity extends EngineEntity {
      * Cloner l'entité
      * @return clone
      */
-    public IOEntity clone() {
+    protected IOEntity clone() {
         return new IOEntity(this);
     }
 
     // GETTERS //
-
-    @Override
-    public Entity getParent() { return parent; }
 
     public Map<Integer, Consumer<Void>> getOnPressMethods() {
         return onPressMethods;

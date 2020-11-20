@@ -3,6 +3,7 @@ package gameplay;
 import engines.graphics.GraphicsEngine;
 import engines.input_output.IOEngine;
 import engines.kernel.Event;
+import engines.kernel.Entity;
 import engines.kernel.KernelEngine;
 import engines.physics.PhysicsEngine;
 
@@ -13,23 +14,13 @@ import java.util.Map;
 /**
  * Joueur
  */
-public class Player {
-    /**
-     * Identifiant entité liée
-     */
-    private int entityID;
-
+public class Player extends Entity {
     /**
      * Directions de déplacement
      */
     public enum MoveDirection {
         UP,RIGHT,DOWN,LEFT
     }
-
-    /**
-     * Vitesse de déplacement
-     */
-    private int moveSpeed;
 
     /**
      * Animations
@@ -59,11 +50,10 @@ public class Player {
      * @param col colonne
      */
     public Player(int height, int width, int moveSpeed, int spriteSheetID, int row, int col) {
-        this.entityID = KernelEngine.generateEntity();
-        this.moveSpeed = moveSpeed;
+        super();
         this.defaultTexture = new int[]{spriteSheetID, row, col};
-        GraphicsEngine.resize(entityID, height, width);
-        PhysicsEngine.setSpeed(entityID, moveSpeed);
+        PhysicsEngine.resize(getPhysicEntity(), height, width);
+        PhysicsEngine.setSpeed(getPhysicEntity(), moveSpeed);
         initAnimations(spriteSheetID);
         initEvents();
         bindEvents();
@@ -127,7 +117,7 @@ public class Player {
         KernelEngine.addEvent("bindDefaultTexture", new Event() {
             @Override
             public void run() {
-                GraphicsEngine.bindTexture(entityID, defaultTexture[0], defaultTexture[1], defaultTexture[2]);
+                GraphicsEngine.bindTexture(getGraphicEntity(), defaultTexture[0], defaultTexture[1], defaultTexture[2]);
             }
         });
         //Lorsqu'il y a une collision
@@ -158,19 +148,19 @@ public class Player {
         KernelEngine.notifyEvent("playCurrentAnimation");
         switch (direction) {
             case UP:
-                PhysicsEngine.goUp(entityID, moveSpeed);
+                PhysicsEngine.goUp(getPhysicEntity());
                 break;
             case RIGHT:
-                PhysicsEngine.goRight(entityID, moveSpeed);
+                PhysicsEngine.goRight(getPhysicEntity());
                 break;
             case DOWN:
-                PhysicsEngine.goDown(entityID, moveSpeed);
+                PhysicsEngine.goDown(getPhysicEntity());
                 break;
             case LEFT:
-                PhysicsEngine.goLeft(entityID, moveSpeed);
+                PhysicsEngine.goLeft(getPhysicEntity());
                 break;
         }
-        GraphicsEngine.bindAnimation(entityID, animations.get(direction.name()));
+        GraphicsEngine.bindAnimation(getGraphicEntity(), animations.get(direction.name()));
     }
 
     /**
@@ -182,18 +172,10 @@ public class Player {
         IOEngine.bindEventOnLastKey(KeyEvent.VK_RIGHT, "goRight");
         IOEngine.bindEventOnLastKey(KeyEvent.VK_LEFT, "goLeft");
         IOEngine.bindEventKeyboardFree("bindDefaultTexture");
-        PhysicsEngine.bindEventOnCollision(entityID, "onCollision");
+        PhysicsEngine.bindEventOnCollision(getPhysicEntity(), "onCollision");
     }
 
     // GETTERS //
-
-    public int getEntityID() {
-        return entityID;
-    }
-
-    public int getMoveSpeed() {
-        return moveSpeed;
-    }
 
     public Map<String, Integer> getAnimations() {
         return animations;

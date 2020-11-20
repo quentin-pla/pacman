@@ -45,17 +45,19 @@ public class GraphicEntity extends EngineEntity {
      * Cloner l'entité
      * @return clone
      */
-    public GraphicEntity clone() {
+    protected GraphicEntity clone() {
         return new GraphicEntity(this);
     }
 
     // GETTERS & SETTERS //
 
-    @Override
-    public Entity getParent() { return parent; }
+    public int getX() { return parent.getPhysicEntity().getX(); }
 
-    @Override
-    public void setParent(Entity parent) { this.parent = parent; }
+    public int getY() { return parent.getPhysicEntity().getY(); }
+
+    public int getHeight() { return parent.getPhysicEntity().getHeight(); }
+
+    public int getWidth() { return parent.getPhysicEntity().getWidth(); }
 
     public Scene getScene() {
         return scene;

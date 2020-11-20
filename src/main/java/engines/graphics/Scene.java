@@ -59,8 +59,8 @@ public class Scene extends SwingScene {
         super.paintComponent(g);
         graphics = (Graphics2D) g;
         for (GraphicEntity entity : entities) {
-            GraphicsEngine.update(entity.getId());
-            GraphicsEngine.draw(entity.getId());
+            GraphicsEngine.update(entity);
+            GraphicsEngine.draw(entity);
         }
     }
 

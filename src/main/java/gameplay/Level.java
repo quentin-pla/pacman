@@ -1,6 +1,6 @@
 package gameplay;
 
-import engines.graphics.GraphicsEngine;
+import engines.kernel.Entity;
 import engines.kernel.KernelEngine;
 import engines.physics.PhysicsEngine;
 
@@ -9,26 +9,21 @@ import java.util.ArrayList;
 /**
  * Niveau de jeu
  */
-public class Level {
-    /**
-     * Identifiant
-     */
-    private int id;
-
+public class Level extends Entity {
     /**
      * Matrice d'entités graphiques
      */
-    private int[][] matrix;
+    private Entity[][] matrix;
 
     /**
      * Entités présentes sur le niveau
      */
-    private ArrayList<Integer> level_entities = new ArrayList<>();
-//
-//    /**
-//     * Joueur
-//     */
-//    private Player player;
+    private ArrayList<Entity> level_entities = new ArrayList<>();
+
+    /**
+     * Joueur
+     */
+    private Player player;
 
     /**
      * Chronomètre
@@ -46,9 +41,9 @@ public class Level {
      * @param cols nombre de colonnes
      */
     public Level(int rows, int cols) {
-        this.id = KernelEngine.generateEntity();
-        GraphicsEngine.resize(id,(rows - 1) * 30, (cols - 1) * 30);
-        this.matrix = new int[rows][cols];
+        super();
+        PhysicsEngine.resize(getPhysicEntity(),(rows - 1) * 30, (cols - 1) * 30);
+        this.matrix = new Entity[rows][cols];
         fill();
     }
 
@@ -59,32 +54,32 @@ public class Level {
         for (int row = 0; row < matrix.length; row++) {
             for (int col = 0; col < matrix[row].length; col++) {
                 matrix[row][col] = KernelEngine.generateEntity();
-                PhysicsEngine.move(matrix[row][col],(30 * col),(30 * row));
+                PhysicsEngine.move(matrix[row][col].getPhysicEntity(),(30 * col),(30 * row));
                 level_entities.add(matrix[row][col]);
             }
         }
     }
 
-//    /**
-//     * Faire apparaitre le joueur à un endroit
-//     * @param player joueur
-//     * @param row ligne
-//     * @param col colonne
-//     */
-//    public void addPlayer(Player player, int row, int col) {
-//        player.addMoveBounds(getBounds());
-//        Entity entity = matrix[row][col];
-//        player.move(entity.getX(), entity.getY());
-//        this.player = player;
-//        level_entities.add(player);
-//    }
+    /**
+     * Faire apparaitre le joueur à un endroit
+     * @param player joueur
+     * @param row ligne
+     * @param col colonne
+     */
+    public void addPlayer(Player player, int row, int col) {
+        PhysicsEngine.addBoundLimits(player.getPhysicEntity(), getBounds()[0], getBounds()[1], getBounds()[2], getBounds()[3]);
+        Entity entity = matrix[row][col];
+        PhysicsEngine.move(player.getPhysicEntity(), entity.getGraphicEntity().getX(), entity.getGraphicEntity().getY());
+        this.player = player;
+        level_entities.add(player);
+    }
 
     /**
      * Récupérer les limites du niveau
      * @return limites
      */
     public int[] getBounds() {
-        return PhysicsEngine.getBounds(id);
+        return getPhysicEntity().getBounds();
     }
 
 //    @Override

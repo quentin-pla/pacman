@@ -1,8 +1,9 @@
 package gameplay;
 
+import engines.kernel.Event;
 import engines.graphics.GraphicsEngine;
 import engines.input_output.IOEngine;
-import engines.kernel.Event;
+import engines.kernel.Entity;
 import engines.kernel.KernelEngine;
 import engines.physics.PhysicsEngine;
 
@@ -37,55 +38,55 @@ public class Gameplay {
         player = new Player(30, 30, 2, textures, 1, 3);
 
         //Id des murs
-        ArrayList<Integer> walls = new ArrayList<>();
+        ArrayList<Entity> walls = new ArrayList<>();
 
         //Génération des murs
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 6; j++) {
-                int wall = KernelEngine.generateEntity();
+                Entity wall = KernelEngine.generateEntity();
                 walls.add(wall);
-                PhysicsEngine.move(wall,30 + (30*j),100 + (60*i));
-                GraphicsEngine.resize(wall,30,30);
-                GraphicsEngine.bindColor(wall,0,0,255);
-                PhysicsEngine.addCollisions(player.getEntityID(), wall);
+                PhysicsEngine.move(wall.getPhysicEntity(),30 + (30*j),100 + (60*i));
+                PhysicsEngine.resize(wall.getPhysicEntity(),30,30);
+                GraphicsEngine.bindColor(wall.getGraphicEntity(),0,0,255);
+                PhysicsEngine.addCollisions(player.getPhysicEntity(), wall.getPhysicEntity());
             }
         }
-        int wall = KernelEngine.generateEntity();
+        Entity wall = KernelEngine.generateEntity();
         walls.add(wall);
-        PhysicsEngine.move(wall,0,160);
-        GraphicsEngine.resize(wall,30,30);
-        GraphicsEngine.bindColor(wall,0,0,255);
-        PhysicsEngine.addCollisions(player.getEntityID(), wall);
+        PhysicsEngine.move(wall.getPhysicEntity(),0,160);
+        PhysicsEngine.resize(wall.getPhysicEntity(),30,30);
+        GraphicsEngine.bindColor(wall.getGraphicEntity(),0,0,255);
+        PhysicsEngine.addCollisions(player.getPhysicEntity(), wall.getPhysicEntity());
 
         //Id des boules
-        ArrayList<Integer> balls = new ArrayList<>();
+        ArrayList<Entity> balls = new ArrayList<>();
 
         //Génération des boules
         for (int i = 0; i < 6; i++) {
-            int ball = KernelEngine.generateEntity();
+            Entity ball = KernelEngine.generateEntity();
             balls.add(ball);
-            PhysicsEngine.move(ball,30 + (30*i),130);
-            GraphicsEngine.resize(ball,30,30);
-            GraphicsEngine.bindTexture(ball,textures,10,2);
+            PhysicsEngine.move(ball.getPhysicEntity(),30 + (30*i),130);
+            PhysicsEngine.resize(ball.getPhysicEntity(),30,30);
+            GraphicsEngine.bindTexture(ball.getGraphicEntity(),textures,10,2);
             KernelEngine.addEvent("eraseBall" + i, new Event() {
                 @Override
-                public void run() { GraphicsEngine.erase(ball); }
+                public void run() { GraphicsEngine.erase(ball.getGraphicEntity()); }
             });
-            PhysicsEngine.bindEventOnSameLocation(player.getEntityID(), ball, "eraseBall" + i);
+            PhysicsEngine.bindEventOnSameLocation(player.getPhysicEntity(), ball.getPhysicEntity(), "eraseBall" + i);
         }
 
         //Ajout des collisions de la scène
-        PhysicsEngine.addBoundLimits(player.getEntityID(), 0,0,300,300);
+        PhysicsEngine.addBoundLimits(player.getPhysicEntity(), 0,0,300,300);
 
         //Scène principale
         int mainScene = GraphicsEngine.generateScene(300, 300);
         GraphicsEngine.setSceneBackgroundColor(mainScene,0,0,0);
         GraphicsEngine.bindScene(mainScene);
-        for (Integer id : walls)
-            GraphicsEngine.addToCurrentScene(id);
-        for (Integer id : balls)
-            GraphicsEngine.addToCurrentScene(id);
-        GraphicsEngine.addToCurrentScene(player.getEntityID());
+        for (Entity entity : walls)
+            GraphicsEngine.addToCurrentScene(entity.getGraphicEntity());
+        for (Entity entity : balls)
+            GraphicsEngine.addToCurrentScene(entity.getGraphicEntity());
+        GraphicsEngine.addToCurrentScene(player.getGraphicEntity());
 
         //Démarrage du jeu
         KernelEngine.start();

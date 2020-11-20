@@ -1,7 +1,6 @@
 package engines.input_output;
 
 import api.SwingAPI;
-import engines.kernel.Engine;
 import engines.kernel.Entity;
 import engines.kernel.KernelEngine;
 
@@ -13,7 +12,7 @@ import java.util.function.Consumer;
 /**
  * Moteur entrées / sorties
  */
-public class IOEngine extends SwingAPI implements Engine<IOEntity> {
+public class IOEngine extends SwingAPI {
     /**
      * Liste des entités entrées / sorties
      */
@@ -46,8 +45,7 @@ public class IOEngine extends SwingAPI implements Engine<IOEntity> {
     /**
      * Constructeur privé
      */
-    private IOEngine() {
-    }
+    private IOEngine() {}
 
     /**
      * Récupérer l'instance
@@ -118,30 +116,30 @@ public class IOEngine extends SwingAPI implements Engine<IOEntity> {
 
     /**
      * Relier une méthode à une touche clavier
-     * @param id identifiant de l'entité
+     * @param entity entité
      * @param method méthode
      * @param keyCode touche du clavier
      */
-    public static void bindMethodToKey(int id, Consumer<Void> method, int keyCode) {
-        entities.get(id).getOnPressMethods().put(keyCode, method);
+    public static void bindMethodToKey(IOEntity entity, Consumer<Void> method, int keyCode) {
+        entity.getOnPressMethods().put(keyCode, method);
     }
 
     /**
      * Relier une méthode lorsque le clavier est libre
-     * @param id identifiant de l'entité
+     * @param entity entité
      * @param method méthode
      */
-    public static void bindMethodToKeyboardFree(int id, Consumer<Void> method) {
-        entities.get(id).getOnPressMethods().put(null, method);
+    public static void bindMethodToKeyboardFree(IOEntity entity, Consumer<Void> method) {
+        entity.getOnPressMethods().put(null, method);
     }
 
     /**
      * Relier une méthode à la dernière touche pressée
-     * @param id identifiant de l'entité
+     * @param entity entité
      * @param method méthode
      */
-    public static void bindMethodToLastKey(int id, Consumer<Void> method, int keyCode) {
-        entities.get(id).getOnLastMethods().put(keyCode, method);
+    public static void bindMethodToLastKey(IOEntity entity, Consumer<Void> method, int keyCode) {
+        entity.getOnLastMethods().put(keyCode, method);
     }
 
     /**
@@ -219,56 +217,40 @@ public class IOEngine extends SwingAPI implements Engine<IOEntity> {
 
     /**
      * Relier une méthode à un bouton de la souris
-     * @param id identifiant de l'entité
+     * @param entity entité
      * @param method méthode
      * @param buttonCode bouton de la souris
      */
-    public static void bindMethodToButton(int id, Consumer<Void> method, int buttonCode) {
-        entities.get(id).getOnPressMethods().put(buttonCode, method);
+    public static void bindMethodToButton(IOEntity entity, Consumer<Void> method, int buttonCode) {
+        entity.getOnPressMethods().put(buttonCode, method);
     }
 
     /**
      * Relier une méthode lorsque le clavier est libre
-     * @param id identifiant de l'entité
+     * @param entity entité
      * @param method méthode
      */
-    public static void bindMethodToMouseFree(int id, Consumer<Void> method) {
-        entities.get(id).getOnPressMethods().put(null, method);
+    public static void bindMethodToMouseFree(IOEntity entity, Consumer<Void> method) {
+        entity.getOnPressMethods().put(null, method);
     }
 
     /**
      * Relier une méthode à la dernière touche pressée
-     * @param id identifiant de l'entité
+     * @param entity entité
      * @param method méthode
      */
-    public static void bindMethodToLastButton(int id, Consumer<Void> method, int buttonCode) {
-        entities.get(id).getOnLastMethods().put(buttonCode, method);
+    public static void bindMethodToLastButton(IOEntity entity, Consumer<Void> method, int buttonCode) {
+        entity.getOnLastMethods().put(buttonCode, method);
     }
 
-    // GETTERS //
-
-    @Override
+    /**
+     * Créer une nouvelle entité
+     * @param parent entité parente
+     * @return entité entrées/sorties
+     */
     public IOEntity createEntity(Entity parent) {
         IOEntity entity = new IOEntity(parent);
         entities.put(parent.getId(), entity);
         return entity;
-    }
-
-    @Override
-    public Map<Integer, IOEntity> getEntities() {
-        return entities;
-    }
-
-    @Override
-    public IOEntity getEntity(int id) {
-        return entities.get(id);
-    }
-
-    public static KeyboardIO getKeyboardIO() {
-        return keyboardIO;
-    }
-
-    public static MouseIO getMouseIO() {
-        return mouseIO;
     }
 }
