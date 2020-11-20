@@ -17,26 +17,6 @@ public class Entity {
     protected int id;
 
     /**
-     * Position x
-     */
-    protected int x;
-
-    /**
-     * Position y
-     */
-    protected int y;
-
-    /**
-     * Hauteur
-     */
-    protected int height;
-
-    /**
-     * Largeur
-     */
-    protected int width;
-
-    /**
      * Entité graphique
      */
     protected GraphicEntity graphicEntity;
@@ -56,10 +36,7 @@ public class Entity {
      */
     protected Entity() {
         id = KernelEngine.generateNewID();
-        x = 0;
-        y = 0;
-        height = 0;
-        width = 0;
+        System.out.println(id);
         graphicEntity = GraphicsEngine.getInstance().createEntity(this);
         physicEntity = PhysicsEngine.getInstance().createEntity(this);
         ioEntity = IOEngine.getInstance().createEntity(this);
@@ -71,19 +48,9 @@ public class Entity {
 
     public void setId(int id) { this.id = id; }
 
-    public int getX() { return x; }
+    public GraphicEntity getGraphicEntity() { return graphicEntity; }
 
-    public void setX(int x) { this.x = x; }
+    public PhysicEntity getPhysicEntity() { return physicEntity; }
 
-    public int getY() { return y; }
-
-    public void setY(int y) { this.y = y; }
-
-    public int getHeight() { return height; }
-
-    public void setHeight(int height) { this.height = height; }
-
-    public int getWidth() { return width; }
-
-    public void setWidth(int width) { this.width = width; }
+    public IOEntity getIoEntity() { return ioEntity; }
 }
