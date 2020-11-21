@@ -64,25 +64,27 @@ public class Player extends Entity {
      * @param spriteSheetID identifiant du fichier de textures
      */
     private void initAnimations(int spriteSheetID) {
-        int moveUP = GraphicsEngine.generateAnimation(spriteSheetID, 4, true);
+        int animationsSpeed = 4;
+
+        int moveUP = GraphicsEngine.generateAnimation(spriteSheetID, animationsSpeed, true);
         GraphicsEngine.addFrameToAnimation(moveUP,1,3);
         GraphicsEngine.addFrameToAnimation(moveUP,1,7);
         GraphicsEngine.addFrameToAnimation(moveUP,1,6);
         animations.put(MoveDirection.UP.name(), moveUP);
 
-        int moveRIGHT = GraphicsEngine.generateAnimation(spriteSheetID, 4, true);
+        int moveRIGHT = GraphicsEngine.generateAnimation(spriteSheetID, animationsSpeed, true);
         GraphicsEngine.addFrameToAnimation(moveRIGHT,1,3);
         GraphicsEngine.addFrameToAnimation(moveRIGHT,1,2);
         GraphicsEngine.addFrameToAnimation(moveRIGHT,1,1);
         animations.put(MoveDirection.RIGHT.name(), moveRIGHT);
 
-        int moveDOWN = GraphicsEngine.generateAnimation(spriteSheetID, 4, true);
+        int moveDOWN = GraphicsEngine.generateAnimation(spriteSheetID, animationsSpeed, true);
         GraphicsEngine.addFrameToAnimation(moveDOWN,1,3);
         GraphicsEngine.addFrameToAnimation(moveDOWN,1,9);
         GraphicsEngine.addFrameToAnimation(moveDOWN,1,8);
         animations.put(MoveDirection.DOWN.name(), moveDOWN);
 
-        int moveLEFT = GraphicsEngine.generateAnimation(spriteSheetID, 4, true);
+        int moveLEFT = GraphicsEngine.generateAnimation(spriteSheetID, animationsSpeed, true);
         GraphicsEngine.addFrameToAnimation(moveLEFT,1,3);
         GraphicsEngine.addFrameToAnimation(moveLEFT,1,4);
         GraphicsEngine.addFrameToAnimation(moveLEFT,1,5);
