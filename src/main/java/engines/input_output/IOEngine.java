@@ -7,7 +7,6 @@ import engines.kernel.KernelEngine;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * Moteur entrées / sorties
@@ -115,34 +114,6 @@ public class IOEngine extends SwingAPI {
     public static int lastPressedKey() { return keyboardIO.getLastPressedKey(); }
 
     /**
-     * Relier une méthode à une touche clavier
-     * @param entity entité
-     * @param method méthode
-     * @param keyCode touche du clavier
-     */
-    public static void bindMethodToKey(IOEntity entity, Consumer<Void> method, int keyCode) {
-        entity.getOnPressMethods().put(keyCode, method);
-    }
-
-    /**
-     * Relier une méthode lorsque le clavier est libre
-     * @param entity entité
-     * @param method méthode
-     */
-    public static void bindMethodToKeyboardFree(IOEntity entity, Consumer<Void> method) {
-        entity.getOnPressMethods().put(null, method);
-    }
-
-    /**
-     * Relier une méthode à la dernière touche pressée
-     * @param entity entité
-     * @param method méthode
-     */
-    public static void bindMethodToLastKey(IOEntity entity, Consumer<Void> method, int keyCode) {
-        entity.getOnLastMethods().put(keyCode, method);
-    }
-
-    /**
      * Attacher un évènement à une touche clavier
      * @param keyCode code de la touche
      * @param eventName nom de l'évènement
@@ -182,7 +153,7 @@ public class IOEngine extends SwingAPI {
     /**
      * Désactiver les entrées/sorties souris
      */
-    public static void disableMouseIO(boolean value) {
+    public static void disableMouseIO() {
         SwingAPI.getListenerMethods().removeMouseListener(mouseIO);
     }
 
@@ -214,34 +185,6 @@ public class IOEngine extends SwingAPI {
      * @return coordonnées dernier click
      */
     public static Point lastClickCoordinates() { return mouseIO.getClickCoords(); }
-
-    /**
-     * Relier une méthode à un bouton de la souris
-     * @param entity entité
-     * @param method méthode
-     * @param buttonCode bouton de la souris
-     */
-    public static void bindMethodToButton(IOEntity entity, Consumer<Void> method, int buttonCode) {
-        entity.getOnPressMethods().put(buttonCode, method);
-    }
-
-    /**
-     * Relier une méthode lorsque le clavier est libre
-     * @param entity entité
-     * @param method méthode
-     */
-    public static void bindMethodToMouseFree(IOEntity entity, Consumer<Void> method) {
-        entity.getOnPressMethods().put(null, method);
-    }
-
-    /**
-     * Relier une méthode à la dernière touche pressée
-     * @param entity entité
-     * @param method méthode
-     */
-    public static void bindMethodToLastButton(IOEntity entity, Consumer<Void> method, int buttonCode) {
-        entity.getOnLastMethods().put(buttonCode, method);
-    }
 
     /**
      * Créer une nouvelle entité

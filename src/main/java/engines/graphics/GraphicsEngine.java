@@ -218,6 +218,8 @@ public class GraphicsEngine {
     /**
      * Générer une animation à partir d'un fichier de textures
      * @param spriteSheetID identifiant du fichier de textures
+     * @param speed vitesse de l'animation
+     * @param looping animation en boucle
      * @return identifiant de l'animation
      */
     public static int generateAnimation(int spriteSheetID, int speed, boolean looping) {

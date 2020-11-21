@@ -82,6 +82,10 @@ public class PhysicsEngine {
     /**
      * Ajouter des limites de déplacement
      * @param entity entité
+     * @param x1 coordonnée horizontale 1
+     * @param x2 coordonnée horizontale 2
+     * @param y1 coordonnée verticale 1
+     * @param y2 coordonnée verticale 2
      */
     public static void addBoundLimits(PhysicEntity entity, int x1, int y1, int x2, int y2) {
         entity.setBoundLimits(new int[]{x1,y1,x2,y2});
