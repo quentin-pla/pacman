@@ -36,7 +36,6 @@ public class Entity {
      */
     protected Entity() {
         id = KernelEngine.generateNewID();
-        System.out.println(id);
         graphicEntity = GraphicsEngine.getInstance().createEntity(this);
         physicEntity = PhysicsEngine.getInstance().createEntity(this);
         ioEntity = IOEngine.getInstance().createEntity(this);
