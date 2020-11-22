@@ -14,12 +14,12 @@ public class IOEntity extends EngineEntity {
     /**
      * Liste des méthodes exécutées lors d'une pression sur une touche ou un bouton
      */
-    private Map<Integer,Consumer<Void>> onPressMethods = new HashMap<>();
+    //private Map<Integer,Consumer<Void>> onPressMethods = new HashMap<>();
 
     /**
      * Liste des méthodes exécutées en fonction de la dernière touche / bouton pressé(e)
      */
-    private Map<Integer,Consumer<Void>> onLastMethods = new HashMap<>();
+    //private Map<Integer,Consumer<Void>> onLastMethods = new HashMap<>();
 
     /**
      * Constructeur
@@ -33,8 +33,8 @@ public class IOEntity extends EngineEntity {
      * @param clone clone
      */
     private IOEntity(IOEntity clone) {
-        this.onPressMethods = clone.onPressMethods;
-        this.onLastMethods = clone.onLastMethods;
+        //this.onPressMethods = clone.onPressMethods;
+       // this.onLastMethods = clone.onLastMethods;
     }
 
     /**
@@ -47,9 +47,9 @@ public class IOEntity extends EngineEntity {
 
     // GETTERS //
 
-    public Map<Integer, Consumer<Void>> getOnPressMethods() {
+    /*public Map<Integer, Consumer<Void>> getOnPressMethods() {
         return onPressMethods;
-    }
+    }*/
 
-    public Map<Integer, Consumer<Void>> getOnLastMethods() { return onLastMethods; }
+    /*public Map<Integer, Consumer<Void>> getOnLastMethods() { return onLastMethods; }*/
 }

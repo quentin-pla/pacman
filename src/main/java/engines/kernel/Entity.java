@@ -38,7 +38,7 @@ public class Entity {
         id = KernelEngine.generateNewID();
         graphicEntity = GraphicsEngine.getInstance().createEntity(this);
         physicEntity = PhysicsEngine.getInstance().createEntity(this);
-        ioEntity = IOEngine.getInstance().createEntity(this);
+        //ioEntity = IOEngine.getInstance().createEntity(this);
     }
 
     // GETTERS & SETTERS //

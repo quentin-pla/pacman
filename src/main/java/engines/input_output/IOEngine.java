@@ -191,9 +191,9 @@ public class IOEngine extends SwingAPI {
      * @param parent entité parente
      * @return entité entrées/sorties
      */
-    public IOEntity createEntity(Entity parent) {
+    /*public IOEntity createEntity(Entity parent) {
         IOEntity entity = new IOEntity(parent);
         entities.put(parent.getId(), entity);
         return entity;
-    }
+    }*/
 }
