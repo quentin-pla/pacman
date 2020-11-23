@@ -10,6 +10,11 @@ import java.util.ArrayList;
  */
 public class Scene extends SwingScene {
     /**
+     * Moteur graphique
+     */
+    private final GraphicsEngine graphicsEngine;
+
+    /**
      * Couleur de fond
      */
     private Color background_color;
@@ -24,8 +29,9 @@ public class Scene extends SwingScene {
      * @param height hateur
      * @param width largeur
      */
-    protected Scene(int height, int width) {
+    protected Scene(GraphicsEngine graphicsEngine, int height, int width) {
         super(height, width);
+        this.graphicsEngine = graphicsEngine;
     }
 
     /**
@@ -59,8 +65,8 @@ public class Scene extends SwingScene {
         super.paintComponent(g);
         graphics = (Graphics2D) g;
         for (GraphicEntity entity : entities) {
-            GraphicsEngine.update(entity);
-            GraphicsEngine.draw(entity);
+            graphicsEngine.update(entity);
+            graphicsEngine.draw(entity);
         }
     }
 

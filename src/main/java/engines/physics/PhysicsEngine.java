@@ -12,46 +12,40 @@ import java.util.Map;
  */
 public class PhysicsEngine {
     /**
+     * Moteur noyau
+     */
+    private KernelEngine kernelEngine;
+
+    /**
      * Liste des entités physiques
      */
-    private static final HashMap<Integer, PhysicEntity> entities = new HashMap<>();
+    private final HashMap<Integer, PhysicEntity> entities = new HashMap<>();
 
     /**
      * Liste des évènements liés aux collisions en entrée
      */
-    private static final Map<PhysicEntity[], String> collisionsEvents = new HashMap<>();
+    private final Map<PhysicEntity[], String> collisionsEvents = new HashMap<>();
 
     /**
      * Liste des évènements lorsque deux entités sont centrées
      */
-    private static final Map<PhysicEntity[], String> centeredEvents = new HashMap<>();
+    private final Map<PhysicEntity[], String> centeredEvents = new HashMap<>();
 
     /**
-     * Instance unique
+     * Constructeur
+     * @param kernelEngine moteur noyau
      */
-    private static PhysicsEngine instance;
-
-    /**
-     * Constructeur privé
-     */
-    private PhysicsEngine() {}
-
-    /**
-     * Récupérer l'instance
-     * @return instance
-     */
-    public static PhysicsEngine getInstance() {
-        if (instance == null) instance = new PhysicsEngine();
-        return instance;
+    public PhysicsEngine(KernelEngine kernelEngine) {
+        this.kernelEngine = kernelEngine;
     }
 
     /**
      * Mettre à jour les entités physiques
      */
-    public static void updateEntites() {
+    public void updateEntites() {
         for (PhysicEntity entity : entities.values()) {
             if (isInCollision(entity) || !isInBounds(entity)) {
-                PhysicsEngine.move(entity, entity.getLastX(), entity.getLastY());
+                move(entity, entity.getLastX(), entity.getLastY());
                 entity.setColliding(true);
             }
             else entity.setColliding(false);
@@ -62,11 +56,11 @@ public class PhysicsEngine {
             if ((e2 == null && e1.isColliding())
                     || (e2 != null && e1.isColliding() && e2.isColliding())
                     || (e2 != null && isInCollision(e1, e2)))
-                KernelEngine.notifyEvent(event.getValue());
+                kernelEngine.notifyEvent(event.getValue());
         }
         for (Map.Entry<PhysicEntity[],String> event : centeredEvents.entrySet()) {
             if (isCentered(event.getKey()[0],event.getKey()[1]))
-                KernelEngine.notifyEvent(event.getValue());
+                kernelEngine.notifyEvent(event.getValue());
         }
     }
 
@@ -75,7 +69,7 @@ public class PhysicsEngine {
      * @param entity1 entité 1
      * @param entity2 entité 2
      */
-    public static void addCollisions(PhysicEntity entity1, PhysicEntity entity2) {
+    public void addCollisions(PhysicEntity entity1, PhysicEntity entity2) {
         entity1.getCollisions().add(entity2);
         entity2.getCollisions().add(entity1);
     }
@@ -88,7 +82,7 @@ public class PhysicsEngine {
      * @param y1 coordonnée verticale 1
      * @param y2 coordonnée verticale 2
      */
-    public static void addBoundLimits(PhysicEntity entity, int x1, int y1, int x2, int y2) {
+    public void addBoundLimits(PhysicEntity entity, int x1, int y1, int x2, int y2) {
         entity.setBoundLimits(new int[]{x1,y1,x2,y2});
     }
 
@@ -97,7 +91,7 @@ public class PhysicsEngine {
      * @param entity entité
      * @param eventName nom de l'évènement
      */
-    public static void bindEventOnCollision(PhysicEntity entity, String eventName) {
+    public void bindEventOnCollision(PhysicEntity entity, String eventName) {
         collisionsEvents.put(new PhysicEntity[]{entity, null}, eventName);
     }
 
@@ -107,7 +101,7 @@ public class PhysicsEngine {
      * @param entity2 entité 2
      * @param eventName nom de l'évènement
      */
-    public static void bindEventOnCollision(PhysicEntity entity1, PhysicEntity entity2, String eventName) {
+    public void bindEventOnCollision(PhysicEntity entity1, PhysicEntity entity2, String eventName) {
         collisionsEvents.put(new PhysicEntity[]{entity1, entity2}, eventName);
     }
 
@@ -117,7 +111,7 @@ public class PhysicsEngine {
      * @param entity2 entité 2
      * @param eventName nom de l'évènement
      */
-    public static void bindEventOnSameLocation(PhysicEntity entity1, PhysicEntity entity2, String eventName) {
+    public void bindEventOnSameLocation(PhysicEntity entity1, PhysicEntity entity2, String eventName) {
         centeredEvents.put(new PhysicEntity[]{entity1, entity2}, eventName);
     }
 
@@ -126,7 +120,7 @@ public class PhysicsEngine {
      * @param entity entité
      * @return s'il y a une collision
      */
-    public static boolean isInCollision(PhysicEntity entity) {
+    public boolean isInCollision(PhysicEntity entity) {
         for (PhysicEntity collision : entity.getCollisions())
             if (isInCollision(collision,entity))
                 return true;
@@ -139,7 +133,7 @@ public class PhysicsEngine {
      * @param y position verticale
      * @return id de l'entité sinon null
      */
-    public static ArrayList<PhysicEntity> getEntityAtPosition(int x, int y, int height, int width) {
+    public ArrayList<PhysicEntity> getEntityAtPosition(int x, int y, int height, int width) {
         ArrayList<PhysicEntity> collidingEntities = new ArrayList<>();
         for (PhysicEntity entity : entities.values()) {
             if (x + width > entity.getX() && y + height > entity.getY()
@@ -155,7 +149,7 @@ public class PhysicsEngine {
      * @param entity entité
      * @return s'il y a une entité
      */
-    public static PhysicEntity isSomethingUp(PhysicEntity entity) {
+    public PhysicEntity isSomethingUp(PhysicEntity entity) {
         ArrayList<PhysicEntity> elements = getEntityAtPosition(entity.getX(), entity.getY() - 1, entity.getHeight(), entity.getWidth());
         for (PhysicEntity entity1 : elements)
             if (entity.getCollisions().contains(entity1))
@@ -168,7 +162,7 @@ public class PhysicsEngine {
      * @param entity entité
      * @return s'il y a une entité
      */
-    public static PhysicEntity isSomethingRight(PhysicEntity entity) {
+    public PhysicEntity isSomethingRight(PhysicEntity entity) {
         ArrayList<PhysicEntity> elements = getEntityAtPosition(entity.getX() + 1, entity.getY(), entity.getHeight(), entity.getWidth());
         for (PhysicEntity entity1 : elements)
             if (entity.getCollisions().contains(entity1))
@@ -181,7 +175,7 @@ public class PhysicsEngine {
      * @param entity entité
      * @return s'il y a une entité
      */
-    public static PhysicEntity isSomethingDown(PhysicEntity entity) {
+    public PhysicEntity isSomethingDown(PhysicEntity entity) {
         ArrayList<PhysicEntity> elements = getEntityAtPosition(entity.getX(), entity.getY() + 1, entity.getHeight(), entity.getWidth());
         for (PhysicEntity entity1 : elements)
             if (entity.getCollisions().contains(entity1))
@@ -194,7 +188,7 @@ public class PhysicsEngine {
      * @param entity entité
      * @return s'il y a une entité
      */
-    public static PhysicEntity isSomethingLeft(PhysicEntity entity) {
+    public PhysicEntity isSomethingLeft(PhysicEntity entity) {
         ArrayList<PhysicEntity> elements = getEntityAtPosition(entity.getX() - 1, entity.getY(), entity.getHeight(), entity.getWidth());
         for (PhysicEntity entity1 : elements)
             if (entity.getCollisions().contains(entity1))
@@ -208,7 +202,7 @@ public class PhysicsEngine {
      * @param entity2 entité 2
      * @return s'il y a collision
      */
-    public static boolean isInCollision(PhysicEntity entity1, PhysicEntity entity2) {
+    public boolean isInCollision(PhysicEntity entity1, PhysicEntity entity2) {
         return entity1.getX() + entity1.getWidth() > entity2.getX()
             && entity1.getY() + entity1.getHeight() > entity2.getY()
             && entity1.getX() < entity2.getX() + entity2.getWidth()
@@ -221,7 +215,7 @@ public class PhysicsEngine {
      * @param parentE entité parente
      * @return si l'enfant est dans le parent
      */
-    public static boolean isInside(PhysicEntity childE, PhysicEntity parentE) {
+    public boolean isInside(PhysicEntity childE, PhysicEntity parentE) {
         return childE.getX() > parentE.getX()
             && childE.getY() > parentE.getY()
             && childE.getX() + childE.getWidth() < parentE.getX() + parentE.getWidth()
@@ -233,7 +227,7 @@ public class PhysicsEngine {
      * @param entity entité
      * @return si l'entité respecte ses limites de déplacement
      */
-    public static boolean isInBounds(PhysicEntity entity) {
+    public boolean isInBounds(PhysicEntity entity) {
         int[] boundLimits = entity.getBoundLimits();
         return boundLimits == null || entity.getX() >= boundLimits[0]
             && entity.getX() + entity.getWidth() <= boundLimits[2]
@@ -247,7 +241,7 @@ public class PhysicsEngine {
      * @param e2 entité 2
      * @return si les entités sont à la même position
      */
-    public static boolean isCentered(PhysicEntity e1, PhysicEntity e2) {
+    public boolean isCentered(PhysicEntity e1, PhysicEntity e2) {
         return (e1.getX() + e1.getWidth()) / 2 == (e2.getX() + e2.getWidth()) / 2
             && (e1.getY() + e1.getHeight()) / 2 == (e2.getY() + e2.getHeight()) / 2;
     }
@@ -256,28 +250,26 @@ public class PhysicsEngine {
      * Déplacement vers le haut
      * @param entity entité physique
      */
-    public static void goUp(PhysicEntity entity) { PhysicsEngine.translate(entity, 0, -entity.getSpeed()); }
+    public void goUp(PhysicEntity entity) { translate(entity, 0, -entity.getSpeed()); }
 
     /**
      * Déplacement vers la droite
      * @param entity entité physique
      */
-    public static void goRight(PhysicEntity entity) { PhysicsEngine.translate(entity, entity.getSpeed(), 0); }
+    public void goRight(PhysicEntity entity) { translate(entity, entity.getSpeed(), 0); }
 
     /**
      * Déplacement vers la gauche
      * @param entity entité physique
      */
-    public static void goLeft(PhysicEntity entity) {
-        PhysicsEngine.translate(entity, -entity.getSpeed(), 0);
-    }
+    public void goLeft(PhysicEntity entity) { translate(entity, -entity.getSpeed(), 0); }
 
     /**
      * Déplacement vers le bas
      * @param entity entité physique
      */
-    public static void goDown(PhysicEntity entity) {
-        PhysicsEngine.translate(entity, 0, entity.getSpeed());
+    public void goDown(PhysicEntity entity) {
+        translate(entity, 0, entity.getSpeed());
     }
 
     /**
@@ -286,7 +278,7 @@ public class PhysicsEngine {
      * @param x position x
      * @param y position y
      */
-    public static void move(PhysicEntity entity, int x, int y) {
+    public void move(PhysicEntity entity, int x, int y) {
         entity.setLastX(entity.getX());
         entity.setLastY(entity.getY());
         entity.setX(x);
@@ -299,7 +291,7 @@ public class PhysicsEngine {
      * @param x position horizontale
      * @param y position verticale
      */
-    public static void translate(PhysicEntity entity, int x, int y) {
+    public void translate(PhysicEntity entity, int x, int y) {
         entity.setLastX(entity.getX());
         entity.setLastY(entity.getY());
         entity.setX(entity.getX() + x);
@@ -313,7 +305,7 @@ public class PhysicsEngine {
      * @param w largeur
      * @param h hauteur
      */
-    public static void resize(PhysicEntity entity, int w, int h) {
+    public void resize(PhysicEntity entity, int w, int h) {
         entity.setWidth(w);
         entity.setHeight(h);
     }
@@ -323,7 +315,7 @@ public class PhysicsEngine {
      * @param entity entité à redimensionner
      * @param h hauteur
      */
-    public static void resizeHeight(PhysicEntity entity, int h) {
+    public void resizeHeight(PhysicEntity entity, int h) {
         entity.setHeight(h);
     }
 
@@ -332,7 +324,7 @@ public class PhysicsEngine {
      * @param entity entité à redimensionner
      * @param w largeur
      */
-    public static void resizeWidth(PhysicEntity entity, int w) {
+    public void resizeWidth(PhysicEntity entity, int w) {
         entity.setWidth(w);
     }
 
@@ -341,7 +333,7 @@ public class PhysicsEngine {
      * @param entity entité physique
      * @param speed vitesse
      */
-    public static void setSpeed(PhysicEntity entity, int speed) {
+    public void setSpeed(PhysicEntity entity, int speed) {
         entity.setSpeed(speed);
     }
 

@@ -1,9 +1,6 @@
 package gameplay;
 
-import engines.graphics.GraphicsEngine;
 import engines.kernel.Entity;
-import engines.kernel.KernelEngine;
-import engines.physics.PhysicsEngine;
 
 import java.util.ArrayList;
 
@@ -11,6 +8,11 @@ import java.util.ArrayList;
  * Niveau de jeu
  */
 public class Level extends Entity {
+    /**
+     * Gameplay
+     */
+    private Gameplay gameplay;
+
     /**
      * Matrice d'entités graphiques
      */
@@ -41,9 +43,10 @@ public class Level extends Entity {
      * @param rows nombre de lignes
      * @param cols nombre de colonnes
      */
-    public Level(int rows, int cols) {
-        super();
-        PhysicsEngine.resize(getPhysicEntity(),(rows - 1) * 30, (cols - 1) * 30);
+    public Level(Gameplay gameplay, int rows, int cols) {
+        super(gameplay.kernelEngine());
+        this.gameplay = gameplay;
+        gameplay.physicsEngine().resize(getPhysicEntity(),(rows - 1) * 30, (cols - 1) * 30);
         this.matrix = new Entity[rows][cols];
         fill();
     }
@@ -52,13 +55,13 @@ public class Level extends Entity {
      * Initialiser les évènements
      */
     public void initEvents() {
-        KernelEngine.addEvent("drawLevel", () -> {
+        gameplay.kernelEngine().addEvent("drawLevel", () -> {
             for (Entity entity : level_entities)
-                GraphicsEngine.draw(entity.getGraphicEntity());
+                gameplay.graphicsEngine().draw(entity.getGraphicEntity());
         });
-        KernelEngine.addEvent("updateLevel", () -> {
+        gameplay.kernelEngine().addEvent("updateLevel", () -> {
             for (Entity entity : level_entities)
-                GraphicsEngine.update(entity.getGraphicEntity());
+                gameplay.graphicsEngine().update(entity.getGraphicEntity());
         });
     }
 
@@ -68,8 +71,8 @@ public class Level extends Entity {
     public void fill() {
         for (int row = 0; row < matrix.length; row++) {
             for (int col = 0; col < matrix[row].length; col++) {
-                matrix[row][col] = KernelEngine.generateEntity();
-                PhysicsEngine.move(matrix[row][col].getPhysicEntity(), (30 * col), (30 * row));
+                matrix[row][col] = gameplay.kernelEngine().generateEntity();
+                gameplay.physicsEngine().move(matrix[row][col].getPhysicEntity(), (30 * col), (30 * row));
                 level_entities.add(matrix[row][col]);
             }
         }
@@ -83,9 +86,9 @@ public class Level extends Entity {
      */
     public void addPlayer(Player player, int row, int col) {
         if (this.player == null) {
-            PhysicsEngine.addBoundLimits(player.getPhysicEntity(), getBounds()[0], getBounds()[1], getBounds()[2], getBounds()[3]);
+            gameplay.physicsEngine().addBoundLimits(player.getPhysicEntity(), getBounds()[0], getBounds()[1], getBounds()[2], getBounds()[3]);
             Entity entity = matrix[row][col];
-            PhysicsEngine.move(player.getPhysicEntity(), entity.getGraphicEntity().getX(), entity.getGraphicEntity().getY());
+            gameplay.physicsEngine().move(player.getPhysicEntity(), entity.getGraphicEntity().getX(), entity.getGraphicEntity().getY());
             this.player = player;
             level_entities.add(player);
         }

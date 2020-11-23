@@ -2,6 +2,7 @@ package engines.graphics;
 
 import api.SwingRenderer;
 import engines.kernel.Entity;
+import engines.kernel.KernelEngine;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,47 +13,41 @@ import java.util.Map;
  */
 public class GraphicsEngine {
     /**
+     * Moteur noyau
+     */
+    private KernelEngine kernelEngine;
+
+    /**
      * Liste des entités graphiques
      */
-    private static final Map<Integer, GraphicEntity> entities = new HashMap<>();
+    private final Map<Integer, GraphicEntity> entities = new HashMap<>();
 
     /**
      * Liste des scènes
      */
-    private static final Map<Integer, Scene> scenes = new HashMap<>();
+    private final Map<Integer, Scene> scenes = new HashMap<>();
 
     /**
      * Liste des textures transférées
      */
-    private static final Map<Integer,Texture> textures = new HashMap<>();
+    private final Map<Integer,Texture> textures = new HashMap<>();
 
     /**
      * Liste des fichiers de textures transférés
      */
-    private static final Map<Integer,SpriteSheet> spriteSheets = new HashMap<>();
+    private final Map<Integer,SpriteSheet> spriteSheets = new HashMap<>();
 
     /**
      * Liste des animations
      */
-    private static final Map<Integer,SpriteAnimation> animations = new HashMap<>();
+    private final Map<Integer,SpriteAnimation> animations = new HashMap<>();
 
     /**
-     * Instance unique
+     * Constructeur
+     * @param kernelEngine moteur noyau
      */
-    private static GraphicsEngine instance;
-
-    /**
-     * Constructeur privé
-     */
-    private GraphicsEngine() {}
-
-    /**
-     * Récupérer l'instance
-     * @return instance
-     */
-    public static GraphicsEngine getInstance() {
-        if (instance == null) instance = new GraphicsEngine();
-        return instance;
+    public GraphicsEngine(KernelEngine kernelEngine) {
+        this.kernelEngine = kernelEngine;
     }
 
     //-----------------------------------------------//
@@ -64,7 +59,7 @@ public class GraphicsEngine {
      * @param entity entité à cloner
      * @return clone
      */
-    public static GraphicEntity clone(GraphicEntity entity) {
+    public GraphicEntity clone(GraphicEntity entity) {
         return entity.clone();
     }
 
@@ -72,7 +67,7 @@ public class GraphicsEngine {
      * Dessine une entité graphique
      * @param entity entité à dessiner
      */
-    public static void draw(GraphicEntity entity) {
+    public void draw(GraphicEntity entity) {
         if (entity.getColor() != null) entity.getColor().cover(entity);
         if (entity.getTexture() != null) entity.getTexture().cover(entity);
     }
@@ -81,7 +76,7 @@ public class GraphicsEngine {
      * Met à jour une entité graphique
      * @param entity entité à mettre à jour
      */
-    public static void update(GraphicEntity entity) {
+    public void update(GraphicEntity entity) {
         if (entity.getTexture() != null) entity.getTexture().update();
     }
 
@@ -89,7 +84,7 @@ public class GraphicsEngine {
      * Supprime une entité graphique de sa scène
      * @param entity entité à supprimer
      */
-    public static void erase(GraphicEntity entity) {
+    public void erase(GraphicEntity entity) {
         Scene scene = entity.getScene();
         scene.removeEntity(entity);
     }
@@ -101,7 +96,7 @@ public class GraphicsEngine {
      * @param g intensité de vert
      * @param b intensité de bleu
      */
-    public static void bindColor(GraphicEntity entity, int r, int g, int b) {
+    public void bindColor(GraphicEntity entity, int r, int g, int b) {
         entity.setColor(new Color(r,g,b));
     }
 
@@ -110,7 +105,7 @@ public class GraphicsEngine {
      * @param entity entité à colorer
      * @param color couleur à ajouter
      */
-    public static void bindColor(GraphicEntity entity, Color color) {
+    public void bindColor(GraphicEntity entity, Color color) {
         entity.setColor(color);
     }
 
@@ -118,7 +113,7 @@ public class GraphicsEngine {
      * Suppression de la couleur d'une entité graphique
      * @param entity entité à décolorer
      */
-    public static void unbindColor(GraphicEntity entity) {
+    public void unbindColor(GraphicEntity entity) {
         entity.setColor(null);
     }
 
@@ -127,7 +122,7 @@ public class GraphicsEngine {
      * @param entity entité à texturer
      * @param textureID identifiant de la texture
      */
-    public static void bindTexture(GraphicEntity entity, int textureID) {
+    public void bindTexture(GraphicEntity entity, int textureID) {
         entity.setTexture(textures.get(textureID));
     }
 
@@ -138,7 +133,7 @@ public class GraphicsEngine {
      * @param row ligne
      * @param col colonne
      */
-    public static void bindTexture(GraphicEntity entity, int spriteSheetID, int row, int col) {
+    public void bindTexture(GraphicEntity entity, int spriteSheetID, int row, int col) {
         entity.setTexture(spriteSheets.get(spriteSheetID).getSprite(row, col));
     }
 
@@ -147,7 +142,7 @@ public class GraphicsEngine {
      * @param entity entité
      * @param animationID identifiant de l'animation
      */
-    public static void bindAnimation(GraphicEntity entity, int animationID) {
+    public void bindAnimation(GraphicEntity entity, int animationID) {
         entity.setTexture(animations.get(animationID));
     }
 
@@ -155,7 +150,7 @@ public class GraphicsEngine {
      * Suppression de la texture d'une entité graphique
      * @param entity entité à détexturer
      */
-    public static void unbindTexture(GraphicEntity entity) {
+    public void unbindTexture(GraphicEntity entity) {
         entity.setTexture(null);
     }
 
@@ -163,7 +158,7 @@ public class GraphicsEngine {
      * Ajouter une entité à la scène courante
      * @param entity entité
      */
-    public static void addToCurrentScene(GraphicEntity entity) {
+    public void addToCurrentScene(GraphicEntity entity) {
         Window.getActualScene().addEntity(entity);
     }
 
@@ -176,7 +171,7 @@ public class GraphicsEngine {
      * @param link lien du fichier
      * @return identifiant de la texture
      */
-    public static int loadTexture(String link) {
+    public int loadTexture(String link) {
         if (!SwingRenderer.isTextureLoaded(link)) {
             SwingRenderer.loadTexture(link);
             int id = textures.isEmpty() ? 1 : Collections.max(textures.keySet()) + 1;
@@ -199,7 +194,7 @@ public class GraphicsEngine {
      * @param width largeur
      * @return identifiant du fichier de textures
      */
-    public static int loadSpriteSheet(String link, int height, int width) {
+    public int loadSpriteSheet(String link, int height, int width) {
         if (!SwingRenderer.isTextureLoaded(link)) {
             SwingRenderer.loadSpriteSheet(link, height, width);
             int id = spriteSheets.isEmpty() ? 1 : Collections.max(spriteSheets.keySet()) + 1;
@@ -222,7 +217,7 @@ public class GraphicsEngine {
      * @param looping animation en boucle
      * @return identifiant de l'animation
      */
-    public static int generateAnimation(int spriteSheetID, int speed, boolean looping) {
+    public int generateAnimation(int spriteSheetID, int speed, boolean looping) {
         int id = animations.isEmpty() ? 1 : Collections.max(animations.keySet()) + 1;
         animations.put(id, new SpriteAnimation(spriteSheets.get(spriteSheetID), speed, looping));
         return id;
@@ -234,7 +229,7 @@ public class GraphicsEngine {
      * @param row ligne où est située la texture
      * @param col colonne où est située la texture
      */
-    public static void addFrameToAnimation(int id, int row, int col) {
+    public void addFrameToAnimation(int id, int row, int col) {
         animations.get(id).addFrame(row, col);
     }
 
@@ -242,7 +237,7 @@ public class GraphicsEngine {
      * Jouer / Arrêter une animation
      * @param id identifiant de l'animation
      */
-    public static void playPauseAnimation(int id) {
+    public void playPauseAnimation(int id) {
         animations.get(id).playPause();
     }
 
@@ -250,7 +245,7 @@ public class GraphicsEngine {
      * Réinitialiser une animation
      * @param id identifiant de l'animation
      */
-    public static void resetAnimation(int id) {
+    public void resetAnimation(int id) {
         animations.get(id).reset();
     }
 
@@ -264,9 +259,9 @@ public class GraphicsEngine {
      * @param width largeur
      * @return identifiant de la scène
      */
-    public static int generateScene(int height, int width) {
+    public int generateScene(int height, int width) {
         int id = scenes.isEmpty() ? 1 : Collections.max(scenes.keySet()) + 1;
-        scenes.put(id, new Scene(height, width));
+        scenes.put(id, new Scene(this, height, width));
         return id;
     }
 
@@ -277,7 +272,7 @@ public class GraphicsEngine {
      * @param g intensité vert
      * @param b intensité bleu
      */
-    public static void setSceneBackgroundColor(int id, int r, int g, int b) {
+    public void setSceneBackgroundColor(int id, int r, int g, int b) {
         scenes.get(id).setBackgroundColor(new Color(r,g,b));
     }
 
@@ -285,7 +280,7 @@ public class GraphicsEngine {
      * Attacher une scène à la fenêtre
      * @param id id de la scène
      */
-    public static void bindScene(int id) {
+    public void bindScene(int id) {
         if (!scenes.containsKey(id)) {
             try {
                 throw new Exception("Scène introuvable");
@@ -304,19 +299,19 @@ public class GraphicsEngine {
     /**
      * Afficher la fenêtre
      */
-    public static void showWindow() {
+    public void showWindow() {
         Window.show();
     }
 
     /**
      * Rafraichir la fenêtre
      */
-    public static void refreshWindow() { Window.refresh(); }
+    public void refreshWindow() { Window.refresh(); }
 
     /**
      * Arrêter la fenêtre
      */
-    public static void stopWindow() {
+    public void stopWindow() {
         Window.stop();
     }
 
@@ -333,11 +328,11 @@ public class GraphicsEngine {
 
     // GETTERS & SETTERS //
 
-    public static Texture getTexture(int id) { return textures.get(id); }
+    public Texture getTexture(int id) { return textures.get(id); }
 
-    public static SpriteAnimation getAnimation(int id) { return animations.get(id); }
+    public SpriteAnimation getAnimation(int id) { return animations.get(id); }
 
-    public static Scene getScene(int id) { return scenes.get(id); }
+    public Scene getScene(int id) { return scenes.get(id); }
 
-    public static Map<Integer, Scene> getScenes() { return scenes; }
+    public Map<Integer, Scene> getScenes() { return scenes; }
 }

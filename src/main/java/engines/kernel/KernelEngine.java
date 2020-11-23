@@ -14,33 +14,57 @@ import java.util.Map;
  */
 public class KernelEngine {
     /**
+     * Moteur graphique
+     */
+    private GraphicsEngine graphicsEngine;
+
+    /**
+     * Moteur entrées / sorties
+     */
+    private IOEngine ioEngine;
+
+    /**
+     * Moteur physique
+     */
+    private PhysicsEngine physicsEngine;
+
+    /**
      * Dernier id généré
      */
-    private static int lastID = 0;
+    private int lastID = 0;
 
     /**
      * Liste des évènements du jeu
      */
-    private static Map<String, Runnable> events = new HashMap<>();
+    private Map<String, Runnable> events = new HashMap<>();
 
     /**
      * Délai de rafraichissement du jeu : 60fps
      */
-    private final static int delay = 1000/60;
+    private final int delay = 1000/60;
+
+    /**
+     * Constructeur
+     */
+    public KernelEngine() {
+        this.graphicsEngine = new GraphicsEngine(this);
+        this.physicsEngine = new PhysicsEngine(this);
+        this.ioEngine = new IOEngine(this);
+    }
 
     /**
      * Générer une nouvelle entité
      * @return id généré
      */
-    public static Entity generateEntity() {
-        return new Entity();
+    public Entity generateEntity() {
+        return new Entity(this);
     }
 
     /**
      * Générer un nouvel ID
      * @return nouvel identifiant
      */
-    protected static int generateNewID() {
+    protected int generateNewID() {
         ++lastID;
         return lastID;
     }
@@ -48,10 +72,10 @@ public class KernelEngine {
     /**
      * Rafraichir le jeu
      */
-    private static final ActionListener refresh = evt -> {
-        IOEngine.updateEntities();
-        PhysicsEngine.updateEntites();
-        GraphicsEngine.refreshWindow();
+    private final ActionListener refresh = evt -> {
+        ioEngine.updateEntities();
+        physicsEngine.updateEntites();
+        graphicsEngine.refreshWindow();
     };
 
     /**
@@ -59,7 +83,7 @@ public class KernelEngine {
      * @param name nom de l'évènement
      * @param event évènement
      */
-    public static void addEvent(String name, Runnable event) {
+    public void addEvent(String name, Runnable event) {
         events.put(name, event);
     }
 
@@ -67,16 +91,24 @@ public class KernelEngine {
      * Exécuter un évènement spécifique
      * @param eventName nom de l'évènement
      */
-    public static void notifyEvent(String eventName) {
+    public void notifyEvent(String eventName) {
         events.get(eventName).run();
     }
 
     /**
      * Exécuter le moteur noyau
      */
-    public static void start() {
-        GraphicsEngine.showWindow();
+    public void start() {
+        graphicsEngine.showWindow();
         //Rafraichissement 60 images par seconde
         new Timer(delay, refresh).start();
     }
+
+    // GETTERS //
+
+    public GraphicsEngine getGraphicsEngine() { return graphicsEngine; }
+
+    public IOEngine getIoEngine() { return ioEngine; }
+
+    public PhysicsEngine getPhysicsEngine() { return physicsEngine; }
 }
