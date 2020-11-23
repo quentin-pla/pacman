@@ -3,6 +3,7 @@ package engines.physics;
 import engines.kernel.Entity;
 import engines.kernel.KernelEngine;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -130,6 +131,75 @@ public class PhysicsEngine {
             if (isInCollision(collision,entity))
                 return true;
         return false;
+    }
+
+    /**
+     * Obtenir une entité à position spécifique
+     * @param x position horizontale
+     * @param y position verticale
+     * @return id de l'entité sinon null
+     */
+    public static ArrayList<PhysicEntity> getEntityAtPosition(int x, int y, int height, int width) {
+        ArrayList<PhysicEntity> collidingEntities = new ArrayList<>();
+        for (PhysicEntity entity : entities.values()) {
+            if (x + width > entity.getX() && y + height > entity.getY()
+                    && x < entity.getX() + entity.getWidth()
+                    && y < entity.getY() + entity.getHeight())
+                collidingEntities.add(entity);
+        }
+        return collidingEntities;
+    }
+
+    /**
+     * Vérifier si une entité est présente en haut
+     * @param entity entité
+     * @return s'il y a une entité
+     */
+    public static PhysicEntity isSomethingUp(PhysicEntity entity) {
+        ArrayList<PhysicEntity> elements = getEntityAtPosition(entity.getX(), entity.getY() - 1, entity.getHeight(), entity.getWidth());
+        for (PhysicEntity entity1 : elements)
+            if (entity.getCollisions().contains(entity1))
+                return entity1;
+        return null;
+    }
+
+    /**
+     * Vérifier si une entité est présente à droite
+     * @param entity entité
+     * @return s'il y a une entité
+     */
+    public static PhysicEntity isSomethingRight(PhysicEntity entity) {
+        ArrayList<PhysicEntity> elements = getEntityAtPosition(entity.getX() + 1, entity.getY(), entity.getHeight(), entity.getWidth());
+        for (PhysicEntity entity1 : elements)
+            if (entity.getCollisions().contains(entity1))
+                return entity1;
+        return null;
+    }
+
+    /**
+     * Vérifier si une entité est présente en bas
+     * @param entity entité
+     * @return s'il y a une entité
+     */
+    public static PhysicEntity isSomethingDown(PhysicEntity entity) {
+        ArrayList<PhysicEntity> elements = getEntityAtPosition(entity.getX(), entity.getY() + 1, entity.getHeight(), entity.getWidth());
+        for (PhysicEntity entity1 : elements)
+            if (entity.getCollisions().contains(entity1))
+                return entity1;
+        return null;
+    }
+
+    /**
+     * Vérifier si une entité est présente à gauche
+     * @param entity entité
+     * @return s'il y a une entité
+     */
+    public static PhysicEntity isSomethingLeft(PhysicEntity entity) {
+        ArrayList<PhysicEntity> elements = getEntityAtPosition(entity.getX() - 1, entity.getY(), entity.getHeight(), entity.getWidth());
+        for (PhysicEntity entity1 : elements)
+            if (entity.getCollisions().contains(entity1))
+                return entity1;
+        return null;
     }
 
     /**

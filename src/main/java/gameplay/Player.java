@@ -5,6 +5,7 @@ import engines.input_output.IOEngine;
 import engines.kernel.Event;
 import engines.kernel.Entity;
 import engines.kernel.KernelEngine;
+import engines.physics.PhysicEntity;
 import engines.physics.PhysicsEngine;
 
 import java.awt.event.KeyEvent;
@@ -31,6 +32,11 @@ public class Player extends Entity {
      * Identifiant de l'animation en cours
      */
     private Integer currentAnimationID = 0;
+
+    /**
+     * Direction courante
+     */
+    private MoveDirection currentDirection = null;
 
     /**
      * Texture par défaut
@@ -148,21 +154,58 @@ public class Player extends Entity {
     private void switchDirection(MoveDirection direction) {
         currentAnimationID = animations.get(direction.name());
         KernelEngine.notifyEvent("playCurrentAnimation");
+        PhysicEntity entityNearby;
         switch (direction) {
             case UP:
-                PhysicsEngine.goUp(getPhysicEntity());
+                entityNearby = PhysicsEngine.isSomethingUp(getPhysicEntity());
+                if (entityNearby == null)
+                    currentDirection = MoveDirection.UP;
+                callEventFromDirection();
                 break;
             case RIGHT:
-                PhysicsEngine.goRight(getPhysicEntity());
+                entityNearby = PhysicsEngine.isSomethingRight(getPhysicEntity());
+                if (entityNearby == null)
+                    currentDirection = MoveDirection.RIGHT;
+                callEventFromDirection();
                 break;
             case DOWN:
-                PhysicsEngine.goDown(getPhysicEntity());
+                entityNearby = PhysicsEngine.isSomethingDown(getPhysicEntity());
+                if (entityNearby == null)
+                    currentDirection = MoveDirection.DOWN;
+                callEventFromDirection();
                 break;
             case LEFT:
-                PhysicsEngine.goLeft(getPhysicEntity());
+                entityNearby = PhysicsEngine.isSomethingLeft(getPhysicEntity());
+                if (entityNearby == null)
+                    currentDirection = MoveDirection.LEFT;
+                callEventFromDirection();
                 break;
         }
-        GraphicsEngine.bindAnimation(getGraphicEntity(), animations.get(direction.name()));
+        GraphicsEngine.bindAnimation(getGraphicEntity(), animations.get(currentDirection.name()));
+    }
+
+    /**
+     * Appeler la méthode de déplacement en fonction de la direction courante
+     */
+    private void callEventFromDirection() {
+        if (currentDirection != null) {
+            switch (currentDirection) {
+                case UP:
+                    PhysicsEngine.goUp(getPhysicEntity());
+                    break;
+                case RIGHT:
+                    PhysicsEngine.goRight(getPhysicEntity());
+                    break;
+                case DOWN:
+                    PhysicsEngine.goDown(getPhysicEntity());
+                    break;
+                case LEFT:
+                    PhysicsEngine.goLeft(getPhysicEntity());
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     /**

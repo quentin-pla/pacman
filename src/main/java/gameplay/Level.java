@@ -1,6 +1,8 @@
 package gameplay;
 
+import engines.graphics.GraphicsEngine;
 import engines.kernel.Entity;
+import engines.kernel.Event;
 import engines.kernel.KernelEngine;
 import engines.physics.PhysicsEngine;
 
@@ -48,13 +50,33 @@ public class Level extends Entity {
     }
 
     /**
+     * Initialiser les évènements
+     */
+    public void initEvents() {
+        KernelEngine.addEvent("drawLevel", new Event() {
+            @Override
+            public void run() {
+                for (Entity entity : level_entities)
+                    GraphicsEngine.draw(entity.getGraphicEntity());
+            }
+        });
+        KernelEngine.addEvent("updateLevel", new Event() {
+            @Override
+            public void run() {
+                for (Entity entity : level_entities)
+                    GraphicsEngine.update(entity.getGraphicEntity());
+            }
+        });
+    }
+
+    /**
      * Remplir la matrice
      */
     public void fill() {
         for (int row = 0; row < matrix.length; row++) {
             for (int col = 0; col < matrix[row].length; col++) {
                 matrix[row][col] = KernelEngine.generateEntity();
-                PhysicsEngine.move(matrix[row][col].getPhysicEntity(),(30 * col),(30 * row));
+                PhysicsEngine.move(matrix[row][col].getPhysicEntity(), (30 * col), (30 * row));
                 level_entities.add(matrix[row][col]);
             }
         }
@@ -67,11 +89,13 @@ public class Level extends Entity {
      * @param col colonne
      */
     public void addPlayer(Player player, int row, int col) {
-        PhysicsEngine.addBoundLimits(player.getPhysicEntity(), getBounds()[0], getBounds()[1], getBounds()[2], getBounds()[3]);
-        Entity entity = matrix[row][col];
-        PhysicsEngine.move(player.getPhysicEntity(), entity.getGraphicEntity().getX(), entity.getGraphicEntity().getY());
-        this.player = player;
-        level_entities.add(player);
+        if (this.player == null) {
+            PhysicsEngine.addBoundLimits(player.getPhysicEntity(), getBounds()[0], getBounds()[1], getBounds()[2], getBounds()[3]);
+            Entity entity = matrix[row][col];
+            PhysicsEngine.move(player.getPhysicEntity(), entity.getGraphicEntity().getX(), entity.getGraphicEntity().getY());
+            this.player = player;
+            level_entities.add(player);
+        }
     }
 
     /**
@@ -82,20 +106,7 @@ public class Level extends Entity {
         return getPhysicEntity().getBounds();
     }
 
-//    @Override
-//    public void draw() {
-//        super.draw();
-//        for (Entity entity : level_entities)
-//            entity.draw();
-//    }
-//
-//    @Override
-//    public void update() {
-//        super.update();
-//        for (Entity entity : level_entities)
-//            entity.update();
-//    }
-//
+
 //    @Override
 //    public void translate(int x, int y) {
 //        super.translate(x, y);

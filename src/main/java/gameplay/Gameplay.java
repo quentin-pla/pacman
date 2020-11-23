@@ -1,9 +1,9 @@
 package gameplay;
 
-import engines.kernel.Event;
 import engines.graphics.GraphicsEngine;
 import engines.input_output.IOEngine;
 import engines.kernel.Entity;
+import engines.kernel.Event;
 import engines.kernel.KernelEngine;
 import engines.physics.PhysicsEngine;
 
