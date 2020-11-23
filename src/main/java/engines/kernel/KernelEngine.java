@@ -21,7 +21,7 @@ public class KernelEngine {
     /**
      * Liste des évènements du jeu
      */
-    private static Map<String, Event> events = new HashMap<>();
+    private static Map<String, Runnable> events = new HashMap<>();
 
     /**
      * Délai de rafraichissement du jeu : 60fps
@@ -59,7 +59,7 @@ public class KernelEngine {
      * @param name nom de l'évènement
      * @param event évènement
      */
-    public static void addEvent(String name, Event event) {
+    public static void addEvent(String name, Runnable event) {
         events.put(name, event);
     }
 

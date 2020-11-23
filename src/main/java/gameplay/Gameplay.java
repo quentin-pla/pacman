@@ -3,7 +3,6 @@ package gameplay;
 import engines.graphics.GraphicsEngine;
 import engines.input_output.IOEngine;
 import engines.kernel.Entity;
-import engines.kernel.Event;
 import engines.kernel.KernelEngine;
 import engines.physics.PhysicsEngine;
 
@@ -68,10 +67,7 @@ public class Gameplay {
             PhysicsEngine.move(ball.getPhysicEntity(),30 + (30*i),130);
             PhysicsEngine.resize(ball.getPhysicEntity(),30,30);
             GraphicsEngine.bindTexture(ball.getGraphicEntity(),textures,10,2);
-            KernelEngine.addEvent("eraseBall" + i, new Event() {
-                @Override
-                public void run() { GraphicsEngine.erase(ball.getGraphicEntity()); }
-            });
+            KernelEngine.addEvent("eraseBall" + i,() -> GraphicsEngine.erase(ball.getGraphicEntity()));
             PhysicsEngine.bindEventOnSameLocation(player.getPhysicEntity(), ball.getPhysicEntity(), "eraseBall" + i);
         }
 

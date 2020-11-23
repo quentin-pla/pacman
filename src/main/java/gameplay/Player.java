@@ -2,7 +2,6 @@ package gameplay;
 
 import engines.graphics.GraphicsEngine;
 import engines.input_output.IOEngine;
-import engines.kernel.Event;
 import engines.kernel.Entity;
 import engines.kernel.KernelEngine;
 import engines.physics.PhysicEntity;
@@ -102,48 +101,26 @@ public class Player extends Entity {
      */
     private void initEvents() {
         //Se déplacer vers le haut
-        KernelEngine.addEvent("goUp", new Event() {
-            @Override
-            public void run() { switchDirection(MoveDirection.UP); }
-        });
+        KernelEngine.addEvent("goUp", () -> switchDirection(MoveDirection.UP));
         //Se déplacer vers la droite
-        KernelEngine.addEvent("goRight", new Event() {
-            @Override
-            public void run() { switchDirection(MoveDirection.RIGHT); }
-        });
+        KernelEngine.addEvent("goRight", () -> switchDirection(MoveDirection.RIGHT));
         //Se déplacer vers le bas
-        KernelEngine.addEvent("goDown", new Event() {
-            @Override
-            public void run() { switchDirection(MoveDirection.DOWN); }
-        });
+        KernelEngine.addEvent("goDown", () -> switchDirection(MoveDirection.DOWN));
         //Se déplacer vers la gauche
-        KernelEngine.addEvent("goLeft", new Event() {
-            @Override
-            public void run() { switchDirection(MoveDirection.LEFT); }
-        });
+        KernelEngine.addEvent("goLeft", () -> switchDirection(MoveDirection.LEFT));
         //Attacher la texture par défaut au joueur
-        KernelEngine.addEvent("bindDefaultTexture", new Event() {
-            @Override
-            public void run() {
-                GraphicsEngine.bindTexture(getGraphicEntity(), defaultTexture[0], defaultTexture[1], defaultTexture[2]);
-            }
-        });
+        KernelEngine.addEvent("bindDefaultTexture", () ->
+            GraphicsEngine.bindTexture(getGraphicEntity(), defaultTexture[0], defaultTexture[1], defaultTexture[2]));
         //Lorsqu'il y a une collision
-        KernelEngine.addEvent("onCollision", new Event() {
-            @Override
-            public void run() {
-                if (currentAnimationID != 0)
-                    if (GraphicsEngine.getAnimation(currentAnimationID).isPlaying())
-                        GraphicsEngine.playPauseAnimation(currentAnimationID);
-            }
+        KernelEngine.addEvent("onCollision", () -> {
+            if (currentAnimationID != 0)
+                if (GraphicsEngine.getAnimation(currentAnimationID).isPlaying())
+                    GraphicsEngine.playPauseAnimation(currentAnimationID);
         });
         //Rejouer l'animation courante
-        KernelEngine.addEvent("playCurrentAnimation", new Event() {
-            @Override
-            public void run() {
-                if (!GraphicsEngine.getAnimation(currentAnimationID).isPlaying())
-                    GraphicsEngine.playPauseAnimation(currentAnimationID);
-            }
+        KernelEngine.addEvent("playCurrentAnimation", () -> {
+            if (!GraphicsEngine.getAnimation(currentAnimationID).isPlaying())
+                GraphicsEngine.playPauseAnimation(currentAnimationID);
         });
     }
 

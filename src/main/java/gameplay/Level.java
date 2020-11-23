@@ -2,7 +2,6 @@ package gameplay;
 
 import engines.graphics.GraphicsEngine;
 import engines.kernel.Entity;
-import engines.kernel.Event;
 import engines.kernel.KernelEngine;
 import engines.physics.PhysicsEngine;
 
@@ -53,19 +52,13 @@ public class Level extends Entity {
      * Initialiser les évènements
      */
     public void initEvents() {
-        KernelEngine.addEvent("drawLevel", new Event() {
-            @Override
-            public void run() {
-                for (Entity entity : level_entities)
-                    GraphicsEngine.draw(entity.getGraphicEntity());
-            }
+        KernelEngine.addEvent("drawLevel", () -> {
+            for (Entity entity : level_entities)
+                GraphicsEngine.draw(entity.getGraphicEntity());
         });
-        KernelEngine.addEvent("updateLevel", new Event() {
-            @Override
-            public void run() {
-                for (Entity entity : level_entities)
-                    GraphicsEngine.update(entity.getGraphicEntity());
-            }
+        KernelEngine.addEvent("updateLevel", () -> {
+            for (Entity entity : level_entities)
+                GraphicsEngine.update(entity.getGraphicEntity());
         });
     }
 
