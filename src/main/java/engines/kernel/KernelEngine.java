@@ -103,7 +103,13 @@ public class KernelEngine {
      * @param eventName nom de l'évènement
      */
     public void notifyEvent(String eventName) {
-        events.get(eventName).run();
+        try {
+            events.get(eventName).run();
+        } catch (NullPointerException e) {
+            System.err.println("ERREUR : Nom de l'évènement introuvable.");
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
 
     /**

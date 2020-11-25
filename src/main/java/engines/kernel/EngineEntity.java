@@ -25,4 +25,6 @@ public abstract class EngineEntity {
     // GETTERS //
 
     public Entity getParent() { return parent; }
+
+    protected void setParent(Entity parent) { this.parent = parent; }
 }

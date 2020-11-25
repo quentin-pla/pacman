@@ -71,24 +71,18 @@ public class PhysicEntity extends EngineEntity {
     }
 
     /**
-     * Constructeur par clonage
-     * @param clone entité physique
-     */
-    private PhysicEntity(PhysicEntity clone) {
-        this.isColliding = false;
-        this.collisions = clone.collisions;
-        this.boundLimits = clone.boundLimits;
-        this.speed = clone.speed;
-        this.lastX = clone.x;
-        this.lastY = clone.y;
-    }
-
-    /**
      * Cloner l'entité
-     * @return clone
      */
-    protected PhysicEntity clone() {
-        return new PhysicEntity(this);
+    public void clone(PhysicEntity entity) {
+        this.collisions = new ArrayList<>(entity.collisions);
+        this.boundLimits = entity.boundLimits;
+        this.speed = entity.speed;
+        this.lastX = entity.x;
+        this.lastY = entity.y;
+        this.x = entity.x;
+        this.y = entity.y;
+        this.height = entity.height;
+        this.width = entity.width;
     }
 
     // GETTERS & SETTERS //

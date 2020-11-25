@@ -23,11 +23,6 @@ public class GraphicsEngine {
     private final Map<Integer, GraphicEntity> entities = new HashMap<>();
 
     /**
-     * Liste des scènes
-     */
-    private final Map<Integer, Scene> scenes = new HashMap<>();
-
-    /**
      * Liste des textures transférées
      */
     private final Map<Integer,Texture> textures = new HashMap<>();
@@ -53,15 +48,6 @@ public class GraphicsEngine {
     //-----------------------------------------------//
     //--------- MÉTHODES ENTITÉS GRAPHIQUES ---------//
     //-----------------------------------------------//
-
-    /**
-     * Cloner une entité graphique
-     * @param entity entité à cloner
-     * @return clone
-     */
-    public GraphicEntity clone(GraphicEntity entity) {
-        return entity.clone();
-    }
 
     /**
      * Dessine une entité graphique
@@ -160,6 +146,15 @@ public class GraphicsEngine {
      */
     public void addToCurrentScene(GraphicEntity entity) {
         Window.getActualScene().addEntity(entity);
+    }
+
+    /**
+     * Ajouter une entité à une scène spécifique
+     * @param scene scène
+     * @param entity entité
+     */
+    public void addToScene(Scene scene, GraphicEntity entity) {
+        scene.addEntity(entity);
     }
 
     /**
@@ -316,37 +311,27 @@ public class GraphicsEngine {
      * @param width largeur
      * @return identifiant de la scène
      */
-    public int generateScene(int height, int width) {
-        int id = scenes.isEmpty() ? 1 : Collections.max(scenes.keySet()) + 1;
-        scenes.put(id, new Scene(this, height, width));
-        return id;
+    public Scene generateScene(int height, int width) {
+        return new Scene(this, height, width);
     }
 
     /**
      * Définir la couleur de fond d'une scène
-     * @param id identifiant
+     * @param scene scène
      * @param r intensité rouge
      * @param g intensité vert
      * @param b intensité bleu
      */
-    public void setSceneBackgroundColor(int id, int r, int g, int b) {
-        scenes.get(id).setBackgroundColor(new Color(r,g,b));
+    public void setSceneBackgroundColor(Scene scene, int r, int g, int b) {
+        scene.setBackgroundColor(new Color(r,g,b));
     }
 
     /**
      * Attacher une scène à la fenêtre
-     * @param id id de la scène
+     * @param scene scène
      */
-    public void bindScene(int id) {
-        if (!scenes.containsKey(id)) {
-            try {
-                throw new Exception("Scène introuvable");
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.exit(1);
-            }
-        }
-        Window.bindScene(scenes.get(id));
+    public void bindScene(Scene scene) {
+        Window.bindScene(scene);
     }
 
     //-----------------------------------------------//
@@ -388,8 +373,4 @@ public class GraphicsEngine {
     public Texture getTexture(int id) { return textures.get(id); }
 
     public SpriteAnimation getAnimation(int id) { return animations.get(id); }
-
-    public Scene getScene(int id) { return scenes.get(id); }
-
-    public Map<Integer, Scene> getScenes() { return scenes; }
 }

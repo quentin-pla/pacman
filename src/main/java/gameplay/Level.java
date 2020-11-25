@@ -1,5 +1,6 @@
 package gameplay;
 
+import engines.graphics.Scene;
 import engines.kernel.Entity;
 
 import java.util.ArrayList;
@@ -7,11 +8,16 @@ import java.util.ArrayList;
 /**
  * Niveau de jeu
  */
-public class Level extends Entity {
+public class Level {
     /**
      * Gameplay
      */
     private Gameplay gameplay;
+
+    /**
+     * Scène liée
+     */
+    private Scene scene;
 
     /**
      * Matrice d'entités graphiques
@@ -21,7 +27,7 @@ public class Level extends Entity {
     /**
      * Entités présentes sur le niveau
      */
-    private ArrayList<Entity> level_entities = new ArrayList<>();
+    private ArrayList<Entity> levelEntities = new ArrayList<>();
 
     /**
      * Joueur
@@ -36,44 +42,32 @@ public class Level extends Entity {
     /**
      * Score actuel
      */
-    private int actual_score;
+    private int actualScore;
 
     /**
      * Constructeur surchargé
      * @param rows nombre de lignes
      * @param cols nombre de colonnes
      */
-    public Level(Gameplay gameplay, int rows, int cols) {
-        super(gameplay.kernelEngine());
+    protected Level(Gameplay gameplay, int rows, int cols) {
         this.gameplay = gameplay;
-        gameplay.physicsEngine().resize(getPhysicEntity(),(rows - 1) * 30, (cols - 1) * 30);
         this.matrix = new Entity[rows][cols];
-        fill();
-    }
-
-    /**
-     * Initialiser les évènements
-     */
-    public void initEvents() {
-        gameplay.kernelEngine().addEvent("drawLevel", () -> {
-            for (Entity entity : level_entities)
-                gameplay.graphicsEngine().draw(entity.getGraphicEntity());
-        });
-        gameplay.kernelEngine().addEvent("updateLevel", () -> {
-            for (Entity entity : level_entities)
-                gameplay.graphicsEngine().update(entity.getGraphicEntity());
-        });
+        this.scene = gameplay.graphicsEngine().generateScene((rows - 1) * 30,(cols - 1) * 30);
+        fillMatrix();
     }
 
     /**
      * Remplir la matrice
      */
-    public void fill() {
+    public void fillMatrix() {
+        Entity defaultFloor = gameplay.kernelEngine().generateEntity();
+        gameplay.physicsEngine().resize(defaultFloor.getPhysicEntity(),30,30);
+        gameplay.graphicsEngine().bindColor(defaultFloor.getGraphicEntity(),0,0,0);
         for (int row = 0; row < matrix.length; row++) {
             for (int col = 0; col < matrix[row].length; col++) {
-                matrix[row][col] = gameplay.kernelEngine().generateEntity();
+                matrix[row][col] = defaultFloor.clone();
                 gameplay.physicsEngine().move(matrix[row][col].getPhysicEntity(), (30 * col), (30 * row));
-                level_entities.add(matrix[row][col]);
+                gameplay.graphicsEngine().addToScene(scene, matrix[row][col].getGraphicEntity());
             }
         }
     }
@@ -85,61 +79,26 @@ public class Level extends Entity {
      * @param col colonne
      */
     public void addPlayer(Player player, int row, int col) {
-        if (this.player == null) {
-            gameplay.physicsEngine().addBoundLimits(player.getPhysicEntity(), getBounds()[0], getBounds()[1], getBounds()[2], getBounds()[3]);
+        if (this.player != null) {
+            levelEntities.remove(this.player);
+            gameplay.graphicsEngine().erase(this.player.getGraphicEntity());
+        } else {
+            gameplay.physicsEngine().addBoundLimits(player.getPhysicEntity(),0,0,scene.getWidth(),scene.getHeight());
             Entity entity = matrix[row][col];
             gameplay.physicsEngine().move(player.getPhysicEntity(), entity.getGraphicEntity().getX(), entity.getGraphicEntity().getY());
             this.player = player;
-            level_entities.add(player);
+            levelEntities.add(player);
+            gameplay.graphicsEngine().addToScene(scene, this.player.getGraphicEntity());
         }
     }
 
-    /**
-     * Récupérer les limites du niveau
-     * @return limites
-     */
-    public int[] getBounds() {
-        return getPhysicEntity().getBounds();
-    }
+    // GETTERS //
 
+    public Entity[][] getMatrix() { return matrix; }
 
-//    @Override
-//    public void translate(int x, int y) {
-//        super.translate(x, y);
-//        //Translation des objets du niveau
-//        for (Entity entity : level_entities) entity.translate(x, y);
-//        //Mise à jour des limites de déplacement pour le joueur
-//        if (player != null) player.addMoveBounds(getBounds());
-//    }
-//
-//    @Override
-//    public void move(int x, int y) {
-//        super.move(x,y);
-//        //Translation des objets du niveau
-//        for (Entity entity : level_entities) entity.translate(x, y);
-//        //Mise à jour des limites de déplacement pour le joueur
-//        if (player != null) player.addMoveBounds(getBounds());
-//    }
-//
-//    // GETTERS //
-//
-//    public Entity[][] getMatrix() {
-//        return matrix;
-//    }
-//
-//    public ArrayList<Entity> getLevel_entities() {
-//        return level_entities;
-//    }
-//
-//    public Player getPlayer() {
-//        return player;
-//    }
-//
-//    public float getTimer() {
-//        return timer;
-//    }
-//
-//    public int getActual_score() {
-//        return actual_score;
-//    }
+    public float getTimer() { return timer; }
+
+    public int getActualScore() { return actualScore; }
+
+    public Scene getScene() { return scene; }
 }

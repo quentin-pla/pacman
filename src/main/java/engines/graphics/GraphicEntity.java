@@ -51,22 +51,16 @@ public class GraphicEntity extends EngineEntity {
     }
 
     /**
-     * Constructeur par clonage
-     * @param clone clone
+     * Cloner une entité
      */
-    private GraphicEntity(GraphicEntity clone) {
-        this.scene = null;
-        this.color = clone.color;
-        if (clone.texture != null)
-            this.texture = clone.texture.clone();
-    }
-
-    /**
-     * Cloner l'entité
-     * @return clone
-     */
-    protected GraphicEntity clone() {
-        return new GraphicEntity(this);
+    public void clone(GraphicEntity entity) {
+        this.x = entity.x;
+        this.y = entity.y;
+        this.height = entity.height;
+        this.width = entity.width;
+        this.color = entity.color;
+        if (entity.texture != null)
+            this.texture = entity.texture.clone();
     }
 
     // GETTERS & SETTERS //

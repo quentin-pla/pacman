@@ -1,17 +1,26 @@
 package gameplay;
 
 import engines.graphics.GraphicsEngine;
+import engines.graphics.Scene;
 import engines.input_output.IOEngine;
-import engines.kernel.Entity;
 import engines.kernel.KernelEngine;
+import engines.physics.PhysicEntity;
 import engines.physics.PhysicsEngine;
 
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 /**
  * Gameplay
  */
 public class Gameplay {
+    /**
+     * Directions de déplacement
+     */
+    public enum MoveDirection {
+        UP,RIGHT,DOWN,LEFT
+    }
+    
     /**
      * Moteur noyau
      */
@@ -21,6 +30,16 @@ public class Gameplay {
      * Identifiant du fichier contenant les textures du jeu
      */
     private final int textures;
+
+    /**
+     * Identifiant scène
+     */
+    private Scene menuView;
+
+    /**
+     * Niveaux disponibles
+     */
+    private ArrayList<Level> levels;
 
     /**
      * Joueur
@@ -33,7 +52,8 @@ public class Gameplay {
     public Gameplay() {
         this.kernelEngine = new KernelEngine();
         this.textures = kernelEngine.getGraphicsEngine().loadSpriteSheet("assets/sprite_sheet.png", 11, 11);
-        this.player = new Player(this,30,30,2,textures,1,3);
+        this.levels = new ArrayList<>();
+        this.player = new Player(this, 30, 30, 2, textures, 1, 3);
         initGameplay();
     }
 
@@ -43,56 +63,131 @@ public class Gameplay {
     private void initGameplay() {
         //Activation des entrées / sorties clavier
         ioEngine().enableKeyboardIO();
+        initEvents();
+        initMenu();
+    }
 
-        //Id des murs
-        ArrayList<Entity> walls = new ArrayList<>();
+    /**
+     * Initialiser les évènements du jeu
+     */
+    private void initEvents() {
+        //Se déplacer vers le haut
+        kernelEngine().addEvent("pacmanGoUp", () -> switchPacmanDirection(MoveDirection.UP));
+        //Se déplacer vers la droite
+        kernelEngine().addEvent("pacmanGoRight", () -> switchPacmanDirection(MoveDirection.RIGHT));
+        //Se déplacer vers le bas
+        kernelEngine().addEvent("pacmanGoDown", () -> switchPacmanDirection(MoveDirection.DOWN));
+        //Se déplacer vers la gauche
+        kernelEngine().addEvent("pacmanGoLeft", () -> switchPacmanDirection(MoveDirection.LEFT));
+        //Attacher la texture par défaut au joueur
+        kernelEngine().addEvent("pacmanBindDefaultTexture", () ->
+                graphicsEngine().bindTexture(player.getGraphicEntity(),
+                        textures, player.getDefaultTextureCoords()[0], player.getDefaultTextureCoords()[1]));
+        //Lorsqu'il y a une collision
+        kernelEngine().addEvent("pacmanOnCollision", () -> {
+            if (player.getCurrentAnimationID() != 0)
+                if (graphicsEngine().getAnimation(player.getCurrentAnimationID()).isPlaying())
+                    graphicsEngine().playPauseAnimation(player.getCurrentAnimationID());
+        });
+        //Rejouer l'animation courante
+        kernelEngine().addEvent("pacmanPlayCurrentAnimation", () -> {
+            if (!graphicsEngine().getAnimation(player.getCurrentAnimationID()).isPlaying())
+                graphicsEngine().playPauseAnimation(player.getCurrentAnimationID());
+        });
+        ioEngine().bindEventOnLastKey(KeyEvent.VK_UP, "pacmanGoUp");
+        ioEngine().bindEventOnLastKey(KeyEvent.VK_RIGHT, "pacmanGoRight");
+        ioEngine().bindEventOnLastKey(KeyEvent.VK_DOWN, "pacmanGoDown");
+        ioEngine().bindEventOnLastKey(KeyEvent.VK_LEFT, "pacmanGoLeft");
+        ioEngine().bindEventKeyboardFree("pacmanBindDefaultTexture");
+        physicsEngine().bindEventOnCollision(player.getPhysicEntity(), "pacmanOnCollision");
+    }
 
-        //Génération des murs
-        for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < 6; j++) {
-                Entity wall = kernelEngine.generateEntity();
-                walls.add(wall);
-                physicsEngine().move(wall.getPhysicEntity(),30 + (30*j),100 + (60*i));
-                physicsEngine().resize(wall.getPhysicEntity(),30,30);
-                graphicsEngine().bindColor(wall.getGraphicEntity(),0,0,255);
-                physicsEngine().addCollisions(player.getPhysicEntity(), wall.getPhysicEntity());
+    /**
+     * Initialiser le menu
+     */
+    private void initMenu() {
+        this.menuView = graphicsEngine().generateScene(400,400);
+    }
+
+    /**
+     * Changer la direction de pacman
+     * @param direction direction
+     */
+    protected void switchPacmanDirection(MoveDirection direction) {
+        player.setCurrentAnimationID(player.getAnimations().get(direction.name()));
+        kernelEngine().notifyEvent("pacmanPlayCurrentAnimation");
+        PhysicEntity entityNearby;
+        switch (direction) {
+            case UP:
+                entityNearby = physicsEngine().isSomethingUp(player.getPhysicEntity());
+                if (entityNearby == null)
+                    player.setCurrentDirection(MoveDirection.UP);
+                callEventFromDirection();
+                break;
+            case RIGHT:
+                entityNearby = physicsEngine().isSomethingRight(player.getPhysicEntity());
+                if (entityNearby == null)
+                    player.setCurrentDirection(MoveDirection.RIGHT);
+                callEventFromDirection();
+                break;
+            case DOWN:
+                entityNearby = physicsEngine().isSomethingDown(player.getPhysicEntity());
+                if (entityNearby == null)
+                    player.setCurrentDirection(MoveDirection.DOWN);
+                callEventFromDirection();
+                break;
+            case LEFT:
+                entityNearby = physicsEngine().isSomethingLeft(player.getPhysicEntity());
+                if (entityNearby == null)
+                    player.setCurrentDirection(MoveDirection.LEFT);
+                callEventFromDirection();
+                break;
+        }
+        graphicsEngine().bindAnimation(player.getGraphicEntity(), player.getAnimations().get(player.getCurrentDirection().name()));
+    }
+
+    /**
+     * Appeler la méthode de déplacement en fonction de la direction courante
+     */
+    private void callEventFromDirection() {
+        if (player.getCurrentDirection() != null) {
+            switch (player.getCurrentDirection()) {
+                case UP:
+                    physicsEngine().goUp(player.getPhysicEntity());
+                    break;
+                case RIGHT:
+                    physicsEngine().goRight(player.getPhysicEntity());
+                    break;
+                case DOWN:
+                    physicsEngine().goDown(player.getPhysicEntity());
+                    break;
+                case LEFT:
+                    physicsEngine().goLeft(player.getPhysicEntity());
+                    break;
+                default:
+                    break;
             }
         }
-        Entity wall = kernelEngine.generateEntity();
-        walls.add(wall);
-        physicsEngine().move(wall.getPhysicEntity(),0,160);
-        physicsEngine().resize(wall.getPhysicEntity(),30,30);
-        graphicsEngine().bindColor(wall.getGraphicEntity(),0,0,255);
-        physicsEngine().addCollisions(player.getPhysicEntity(), wall.getPhysicEntity());
+    }
 
-        //Id des boules
-        ArrayList<Entity> balls = new ArrayList<>();
+    /**
+     * Générer un niveau
+     * @param rows nombre de lignes
+     * @param cols nombre de colonnes
+     */
+    public Level generateLevel(int rows, int cols) {
+        Level level = new Level(this,rows,cols);
+        this.levels.add(level);
+        return level;
+    }
 
-        //Génération des boules
-        for (int i = 0; i < 6; i++) {
-            Entity ball = kernelEngine.generateEntity();
-            balls.add(ball);
-            physicsEngine().move(ball.getPhysicEntity(),30 + (30*i),130);
-            physicsEngine().resize(ball.getPhysicEntity(),30,30);
-            graphicsEngine().bindTexture(ball.getGraphicEntity(),textures,10,2);
-            kernelEngine.addEvent("eraseBall" + i,() -> graphicsEngine().erase(ball.getGraphicEntity()));
-            physicsEngine().bindEventOnSameLocation(player.getPhysicEntity(), ball.getPhysicEntity(), "eraseBall" + i);
-        }
-
-        //Ajout des collisions de la scène
-        physicsEngine().addBoundLimits(player.getPhysicEntity(), 0,0,300,300);
-
-        //Scène principale
-        int mainScene = graphicsEngine().generateScene(300, 300);
-        graphicsEngine().setSceneBackgroundColor(mainScene,0,0,0);
-        graphicsEngine().bindScene(mainScene);
-        for (Entity entity : walls)
-            graphicsEngine().addToCurrentScene(entity.getGraphicEntity());
-        for (Entity entity : balls)
-            graphicsEngine().addToCurrentScene(entity.getGraphicEntity());
-        graphicsEngine().addToCurrentScene(player.getGraphicEntity());
-
-        //Démarrage du jeu
+    /**
+     * Jouer un niveau
+     * @param level level
+     */
+    public void playLevel(Level level) {
+        level.addPlayer(player, 1,1);
+        graphicsEngine().bindScene(level.getScene());
         kernelEngine.start();
     }
 
@@ -107,4 +202,6 @@ public class Gameplay {
     public IOEngine ioEngine() { return kernelEngine.getIoEngine(); }
 
     public PhysicsEngine physicsEngine() { return kernelEngine.getPhysicsEngine(); }
+
+    public Player getPlayer() { return player; }
 }

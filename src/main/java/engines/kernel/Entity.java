@@ -37,6 +37,27 @@ public class Entity {
         this.physicEntity = kernelEngine.getPhysicsEngine().createEntity(this);
     }
 
+    /**
+     * Constructeur par clonage
+     * @param entity clone
+     */
+    private Entity(Entity entity) {
+        this.kernelEngine = entity.kernelEngine;
+        this.id = kernelEngine.generateNewID();
+        this.graphicEntity = kernelEngine.getGraphicsEngine().createEntity(this);
+        this.graphicEntity.clone(entity.getGraphicEntity());
+        this.physicEntity = kernelEngine.getPhysicsEngine().createEntity(this);
+        this.physicEntity.clone(entity.getPhysicEntity());
+    }
+
+    /**
+     * Cloner une entité
+     * @return clone
+     */
+    public Entity clone() {
+        return new Entity(this);
+    }
+
     // GETTERS & SETTERS //
 
     public int getId() { return id; }
