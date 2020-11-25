@@ -1,104 +1,124 @@
 package engines.sound;
 
+import engines.kernel.KernelEngine;
+
 import javax.sound.sampled.*;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
- * Moteur de sons
+ * Moteur audio
  */
 public class SoundEngine {
+    /**
+     * Réservoir de threads
+     */
+    private static ExecutorService executor = Executors.newFixedThreadPool(4);
+
+    /**
+     * Moteur noyau
+     */
+    private KernelEngine kernelEngine;
 
     /**
      * Liste des entités son référencées par leur nom
      */
-    private static final HashMap<String, SoundEntity> entities = new HashMap<>();
+    private final Map<String, Clip> sounds = new HashMap<>();
+
+    private final CopyOnWriteArrayList<Clip> playingSounds = new CopyOnWriteArrayList<>();
 
     /**
-     * Liste des time codes de reprise d'un son
+     * Constructeur
+     * @param kernelEngine moteur noyau
      */
-    private static final HashMap<String, Long> entitiesPaused = new HashMap<>();
+    public SoundEngine(KernelEngine kernelEngine) {
+        this.kernelEngine = kernelEngine;
+    }
 
     /**
-     * Préchargement d'un son afin de le rendre disponible a tout moment
-     * @param path
-     * @param soundName
-     * @throws IOException
-     * @throws UnsupportedAudioFileException
-     * @throws LineUnavailableException
+     * Précharger un son pour l'utiliser ultérieurement
+     * @param path chamin
+     * @param soundName nom du son
      */
-    public void loadSound(String path,String soundName) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
-
-        //creation du clip audio
-        Clip clip = AudioSystem.getClip();
+    public Clip loadSound(String path,String soundName) {
+        Clip clip = null;
         try {
-
-            //chargement du stream audio et attribution a un clip
-            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(SoundEngine.class.getResourceAsStream("/sounds/"+ path));
+            clip = AudioSystem.getClip();
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(
+                SoundEngine.class.getResourceAsStream("/sounds/" + path)
+            );
             clip.open(audioInputStream);
-
-        } catch (Exception e){
-            System.err.println(e.getMessage());
+        } catch (LineUnavailableException | UnsupportedAudioFileException | IOException e) {
+            e.printStackTrace();
         }
-
-        //ajout du son "clip" a la liste globale
-        entities.put(soundName,new SoundEntity(clip));
-        long timeNull = 0;
-        //ajout d'un timecode de pause du son à 0 car aucun son n'a été joué pour le moment
-        //évite toute erreur liée a la fonction resumeSound() car un timecode n'aurait pas été initialisé
-        entitiesPaused.put(soundName, timeNull);
+        sounds.put(soundName,clip);
+        return clip;
     }
 
     /**
-     * Joue un son
-     * @param name
+     * Jouer un son
+     * @param name entité
      */
-    public void playSound(String name){
-        entities.get(name).sound.start();
+    public void playSound(String name) {
+        executor.execute(() -> {
+            Clip sound = this.sounds.get(name);
+            sound.setFramePosition(0);
+            sound.start();
+        });
     }
 
     /**
-     * Stop un son
-     * @param name
+     * Arrêter un son
+     * @param name nom
      */
-    public void stopSound(String name){
-        entities.get(name).sound.stop();
+    public void stopSound(String name) {
+        Clip sound = sounds.get(name);
+        sound.setMicrosecondPosition(0);
+        sound.stop();
     }
 
     /**
-     * Joue un son un boucle jusqu'a arret
-     * @param name
+     * Jouer un son un boucle
+     * @param name nom
      */
-    public void loopSound(String name){
-        entities.get(name).sound.loop(Clip.LOOP_CONTINUOUSLY);
+    public void loopSound(String name) {
+        Clip sound = sounds.get(name);
+        sound.loop(Clip.LOOP_CONTINUOUSLY);
     }
 
     /**
-     * Mets un son en pause
-     * @param name
+     * Mettre en pause la lecture d'un son
+     * @param name nom
      */
-    public void pauseSound(String name){
-        //récupère le timeCode auquel le son joué se trouve
-        long tempTimeCode = entities.get(name).sound.getMicrosecondPosition();
-        //sauvegarde ce time code dans la bonne hashmap
-        entitiesPaused.put(name,tempTimeCode);
-        //stop le son joué
-        entities.get(name).sound.stop();
+    public void pauseSound(String name) {
+        Clip sound = sounds.get(name);
+        sound.stop();
     }
 
     /**
-     * Joue le son a partir du moment auquel il a été arrêté
-     * @param name
+     * Reprendre la lecture d'un son
+     * @param name nom
      */
-    public void resumeSound(String name){
-        //recupère le timecode du son en pause
-        long timeCode = entitiesPaused.get(name);
-        //applique au son ce timecode et le lance
-        entities.get(name).sound.setMicrosecondPosition(timeCode);
-        entities.get(name).sound.start();
-        //reset le timecode dans la hashmap afin de ne pas garder une donnée désormais éronnée
-        long timeReset = 0;
-        entitiesPaused.put(name,timeReset);
+    public void resumeSound(String name) {
+        Clip sound = sounds.get(name);
+        sound.setMicrosecondPosition(sound.getMicrosecondPosition());
+        sound.start();
     }
 
+    /**
+     * Savoir si un son est joué
+     * @param name nom
+     * @return booléen
+     */
+    public boolean isSoundPlaying(String name) {
+        return playingSounds.contains(sounds.get(name));
+    }
+
+    public Map<String, Clip> getSounds() {
+        return sounds;
+    }
 }

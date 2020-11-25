@@ -24,7 +24,10 @@ public class Main {
         for (int j = 0; j < 6; j++) {
             Entity ball = defaultLevel.getMatrix()[6][j];
             gameplay.graphicsEngine().bindTexture(ball.getGraphicEntity(),gameplay.getTexturesFile(),10,2);
-            gameplay.kernelEngine().addEvent("eraseBall" + j,() -> gameplay.graphicsEngine().erase(ball.getGraphicEntity()));
+            gameplay.kernelEngine().addEvent("eraseBall" + j,() -> {
+                gameplay.kernelEngine().removeEntity(ball);
+                gameplay.soundEngine().playSound("munch");
+            });
             gameplay.physicsEngine().bindEventOnSameLocation(gameplay.getPlayer().getPhysicEntity(), ball.getPhysicEntity(), "eraseBall" + j);
         }
 
