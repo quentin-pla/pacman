@@ -5,6 +5,7 @@ import engines.graphics.GraphicsEngine;
 import engines.input_output.IOEngine;
 import engines.physics.PhysicEntity;
 import engines.physics.PhysicsEngine;
+import engines.sound.SoundEngine;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
@@ -31,6 +32,11 @@ public class KernelEngine {
     private PhysicsEngine physicsEngine;
 
     /**
+     * Moteur audio
+     */
+    private SoundEngine soundEngine;
+
+    /**
      * Dernier id généré
      */
     private int lastID = 0;
@@ -52,6 +58,7 @@ public class KernelEngine {
         this.graphicsEngine = new GraphicsEngine(this);
         this.physicsEngine = new PhysicsEngine(this);
         this.ioEngine = new IOEngine(this);
+        this.soundEngine = new SoundEngine(this);
     }
 
     /**
@@ -132,4 +139,6 @@ public class KernelEngine {
     public IOEngine getIoEngine() { return ioEngine; }
 
     public PhysicsEngine getPhysicsEngine() { return physicsEngine; }
+
+    public SoundEngine getSoundEngine() { return soundEngine; }
 }

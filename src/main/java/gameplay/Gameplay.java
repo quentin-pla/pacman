@@ -6,6 +6,7 @@ import engines.input_output.IOEngine;
 import engines.kernel.KernelEngine;
 import engines.physics.PhysicEntity;
 import engines.physics.PhysicsEngine;
+import engines.sound.SoundEngine;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -64,6 +65,7 @@ public class Gameplay {
         //Activation des entrées / sorties clavier
         ioEngine().enableKeyboardIO();
         initEvents();
+        initSounds();
         initMenu();
     }
 
@@ -100,6 +102,13 @@ public class Gameplay {
         ioEngine().bindEventOnLastKey(KeyEvent.VK_LEFT, "pacmanGoLeft");
         ioEngine().bindEventKeyboardFree("pacmanBindDefaultTexture");
         physicsEngine().bindEventOnCollision(player.getPhysicEntity(), "pacmanOnCollision");
+    }
+
+    /**
+     * Initialiser les sons du jeu
+     */
+    private void initSounds() {
+        soundEngine().loadSound("munch.wav","munch");
     }
 
     /**
@@ -202,6 +211,8 @@ public class Gameplay {
     public IOEngine ioEngine() { return kernelEngine.getIoEngine(); }
 
     public PhysicsEngine physicsEngine() { return kernelEngine.getPhysicsEngine(); }
+
+    public SoundEngine soundEngine() { return kernelEngine.getSoundEngine(); }
 
     public Player getPlayer() { return player; }
 }
