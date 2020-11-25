@@ -162,6 +162,63 @@ public class GraphicsEngine {
         Window.getActualScene().addEntity(entity);
     }
 
+    /**
+     * Déplacement de l'entité graphique à la position indiquée
+     * @param entity entité graphique
+     * @param x position x
+     * @param y position y
+     */
+    public void move(GraphicEntity entity, int x, int y) {
+        entity.setX(x);
+        entity.setY(y);
+        kernelEngine.notifyEntityUpdate(entity);
+    }
+
+    /**
+     * Translater une entité graphique
+     * @param entity entité
+     * @param x position horizontale
+     * @param y position verticale
+     */
+    public void translate(GraphicEntity entity, int x, int y) {
+        entity.setX(entity.getX() + x);
+        entity.setY(entity.getY() + y);
+        kernelEngine.notifyEntityUpdate(entity);
+    }
+
+    /**
+     * Redimensionne une entité graphique
+     *
+     * @param entity entité à redimensionner
+     * @param w largeur
+     * @param h hauteur
+     */
+    public void resize(GraphicEntity entity, int w, int h) {
+        entity.setWidth(w);
+        entity.setHeight(h);
+        kernelEngine.notifyEntityUpdate(entity);
+    }
+
+    /**
+     * Redimensionne en hauteur d'une entité graphique
+     * @param entity entité à redimensionner
+     * @param h hauteur
+     */
+    public void resizeHeight(GraphicEntity entity, int h) {
+        entity.setHeight(h);
+        kernelEngine.notifyEntityUpdate(entity);
+    }
+
+    /**
+     * Redimensionne en largeur d'une entité graphique
+     * @param entity entité à redimensionner
+     * @param w largeur
+     */
+    public void resizeWidth(GraphicEntity entity, int w) {
+        entity.setWidth(w);
+        kernelEngine.notifyEntityUpdate(entity);
+    }
+
     //-----------------------------------------------//
     //------------ MÉTHODES TEXTURES ----------------//
     //-----------------------------------------------//
@@ -293,7 +350,7 @@ public class GraphicsEngine {
     }
 
     //-----------------------------------------------//
-    //----------------MÉTHODES FENETRE ----------------//
+    //----------------MÉTHODES FENETRE --------------//
     //-----------------------------------------------//
 
     /**

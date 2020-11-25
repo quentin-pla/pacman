@@ -21,4 +21,8 @@ public abstract class EngineEntity {
     protected EngineEntity(Entity parent) {
         this.parent = parent;
     }
+
+    // GETTERS //
+
+    public Entity getParent() { return parent; }
 }

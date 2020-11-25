@@ -250,19 +250,28 @@ public class PhysicsEngine {
      * Déplacement vers le haut
      * @param entity entité physique
      */
-    public void goUp(PhysicEntity entity) { translate(entity, 0, -entity.getSpeed()); }
+    public void goUp(PhysicEntity entity) {
+        translate(entity, 0, -entity.getSpeed());
+        kernelEngine.notifyEntityUpdate(entity);
+    }
 
     /**
      * Déplacement vers la droite
      * @param entity entité physique
      */
-    public void goRight(PhysicEntity entity) { translate(entity, entity.getSpeed(), 0); }
+    public void goRight(PhysicEntity entity) {
+        translate(entity, entity.getSpeed(), 0);
+        kernelEngine.notifyEntityUpdate(entity);
+    }
 
     /**
      * Déplacement vers la gauche
      * @param entity entité physique
      */
-    public void goLeft(PhysicEntity entity) { translate(entity, -entity.getSpeed(), 0); }
+    public void goLeft(PhysicEntity entity) {
+        translate(entity, -entity.getSpeed(), 0);
+        kernelEngine.notifyEntityUpdate(entity);
+    }
 
     /**
      * Déplacement vers le bas
@@ -270,6 +279,7 @@ public class PhysicsEngine {
      */
     public void goDown(PhysicEntity entity) {
         translate(entity, 0, entity.getSpeed());
+        kernelEngine.notifyEntityUpdate(entity);
     }
 
     /**
@@ -283,6 +293,7 @@ public class PhysicsEngine {
         entity.setLastY(entity.getY());
         entity.setX(x);
         entity.setY(y);
+        kernelEngine.notifyEntityUpdate(entity);
     }
 
     /**
@@ -296,6 +307,7 @@ public class PhysicsEngine {
         entity.setLastY(entity.getY());
         entity.setX(entity.getX() + x);
         entity.setY(entity.getY() + y);
+        kernelEngine.notifyEntityUpdate(entity);
     }
 
     /**
@@ -308,24 +320,27 @@ public class PhysicsEngine {
     public void resize(PhysicEntity entity, int w, int h) {
         entity.setWidth(w);
         entity.setHeight(h);
+        kernelEngine.notifyEntityUpdate(entity);
     }
 
     /**
-     * Redimensionne en hauteur d'une entité graphique
+     * Redimensionne en hauteur d'une entité physique
      * @param entity entité à redimensionner
      * @param h hauteur
      */
     public void resizeHeight(PhysicEntity entity, int h) {
         entity.setHeight(h);
+        kernelEngine.notifyEntityUpdate(entity);
     }
 
     /**
-     * Redimensionne en largeur d'une entité graphique
+     * Redimensionne en largeur d'une entité physique
      * @param entity entité à redimensionner
      * @param w largeur
      */
     public void resizeWidth(PhysicEntity entity, int w) {
         entity.setWidth(w);
+        kernelEngine.notifyEntityUpdate(entity);
     }
 
     /**
@@ -335,6 +350,7 @@ public class PhysicsEngine {
      */
     public void setSpeed(PhysicEntity entity, int speed) {
         entity.setSpeed(speed);
+        kernelEngine.notifyEntityUpdate(entity);
     }
 
     /**

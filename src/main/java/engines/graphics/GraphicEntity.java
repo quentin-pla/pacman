@@ -8,6 +8,26 @@ import engines.kernel.Entity;
  */
 public class GraphicEntity extends EngineEntity {
     /**
+     * Position x
+     */
+    private int x;
+
+    /**
+     * Position y
+     */
+    private int y;
+
+    /**
+     * Hauteur
+     */
+    private int height;
+
+    /**
+     * Largeur
+     */
+    private int width;
+
+    /**
      * Scène
      */
     protected Scene scene;
@@ -51,35 +71,31 @@ public class GraphicEntity extends EngineEntity {
 
     // GETTERS & SETTERS //
 
-    public int getX() { return parent.getPhysicEntity().getX(); }
+    public int getX() { return x; }
 
-    public int getY() { return parent.getPhysicEntity().getY(); }
+    protected void setX(int x) { this.x = x; }
 
-    public int getHeight() { return parent.getPhysicEntity().getHeight(); }
+    public int getY() { return y; }
 
-    public int getWidth() { return parent.getPhysicEntity().getWidth(); }
+    protected void setY(int y) { this.y = y; }
 
-    public Scene getScene() {
-        return scene;
-    }
+    public int getHeight() { return height; }
 
-    protected void setScene(Scene scene) {
-        this.scene = scene;
-    }
+    protected void setHeight(int height) { this.height = height; }
 
-    public Color getColor() {
-        return color;
-    }
+    public int getWidth() { return width; }
 
-    protected void setColor(Color color) {
-        this.color = color;
-    }
+    protected void setWidth(int width) { this.width = width; }
 
-    public Cover getTexture() {
-        return texture;
-    }
+    public Scene getScene() { return scene; }
 
-    protected void setTexture(Cover texture) {
-        this.texture = texture;
-    }
+    protected void setScene(Scene scene) { this.scene = scene; }
+
+    public Color getColor() { return color; }
+
+    protected void setColor(Color color) { this.color = color; }
+
+    public Cover getTexture() { return texture; }
+
+    protected void setTexture(Cover texture) { this.texture = texture; }
 }

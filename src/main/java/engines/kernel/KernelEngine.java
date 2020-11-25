@@ -1,7 +1,9 @@
 package engines.kernel;
 
+import engines.graphics.GraphicEntity;
 import engines.graphics.GraphicsEngine;
 import engines.input_output.IOEngine;
+import engines.physics.PhysicEntity;
 import engines.physics.PhysicsEngine;
 
 import javax.swing.*;
@@ -36,7 +38,7 @@ public class KernelEngine {
     /**
      * Liste des évènements du jeu
      */
-    private Map<String, Runnable> events = new HashMap<>();
+    private final Map<String, Runnable> events = new HashMap<>();
 
     /**
      * Délai de rafraichissement du jeu : 60fps
@@ -79,6 +81,15 @@ public class KernelEngine {
     };
 
     /**
+     * Exécuter le moteur noyau
+     */
+    public void start() {
+        graphicsEngine.showWindow();
+        //Rafraichissement 60 images par seconde
+        new Timer(delay, refresh).start();
+    }
+
+    /**
      * Ajouter un évènement au jeu
      * @param name nom de l'évènement
      * @param event évènement
@@ -96,12 +107,16 @@ public class KernelEngine {
     }
 
     /**
-     * Exécuter le moteur noyau
+     * Mettre à jour les coordonnées des entités entre les moteurs
      */
-    public void start() {
-        graphicsEngine.showWindow();
-        //Rafraichissement 60 images par seconde
-        new Timer(delay, refresh).start();
+    public void notifyEntityUpdate(EngineEntity entity) {
+        if (entity instanceof PhysicEntity) {
+            PhysicEntity physicEntity = (PhysicEntity) entity;
+            GraphicEntity graphicEntity = entity.getParent().getGraphicEntity();
+            graphicsEngine.move(graphicEntity, physicEntity.getX(), physicEntity.getY());
+            graphicsEngine.resize(graphicEntity, physicEntity.getWidth(), physicEntity.getHeight());
+        }
+
     }
 
     // GETTERS //
