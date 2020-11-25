@@ -70,6 +70,15 @@ public class KernelEngine {
     }
 
     /**
+     * Supprimer une entité
+     * @param entity entité
+     */
+    public void removeEntity(Entity entity) {
+        graphicsEngine.removeEntity(entity);
+        physicsEngine.removeEntity(entity);
+    }
+
+    /**
      * Générer un nouvel ID
      * @return nouvel identifiant
      */

@@ -4,8 +4,10 @@ import engines.kernel.Entity;
 import engines.kernel.KernelEngine;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Moteur physique
@@ -19,17 +21,17 @@ public class PhysicsEngine {
     /**
      * Liste des entités physiques
      */
-    private final HashMap<Integer, PhysicEntity> entities = new HashMap<>();
+    private final ConcurrentMap<Integer, PhysicEntity> entities = new ConcurrentHashMap<>();
 
     /**
      * Liste des évènements liés aux collisions en entrée
      */
-    private final Map<PhysicEntity[], String> collisionsEvents = new HashMap<>();
+    private final ConcurrentMap<PhysicEntity[], String> collisionsEvents = new ConcurrentHashMap<>();
 
     /**
      * Liste des évènements lorsque deux entités sont centrées
      */
-    private final Map<PhysicEntity[], String> centeredEvents = new HashMap<>();
+    private final ConcurrentMap<PhysicEntity[], String> centeredEvents = new ConcurrentHashMap<>();
 
     /**
      * Constructeur
@@ -362,5 +364,29 @@ public class PhysicsEngine {
         PhysicEntity entity = new PhysicEntity(parent);
         entities.put(parent.getId(), entity);
         return entity;
+    }
+
+    /**
+     * Supprimer une entité
+     * @param entity entité
+     */
+    public void removeEntity(Entity entity) {
+        entities.remove(entity.getId());
+
+        ArrayList<PhysicEntity[]> removes = new ArrayList<>();
+
+        for (PhysicEntity[] entities : collisionsEvents.keySet())
+            if (entities[0] == entity.getPhysicEntity() || entities[1] == entity.getPhysicEntity())
+                removes.add(entities);
+        for (PhysicEntity[] element : removes)
+            collisionsEvents.remove(element);
+
+        removes.clear();
+        Set<PhysicEntity[]> centeredEventsEntities = centeredEvents.keySet();
+        for (PhysicEntity[] entities : centeredEventsEntities)
+            if (entities[0] == entity.getPhysicEntity() || entities[1] == entity.getPhysicEntity())
+                removes.add(entities);
+        for (PhysicEntity[] element : removes)
+            centeredEvents.remove(element);
     }
 }

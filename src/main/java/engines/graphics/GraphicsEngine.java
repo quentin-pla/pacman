@@ -7,6 +7,8 @@ import engines.kernel.KernelEngine;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Moteur graphique
@@ -20,7 +22,7 @@ public class GraphicsEngine {
     /**
      * Liste des entités graphiques
      */
-    private final Map<Integer, GraphicEntity> entities = new HashMap<>();
+    private final ConcurrentMap<Integer, GraphicEntity> entities = new ConcurrentHashMap<>();
 
     /**
      * Liste des textures transférées
@@ -368,9 +370,20 @@ public class GraphicsEngine {
         return entity;
     }
 
+    /**
+     * Supprimer une entité
+     * @param entity entité
+     */
+    public void removeEntity(Entity entity) {
+        entities.remove(entity.getId());
+        erase(entity.getGraphicEntity());
+    }
+
     // GETTERS & SETTERS //
 
     public Texture getTexture(int id) { return textures.get(id); }
 
     public SpriteAnimation getAnimation(int id) { return animations.get(id); }
+
+    public Map<Integer, GraphicEntity> getEntities() { return entities; }
 }
