@@ -61,4 +61,10 @@ public class AIEngine {
     public void removeEntity(Entity entity) {
         entities.remove(entity.getId());
     }
+
+    // GETTERS //
+
+    public ConcurrentMap<Integer, AIEntity> getEntities() {
+        return entities;
+    }
 }

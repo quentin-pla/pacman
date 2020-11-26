@@ -43,6 +43,11 @@ public class GraphicEntity extends EngineEntity {
     protected Cover texture;
 
     /**
+     * Texte
+     */
+    protected Cover text;
+
+    /**
      * Constructeur par défaut
      * @param parent parent
      */
@@ -92,4 +97,8 @@ public class GraphicEntity extends EngineEntity {
     public Cover getTexture() { return texture; }
 
     protected void setTexture(Cover texture) { this.texture = texture; }
+
+    public Cover getText() { return text; }
+
+    protected void setText(Cover text) { this.text = text; }
 }

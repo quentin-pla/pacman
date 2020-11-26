@@ -1,6 +1,7 @@
 package engines.input_output;
 
 import api.SwingAPI;
+import engines.kernel.Entity;
 import engines.kernel.KernelEngine;
 
 import java.awt.*;
@@ -16,15 +17,6 @@ public class IOEngine extends SwingAPI {
      */
     private KernelEngine kernelEngine;
 
-    /**
-     * Liste des évènements attachés à une touche ou un bouton
-     */
-    public final Map<Integer, String> bindedEvents = new HashMap<>();
-
-    /**
-     * Liste des évènements attachés à la dernière touche / bouton
-     */
-    public final Map<Integer, String> bindedEventsOnLastKey = new HashMap<>();
     /**
      * Écouteur actions utilisateur clavier
      */
@@ -57,11 +49,26 @@ public class IOEngine extends SwingAPI {
         for (Map.Entry<Integer,String> event: bindedEventsOnLastKey.entrySet())
             if(lastPressedKey() == event.getKey())
                 kernelEngine.notifyEvent(event.getValue());
+        if (lastClickCoordinates() != null) {
+            for (Map.Entry<Entity, String> event : bindedClickEvents.entrySet())
+                kernelEngine.checkClickEvent(event.getKey(), event.getValue());
+            resetLastClick();
+        }
     }
 
     //-------------------------------//
     //----------- CLAVIER -----------//
     //-------------------------------//
+
+    /**
+     * Liste des évènements attachés à une touche ou un bouton
+     */
+    public final Map<Integer, String> bindedEvents = new HashMap<>();
+
+    /**
+     * Liste des évènements attachés à la dernière touche / bouton
+     */
+    public final Map<Integer, String> bindedEventsOnLastKey = new HashMap<>();
 
     /**
      * Activer les entrées/sorties clavier
@@ -131,6 +138,11 @@ public class IOEngine extends SwingAPI {
     //------------------------------//
 
     /**
+     * Liste des évènements attachés à un click
+     */
+    public final Map<Entity,String> bindedClickEvents = new HashMap<>();
+
+    /**
      * Activer les entrées/sorties souris
      */
     public void enableMouseIO() {
@@ -173,14 +185,14 @@ public class IOEngine extends SwingAPI {
      */
     public Point lastClickCoordinates() { return mouseIO.getClickCoords(); }
 
+    public void resetLastClick() { mouseIO.setClickCoords(null); }
+
     /**
-     * Créer une nouvelle entité
-     * @param parent entité parente
-     * @return entité entrées/sorties
+     * Attacher un évènement lors d'un click
+     * @param entity entité
+     * @param eventName nom de l'évènement
      */
-    /*public IOEntity createEntity(Entity parent) {
-        IOEntity entity = new IOEntity(parent);
-        entities.put(parent.getId(), entity);
-        return entity;
-    }*/
+    public void bindEventOnClick(Entity entity, String eventName) {
+        bindedClickEvents.put(entity,eventName);
+    }
 }

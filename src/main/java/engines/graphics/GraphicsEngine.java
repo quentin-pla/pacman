@@ -58,6 +58,7 @@ public class GraphicsEngine {
     public void draw(GraphicEntity entity) {
         if (entity.getColor() != null) entity.getColor().cover(entity);
         if (entity.getTexture() != null) entity.getTexture().cover(entity);
+        if (entity.getText() != null) entity.getText().cover(entity);
     }
 
     /**
@@ -103,6 +104,25 @@ public class GraphicsEngine {
      */
     public void unbindColor(GraphicEntity entity) {
         entity.setColor(null);
+    }
+
+    /**
+     * Ajoute un texte à une entité graphique
+     * @param entity entité à colorer
+     * @param text contenu
+     * @param color couleur
+     * @param fontSize taille police
+     */
+    public void bindText(GraphicEntity entity, String text, Color color, int fontSize) {
+        entity.setText(new Text(text,color.getSwingColor(),fontSize));
+    }
+
+    /**
+     * Suppression du texte d'une entité graphique
+     * @param entity entité à décolorer
+     */
+    public void unbindText(GraphicEntity entity) {
+        entity.setText(null);
     }
 
     /**
@@ -226,8 +246,8 @@ public class GraphicsEngine {
      * @return identifiant de la texture
      */
     public int loadTexture(String link) {
-        if (!SwingRenderer.isTextureLoaded(link)) {
-            SwingRenderer.loadTexture(link);
+        if (!SwingRenderer.getInstance().isTextureLoaded(link)) {
+            SwingRenderer.getInstance().loadTexture(link);
             int id = textures.isEmpty() ? 1 : Collections.max(textures.keySet()) + 1;
             textures.put(id, new Texture(link));
             return id;
@@ -249,8 +269,8 @@ public class GraphicsEngine {
      * @return identifiant du fichier de textures
      */
     public int loadSpriteSheet(String link, int height, int width) {
-        if (!SwingRenderer.isTextureLoaded(link)) {
-            SwingRenderer.loadSpriteSheet(link, height, width);
+        if (!SwingRenderer.getInstance().isTextureLoaded(link)) {
+            SwingRenderer.getInstance().loadSpriteSheet(link, height, width);
             int id = spriteSheets.isEmpty() ? 1 : Collections.max(spriteSheets.keySet()) + 1;
             spriteSheets.put(id, new SpriteSheet(link, height, width));
             return id;
@@ -334,6 +354,7 @@ public class GraphicsEngine {
      */
     public void bindScene(Scene scene) {
         Window.bindScene(scene);
+        kernelEngine.updateFocusedEntities();
     }
 
     //-----------------------------------------------//

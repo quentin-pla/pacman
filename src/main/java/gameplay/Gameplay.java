@@ -1,6 +1,7 @@
 package gameplay;
 
 import engines.AI.AIEngine;
+import engines.graphics.Color;
 import engines.graphics.GraphicsEngine;
 import engines.graphics.Scene;
 import engines.input_output.IOEngine;
@@ -49,6 +50,9 @@ public class Gameplay {
      */
     private final Pacman pacman;
 
+    /**
+     * Fantomes
+     */
     private final ArrayList<Ghost> ghosts;
 
     /**
@@ -68,17 +72,22 @@ public class Gameplay {
      * Initialiser le gameplay
      */
     private void initGameplay() {
-        //Activation des entrées / sorties clavier
+        //Activation des entrées / sorties
         ioEngine().enableKeyboardIO();
+        ioEngine().enableMouseIO();
+
         initEvents();
         initSounds();
         initMenu();
+        initDefaultLevel();
     }
 
     /**
      * Initialiser les évènements du jeu
      */
     private void initEvents() {
+        kernelEngine.addEvent("playLevel", () -> playLevel(levels.get(0)));
+        //Déplacer un fantome
         kernelEngine.addEvent("moveGhost", () -> {
             for (Ghost ghost : ghosts)
                 updateGhostDirection(ghost);
@@ -121,13 +130,48 @@ public class Gameplay {
      */
     private void initSounds() {
         soundEngine().loadSound("munch.wav","munch");
+        soundEngine().loadSound("game_start.wav","gameStart");
     }
 
     /**
      * Initialiser le menu
      */
     private void initMenu() {
-        this.menuView = graphicsEngine().generateScene(400,400);
+        menuView = graphicsEngine().generateScene(400,400);
+        Entity button = kernelEngine.generateEntity();
+        physicsEngine().resize(button.getPhysicEntity(),100,50);
+        physicsEngine().move(button.getPhysicEntity(), 150,175);
+        graphicsEngine().bindColor(button.getGraphicEntity(),255,0,0);
+        graphicsEngine().bindText(button.getGraphicEntity(), "Jouer", new Color(255,255,255), 20);
+        graphicsEngine().addToScene(menuView, button.getGraphicEntity());
+        ioEngine().bindEventOnClick(button,"playLevel");
+    }
+
+    /**
+     * Initialiser le niveau par défaut
+     */
+    private void initDefaultLevel() {
+        //Level par défaut
+        Level defaultLevel = generateLevel(10,10);
+        //Génération des murs
+        for (int j = 0; j < 6; j++) {
+            Entity wall = defaultLevel.getMatrix()[5][j];
+            graphicsEngine().bindColor(wall.getGraphicEntity(),0,0,255);
+            physicsEngine().addCollisions(pacman.getPhysicEntity(), wall.getPhysicEntity());
+            for (Ghost ghost : ghosts)
+                physicsEngine().addCollisions(ghost.getPhysicEntity(), wall.getPhysicEntity());
+        }
+        //Génération des boules
+        for (int j = 0; j < 6; j++) {
+            Entity ball = defaultLevel.getMatrix()[6][j];
+            graphicsEngine().bindTexture(ball.getGraphicEntity(),getTexturesFile(),10,2);
+            kernelEngine().addEvent("eraseBall" + j,() -> {
+                kernelEngine().removeEntity(ball);
+                soundEngine().playSound("munch");
+            });
+            physicsEngine().bindEventOnSameLocation(pacman.getPhysicEntity(), ball.getPhysicEntity(), "eraseBall" + j);
+        }
+        levels.add(defaultLevel);
     }
 
     /**
@@ -242,10 +286,18 @@ public class Gameplay {
      * @param level level
      */
     public void playLevel(Level level) {
+        soundEngine().playSound("gameStart");
         level.spawnPlayer(1,1);
         for (Ghost ghost : ghosts)
             level.spawnGhost(ghost,9,5);
         graphicsEngine().bindScene(level.getScene());
+    }
+
+    /**
+     * Lancer le jeu
+     */
+    public void start() {
+        graphicsEngine().bindScene(menuView);
         kernelEngine.start();
     }
 

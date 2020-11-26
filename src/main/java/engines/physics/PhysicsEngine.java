@@ -389,4 +389,10 @@ public class PhysicsEngine {
         for (PhysicEntity[] element : removes)
             centeredEvents.remove(element);
     }
+
+    // GETTERS //
+
+    public ConcurrentMap<Integer, PhysicEntity> getEntities() {
+        return entities;
+    }
 }

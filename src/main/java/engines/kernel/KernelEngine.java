@@ -3,13 +3,16 @@ package engines.kernel;
 import engines.AI.AIEngine;
 import engines.graphics.GraphicEntity;
 import engines.graphics.GraphicsEngine;
+import engines.graphics.Window;
 import engines.input_output.IOEngine;
 import engines.physics.PhysicEntity;
 import engines.physics.PhysicsEngine;
 import engines.sound.SoundEngine;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,6 +56,11 @@ public class KernelEngine {
     private final Map<String, Runnable> events = new HashMap<>();
 
     /**
+     * Liste des entités
+     */
+    private final ArrayList<Entity> entities = new ArrayList<>();
+
+    /**
      * Délai de rafraichissement du jeu : 60fps
      */
     private final int delay = 1000/60;
@@ -73,7 +81,9 @@ public class KernelEngine {
      * @return id généré
      */
     public Entity generateEntity() {
-        return new Entity(this);
+        Entity entity = new Entity(this);
+        entities.add(entity);
+        return entity;
     }
 
     /**
@@ -115,6 +125,20 @@ public class KernelEngine {
     }
 
     /**
+     * Mettre à jour les entités sur lesquelles on a le focus
+     */
+    public void updateFocusedEntities() {
+        graphicsEngine.getEntities().clear();
+        physicsEngine.getEntities().clear();
+        aiEngine.getEntities().clear();
+        for (GraphicEntity entity : Window.getActualScene().getEntities()) {
+            graphicsEngine.getEntities().put(entity.parent.getId(),entity.parent.getGraphicEntity());
+            physicsEngine.getEntities().put(entity.parent.getId(),entity.parent.getPhysicEntity());
+            aiEngine.getEntities().put(entity.parent.getId(),entity.parent.getAiEntity());
+        }
+    }
+
+    /**
      * Ajouter un évènement au jeu
      * @param name nom de l'évènement
      * @param event évènement
@@ -147,7 +171,20 @@ public class KernelEngine {
             graphicsEngine.move(graphicEntity, physicEntity.getX(), physicEntity.getY());
             graphicsEngine.resize(graphicEntity, physicEntity.getWidth(), physicEntity.getHeight());
         }
+    }
 
+    /**
+     * Vérifier un évènement de click
+     * @param entity entité
+     * @param eventName nom de l'évènement
+     */
+    public void checkClickEvent(Entity entity, String eventName) {
+        Point click = ioEngine.lastClickCoordinates();
+        if (click != null) {
+            ArrayList<PhysicEntity> entities = physicsEngine.getEntityAtPosition(click.x,click.y,0,0);
+            if (entities.contains(entity.getPhysicEntity()))
+                notifyEvent(eventName);
+        }
     }
 
     // GETTERS //
@@ -161,8 +198,4 @@ public class KernelEngine {
     public SoundEngine getSoundEngine() { return soundEngine; }
 
     public AIEngine getAiEngine() { return aiEngine; }
-
-    public Map<String, Runnable> getEvents() {
-        return events;
-    }
 }

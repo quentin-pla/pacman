@@ -1,5 +1,7 @@
 package engines.input_output;
 
+import api.SwingWindow;
+
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -22,7 +24,7 @@ public class MouseIO implements MouseListener {
     /**
      * Coordonnées du click
      */
-    private Point clickCoords = new Point();
+    private Point clickCoords;
 
     /**
      * Constructeur privé
@@ -31,7 +33,9 @@ public class MouseIO implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        clickCoords = e.getPoint();
+        Point point = e.getPoint();
+        point.y = point.y - SwingWindow.getInstance().getUselessTopGap();
+        clickCoords = point;
     }
 
     @Override
@@ -67,4 +71,6 @@ public class MouseIO implements MouseListener {
     }
 
     public Point getClickCoords() { return clickCoords; }
+
+    public void setClickCoords(Point clickCoords) { this.clickCoords = clickCoords; }
 }

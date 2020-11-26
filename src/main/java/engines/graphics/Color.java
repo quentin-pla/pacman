@@ -27,7 +27,7 @@ public class Color extends Cover {
      * @param green vert
      * @param blue bleu
      */
-    protected Color(int red, int green, int blue) {
+    public Color(int red, int green, int blue) {
         this.red = red;
         this.green = green;
         this.blue= blue;
@@ -35,7 +35,7 @@ public class Color extends Cover {
 
     @Override
     public void cover(GraphicEntity graphicEntity) {
-        SwingRenderer.renderRect(graphicEntity.getHeight(), graphicEntity.getWidth(),
+        SwingRenderer.getInstance().renderRect(graphicEntity.getHeight(), graphicEntity.getWidth(),
                 graphicEntity.getX(), graphicEntity.getY(), getSwingColor());
     }
 
@@ -61,5 +61,5 @@ public class Color extends Cover {
         return blue;
     }
 
-    public java.awt.Color getSwingColor() { return SwingRenderer.getSwingColor(red, green, blue); }
+    public java.awt.Color getSwingColor() { return SwingRenderer.getInstance().getSwingColor(red, green, blue); }
 }

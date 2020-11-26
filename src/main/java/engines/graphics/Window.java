@@ -50,19 +50,19 @@ public class Window extends SwingAPI {
      * Initialiser la fenêtre
      */
     private static void init() {
-        SwingWindow.initWindow(title);
+        SwingWindow.getInstance().initWindow(title);
     }
 
     /**
      * Rafraichir la fenêtre
      */
-    protected static void refresh() { SwingWindow.refreshWindow(); }
+    protected static void refresh() { SwingWindow.getInstance().refreshWindow(); }
 
     /**
      * Terminer l'exécution de la fenêtre
      */
     protected static void stop() {
-        SwingWindow.stopWindow();
+        SwingWindow.getInstance().stopWindow();
     }
 
     /**
@@ -73,7 +73,7 @@ public class Window extends SwingAPI {
         Window.actual_scene = scene;
         Window.height = scene.getHeight();
         Window.width = scene.getWidth();
-        SwingWindow.showScene(actual_scene);
+        SwingWindow.getInstance().showScene(actual_scene);
     }
 
     // GETTERS & SETTERS //
