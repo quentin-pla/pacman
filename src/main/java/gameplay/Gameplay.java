@@ -23,7 +23,7 @@ public class Gameplay {
     public enum MoveDirection {
         UP,RIGHT,DOWN,LEFT
     }
-    
+
     /**
      * Moteur noyau
      */
@@ -138,6 +138,7 @@ public class Gameplay {
         PhysicEntity playerPhysic = pacman.getPhysicEntity();
         PhysicEntity ghostPhysic = ghost.getPhysicEntity();
 
+
         int playerXmiddle = (playerPhysic.getX() + playerPhysic.getWidth())/2;
         int playerYmiddle = (playerPhysic.getY() + playerPhysic.getHeight())/2;
         int ghostXmiddle = (ghostPhysic.getX() + ghostPhysic.getWidth())/2;
@@ -146,13 +147,78 @@ public class Gameplay {
         int yDistance = playerYmiddle - ghostYmiddle;
 
         MoveDirection direction;
+        PhysicEntity entityOnTheWay;
 
         if (Math.abs(xDistance) > Math.abs(yDistance)) {
-            if (xDistance < 0) direction = MoveDirection.LEFT;
-            else direction = MoveDirection.RIGHT;
+            if (xDistance < 0) {
+                entityOnTheWay = physicsEngine().isSomethingLeftInLine(ghostPhysic,Math.abs(xDistance));
+                if (entityOnTheWay != null){
+                    int entityOnTheWayXMiddle = (entityOnTheWay.getX() + entityOnTheWay.getWidth())/2;
+                    int xDistanceWithWall =  entityOnTheWayXMiddle - ghostXmiddle;
+                    if ((Math.abs(xDistance) > Math.abs(xDistanceWithWall)) && (Math.abs(xDistanceWithWall) <= (ghostPhysic.getWidth()/2 + entityOnTheWay.getWidth()/2)/2)){ //si la distance entre fantome et pacman est inférieure a la distance entre fantome et mur
+                        if (yDistance < 0) direction = MoveDirection.UP;
+                        else direction = MoveDirection.DOWN;
+                    }
+                    else {
+                        direction = MoveDirection.LEFT;
+                    }
+                }
+                else {
+                    direction = MoveDirection.LEFT;
+                }
+            }
+            else {
+                entityOnTheWay = physicsEngine().isSomethingRightInLine(ghostPhysic,Math.abs(xDistance));
+                if (entityOnTheWay != null){
+                    int entityOnTheWayXMiddle = (entityOnTheWay.getX() + entityOnTheWay.getWidth())/2;
+                    int xDistanceWithWall =  entityOnTheWayXMiddle - ghostXmiddle;
+                    if ((Math.abs(xDistance) > Math.abs(xDistanceWithWall)) && (Math.abs(xDistanceWithWall) <= (ghostPhysic.getWidth()/2 + entityOnTheWay.getWidth()/2)/2)){ //si la distance entre fantome et pacman est inférieure a la distance entre fantome et mur
+                        if (yDistance < 0) direction = MoveDirection.UP;
+                        else direction = MoveDirection.DOWN;
+                    }
+                    else {
+                        direction = MoveDirection.RIGHT;
+                    }
+                }
+                else {
+                    direction = MoveDirection.RIGHT;
+                }
+            }
         } else {
-            if (yDistance < 0) direction = MoveDirection.UP;
-            else direction = MoveDirection.DOWN;
+            if (yDistance < 0) {
+                entityOnTheWay = physicsEngine().isSomethingUpInLine(ghostPhysic,Math.abs(yDistance));
+                if (entityOnTheWay != null){
+                    int entityOnTheWayYMiddle = (entityOnTheWay.getY() + entityOnTheWay.getHeight())/2;
+                    int yDistanceWithWall =  entityOnTheWayYMiddle - ghostYmiddle;
+                    if ((Math.abs(yDistance) > Math.abs(yDistanceWithWall)) && (Math.abs(yDistanceWithWall) <= (ghostPhysic.getHeight()/2 + entityOnTheWay.getHeight()/2)/2)){ //si la distance entre fantome et pacman est inférieure a la distance entre fantome et mur
+                        if (xDistance < 0) direction = MoveDirection.LEFT;
+                        else direction = MoveDirection.RIGHT;
+                    }
+                    else {
+                        direction = MoveDirection.UP;
+                    }
+                }
+                else {
+                    direction = MoveDirection.UP;
+                }
+            }
+            else {
+                entityOnTheWay = physicsEngine().isSomethingDownInLine(ghostPhysic,Math.abs(yDistance));
+                if (entityOnTheWay != null){
+                    int entityOnTheWayYMiddle = (entityOnTheWay.getY() + entityOnTheWay.getHeight())/2;
+                    int yDistanceWithWall =  entityOnTheWayYMiddle - ghostYmiddle;
+                    if ((Math.abs(yDistance) > Math.abs(yDistanceWithWall)) && (Math.abs(yDistanceWithWall) <= (ghostPhysic.getHeight()/2 + entityOnTheWay.getHeight()/2)/2)){ //si la distance entre fantome et pacman est inférieure a la distance entre fantome et mur
+                        if (xDistance < 0) direction = MoveDirection.LEFT;
+                        else direction = MoveDirection.RIGHT;
+                    }
+                    else {
+                        direction = MoveDirection.DOWN;
+                    }
+                }
+                else {
+                    direction = MoveDirection.DOWN;
+                }
+            }
         }
         setEntityNextDirection(ghost,direction);
     }
