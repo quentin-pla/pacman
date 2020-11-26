@@ -32,7 +32,7 @@ public class PhysicEntity extends EngineEntity {
     /**
      * Liste des entités pouvant être en collision avec celle-ci
      */
-    private ArrayList<PhysicEntity> collisions = new ArrayList<>();
+    private ArrayList<PhysicEntity> collisions;
 
     /**
      * Entité en collision ou pas
@@ -68,6 +68,10 @@ public class PhysicEntity extends EngineEntity {
         y = 0;
         height = 0;
         width = 0;
+        collisions = new ArrayList<>();
+        speed = 1;
+        lastX = 0;
+        lastY = 0;
     }
 
     /**
