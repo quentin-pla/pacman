@@ -1,5 +1,6 @@
 package engines.kernel;
 
+import engines.AI.AIEngine;
 import engines.graphics.GraphicEntity;
 import engines.graphics.GraphicsEngine;
 import engines.input_output.IOEngine;
@@ -37,6 +38,11 @@ public class KernelEngine {
     private SoundEngine soundEngine;
 
     /**
+     * Moteur intelligence artificielle
+     */
+    private AIEngine aiEngine;
+
+    /**
      * Dernier id généré
      */
     private int lastID = 0;
@@ -59,6 +65,7 @@ public class KernelEngine {
         this.physicsEngine = new PhysicsEngine(this);
         this.ioEngine = new IOEngine(this);
         this.soundEngine = new SoundEngine(this);
+        this.aiEngine = new AIEngine(this);
     }
 
     /**
@@ -76,6 +83,7 @@ public class KernelEngine {
     public void removeEntity(Entity entity) {
         graphicsEngine.removeEntity(entity);
         physicsEngine.removeEntity(entity);
+        aiEngine.removeEntity(entity);
     }
 
     /**
@@ -92,6 +100,7 @@ public class KernelEngine {
      */
     private final ActionListener refresh = evt -> {
         ioEngine.updateEntities();
+        aiEngine.updateEntities();
         physicsEngine.updateEntites();
         graphicsEngine.refreshWindow();
     };
@@ -150,4 +159,10 @@ public class KernelEngine {
     public PhysicsEngine getPhysicsEngine() { return physicsEngine; }
 
     public SoundEngine getSoundEngine() { return soundEngine; }
+
+    public AIEngine getAiEngine() { return aiEngine; }
+
+    public Map<String, Runnable> getEvents() {
+        return events;
+    }
 }

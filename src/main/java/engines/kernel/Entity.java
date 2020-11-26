@@ -1,5 +1,6 @@
 package engines.kernel;
 
+import engines.AI.AIEntity;
 import engines.graphics.GraphicEntity;
 import engines.physics.PhysicEntity;
 
@@ -28,6 +29,11 @@ public class Entity {
     protected PhysicEntity physicEntity;
 
     /**
+     * Entité intelligence artificielle
+     */
+    protected AIEntity aiEntity;
+
+    /**
      * Constructeur
      */
     protected Entity(KernelEngine kernelEngine) {
@@ -35,6 +41,7 @@ public class Entity {
         this.id = kernelEngine.generateNewID();
         this.graphicEntity = kernelEngine.getGraphicsEngine().createEntity(this);
         this.physicEntity = kernelEngine.getPhysicsEngine().createEntity(this);
+        this.aiEntity = kernelEngine.getAiEngine().createEntity(this);
     }
 
     /**
@@ -48,6 +55,8 @@ public class Entity {
         this.graphicEntity.clone(entity.getGraphicEntity());
         this.physicEntity = kernelEngine.getPhysicsEngine().createEntity(this);
         this.physicEntity.clone(entity.getPhysicEntity());
+        this.aiEntity = kernelEngine.getAiEngine().createEntity(this);
+        this.aiEntity.clone(entity.getAiEntity());
     }
 
     /**
@@ -71,4 +80,8 @@ public class Entity {
     public void setGraphicEntity(GraphicEntity graphicEntity) { this.graphicEntity = graphicEntity; }
 
     public void setPhysicEntity(PhysicEntity physicEntity) { this.physicEntity = physicEntity; }
+
+    public AIEntity getAiEntity() { return aiEntity; }
+
+    public void setAiEntity(AIEntity aiEntity) { this.aiEntity = aiEntity; }
 }
