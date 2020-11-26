@@ -1,8 +1,10 @@
 package gameplay;
 
+import engines.AI.AIEngine;
 import engines.graphics.GraphicsEngine;
 import engines.graphics.Scene;
 import engines.input_output.IOEngine;
+import engines.kernel.Entity;
 import engines.kernel.KernelEngine;
 import engines.physics.PhysicEntity;
 import engines.physics.PhysicsEngine;
@@ -45,7 +47,9 @@ public class Gameplay {
     /**
      * Joueur
      */
-    private final Player player;
+    private final Pacman pacman;
+
+    private final ArrayList<Ghost> ghosts;
 
     /**
      * Constructeur
@@ -54,7 +58,9 @@ public class Gameplay {
         this.kernelEngine = new KernelEngine();
         this.textures = kernelEngine.getGraphicsEngine().loadSpriteSheet("assets/sprite_sheet.png", 11, 11);
         this.levels = new ArrayList<>();
-        this.player = new Player(this, 30, 30, 2, textures, 1, 3);
+        this.pacman = new Pacman(this);
+        this.ghosts = new ArrayList<>();
+        ghosts.add(new Ghost(this));
         initGameplay();
     }
 
@@ -73,35 +79,41 @@ public class Gameplay {
      * Initialiser les évènements du jeu
      */
     private void initEvents() {
+        kernelEngine.addEvent("moveGhost", () -> {
+            for (Ghost ghost : ghosts)
+                updateGhostDirection(ghost);
+        });
         //Se déplacer vers le haut
-        kernelEngine().addEvent("pacmanGoUp", () -> switchPacmanDirection(MoveDirection.UP));
+        kernelEngine.addEvent("pacmanGoUp", () -> switchPacmanDirection(MoveDirection.UP));
         //Se déplacer vers la droite
-        kernelEngine().addEvent("pacmanGoRight", () -> switchPacmanDirection(MoveDirection.RIGHT));
+        kernelEngine.addEvent("pacmanGoRight", () -> switchPacmanDirection(MoveDirection.RIGHT));
         //Se déplacer vers le bas
-        kernelEngine().addEvent("pacmanGoDown", () -> switchPacmanDirection(MoveDirection.DOWN));
+        kernelEngine.addEvent("pacmanGoDown", () -> switchPacmanDirection(MoveDirection.DOWN));
         //Se déplacer vers la gauche
-        kernelEngine().addEvent("pacmanGoLeft", () -> switchPacmanDirection(MoveDirection.LEFT));
+        kernelEngine.addEvent("pacmanGoLeft", () -> switchPacmanDirection(MoveDirection.LEFT));
         //Attacher la texture par défaut au joueur
-        kernelEngine().addEvent("pacmanBindDefaultTexture", () ->
-                graphicsEngine().bindTexture(player.getGraphicEntity(),
-                        textures, player.getDefaultTextureCoords()[0], player.getDefaultTextureCoords()[1]));
+        kernelEngine.addEvent("pacmanBindDefaultTexture", () ->
+                graphicsEngine().bindTexture(pacman.getGraphicEntity(),
+                        textures, pacman.getDefaultTextureCoords()[0], pacman.getDefaultTextureCoords()[1]));
         //Lorsqu'il y a une collision
-        kernelEngine().addEvent("pacmanOnCollision", () -> {
-            if (player.getCurrentAnimationID() != 0)
-                if (graphicsEngine().getAnimation(player.getCurrentAnimationID()).isPlaying())
-                    graphicsEngine().playPauseAnimation(player.getCurrentAnimationID());
+        kernelEngine.addEvent("pacmanOnCollision", () -> {
+            if (pacman.getCurrentAnimationID() != 0)
+                if (graphicsEngine().getAnimation(pacman.getCurrentAnimationID()).isPlaying())
+                    graphicsEngine().playPauseAnimation(pacman.getCurrentAnimationID());
         });
         //Rejouer l'animation courante
-        kernelEngine().addEvent("pacmanPlayCurrentAnimation", () -> {
-            if (!graphicsEngine().getAnimation(player.getCurrentAnimationID()).isPlaying())
-                graphicsEngine().playPauseAnimation(player.getCurrentAnimationID());
+        kernelEngine.addEvent("pacmanPlayCurrentAnimation", () -> {
+            if (!graphicsEngine().getAnimation(pacman.getCurrentAnimationID()).isPlaying())
+                graphicsEngine().playPauseAnimation(pacman.getCurrentAnimationID());
         });
         ioEngine().bindEventOnLastKey(KeyEvent.VK_UP, "pacmanGoUp");
         ioEngine().bindEventOnLastKey(KeyEvent.VK_RIGHT, "pacmanGoRight");
         ioEngine().bindEventOnLastKey(KeyEvent.VK_DOWN, "pacmanGoDown");
         ioEngine().bindEventOnLastKey(KeyEvent.VK_LEFT, "pacmanGoLeft");
         ioEngine().bindEventKeyboardFree("pacmanBindDefaultTexture");
-        physicsEngine().bindEventOnCollision(player.getPhysicEntity(), "pacmanOnCollision");
+        physicsEngine().bindEventOnCollision(pacman.getPhysicEntity(), "pacmanOnCollision");
+        for (Ghost ghost : ghosts)
+            aiEngine().bindEvent(ghost.getAiEntity(), "moveGhost");
     }
 
     /**
@@ -119,59 +131,94 @@ public class Gameplay {
     }
 
     /**
+     * Mettre à jour la position d'un fanôme
+     * @param ghost fantôme
+     */
+    protected void updateGhostDirection(Ghost ghost) {
+        PhysicEntity playerPhysic = pacman.getPhysicEntity();
+        PhysicEntity ghostPhysic = ghost.getPhysicEntity();
+
+        int playerXmiddle = (playerPhysic.getX() + playerPhysic.getWidth())/2;
+        int playerYmiddle = (playerPhysic.getY() + playerPhysic.getHeight())/2;
+        int ghostXmiddle = (ghostPhysic.getX() + ghostPhysic.getWidth())/2;
+        int ghostYmiddle = (ghostPhysic.getY() + ghostPhysic.getHeight())/2;
+        int xDistance = playerXmiddle - ghostXmiddle;
+        int yDistance = playerYmiddle - ghostYmiddle;
+
+        MoveDirection direction;
+
+        if (Math.abs(xDistance) > Math.abs(yDistance)) {
+            if (xDistance < 0) direction = MoveDirection.LEFT;
+            else direction = MoveDirection.RIGHT;
+        } else {
+            if (yDistance < 0) direction = MoveDirection.UP;
+            else direction = MoveDirection.DOWN;
+        }
+        setEntityNextDirection(ghost,direction);
+    }
+
+    /**
      * Changer la direction de pacman
      * @param direction direction
      */
     protected void switchPacmanDirection(MoveDirection direction) {
-        player.setCurrentAnimationID(player.getAnimations().get(direction.name()));
+        pacman.setCurrentAnimationID(pacman.getAnimations().get(direction.name()));
         kernelEngine().notifyEvent("pacmanPlayCurrentAnimation");
+        setEntityNextDirection(pacman,direction);
+    }
+
+    /**
+     * Déterminer la prochaine direction de l'entité
+     * @param entity entité
+     * @param direction direction
+     */
+    private void setEntityNextDirection(Player entity, MoveDirection direction) {
         PhysicEntity entityNearby;
         switch (direction) {
             case UP:
-                entityNearby = physicsEngine().isSomethingUp(player.getPhysicEntity());
+                entityNearby = physicsEngine().isSomethingUp(entity.getPhysicEntity());
                 if (entityNearby == null)
-                    player.setCurrentDirection(MoveDirection.UP);
-                callEventFromDirection();
+                    entity.setCurrentDirection(MoveDirection.UP);
                 break;
             case RIGHT:
-                entityNearby = physicsEngine().isSomethingRight(player.getPhysicEntity());
+                entityNearby = physicsEngine().isSomethingRight(entity.getPhysicEntity());
                 if (entityNearby == null)
-                    player.setCurrentDirection(MoveDirection.RIGHT);
-                callEventFromDirection();
+                    entity.setCurrentDirection(MoveDirection.RIGHT);
                 break;
             case DOWN:
-                entityNearby = physicsEngine().isSomethingDown(player.getPhysicEntity());
+                entityNearby = physicsEngine().isSomethingDown(entity.getPhysicEntity());
                 if (entityNearby == null)
-                    player.setCurrentDirection(MoveDirection.DOWN);
-                callEventFromDirection();
+                    entity.setCurrentDirection(MoveDirection.DOWN);
                 break;
             case LEFT:
-                entityNearby = physicsEngine().isSomethingLeft(player.getPhysicEntity());
+                entityNearby = physicsEngine().isSomethingLeft(entity.getPhysicEntity());
                 if (entityNearby == null)
-                    player.setCurrentDirection(MoveDirection.LEFT);
-                callEventFromDirection();
+                    entity.setCurrentDirection(MoveDirection.LEFT);
+                break;
+            default:
                 break;
         }
-        graphicsEngine().bindAnimation(player.getGraphicEntity(), player.getAnimations().get(player.getCurrentDirection().name()));
+        callEventFromDirection(entity, entity.getCurrentDirection());
+        graphicsEngine().bindAnimation(entity.getGraphicEntity(), entity.getAnimations().get(entity.getCurrentDirection().name()));
     }
 
     /**
      * Appeler la méthode de déplacement en fonction de la direction courante
      */
-    private void callEventFromDirection() {
-        if (player.getCurrentDirection() != null) {
-            switch (player.getCurrentDirection()) {
+    private void callEventFromDirection(Entity entity, MoveDirection direction) {
+        if (direction != null) {
+            switch (direction) {
                 case UP:
-                    physicsEngine().goUp(player.getPhysicEntity());
+                    physicsEngine().goUp(entity.getPhysicEntity());
                     break;
                 case RIGHT:
-                    physicsEngine().goRight(player.getPhysicEntity());
+                    physicsEngine().goRight(entity.getPhysicEntity());
                     break;
                 case DOWN:
-                    physicsEngine().goDown(player.getPhysicEntity());
+                    physicsEngine().goDown(entity.getPhysicEntity());
                     break;
                 case LEFT:
-                    physicsEngine().goLeft(player.getPhysicEntity());
+                    physicsEngine().goLeft(entity.getPhysicEntity());
                     break;
                 default:
                     break;
@@ -195,7 +242,9 @@ public class Gameplay {
      * @param level level
      */
     public void playLevel(Level level) {
-        level.addPlayer(player, 1,1);
+        level.spawnPlayer(1,1);
+        for (Ghost ghost : ghosts)
+            level.spawnGhost(ghost,9,5);
         graphicsEngine().bindScene(level.getScene());
         kernelEngine.start();
     }
@@ -214,5 +263,9 @@ public class Gameplay {
 
     public SoundEngine soundEngine() { return kernelEngine.getSoundEngine(); }
 
-    public Player getPlayer() { return player; }
+    public AIEngine aiEngine() { return kernelEngine.getAiEngine(); }
+
+    public Pacman getPlayer() { return pacman; }
+
+    public ArrayList<Ghost> getGhosts() { return ghosts; }
 }

@@ -3,8 +3,6 @@ package gameplay;
 import engines.graphics.Scene;
 import engines.kernel.Entity;
 
-import java.util.ArrayList;
-
 /**
  * Niveau de jeu
  */
@@ -25,16 +23,6 @@ public class Level {
     private Entity[][] matrix;
 
     /**
-     * Entités présentes sur le niveau
-     */
-    private ArrayList<Entity> levelEntities = new ArrayList<>();
-
-    /**
-     * Joueur
-     */
-    private Player player;
-
-    /**
      * Chronomètre
      */
     private float timer;
@@ -52,7 +40,7 @@ public class Level {
     protected Level(Gameplay gameplay, int rows, int cols) {
         this.gameplay = gameplay;
         this.matrix = new Entity[rows][cols];
-        this.scene = gameplay.graphicsEngine().generateScene((rows - 1) * 30,(cols - 1) * 30);
+        this.scene = gameplay.graphicsEngine().generateScene(rows * 30,cols * 30);
         fillMatrix();
     }
 
@@ -74,22 +62,28 @@ public class Level {
 
     /**
      * Faire apparaitre le joueur à un endroit
-     * @param player joueur
      * @param row ligne
      * @param col colonne
      */
-    public void addPlayer(Player player, int row, int col) {
-        if (this.player != null) {
-            levelEntities.remove(this.player);
-            gameplay.graphicsEngine().erase(this.player.getGraphicEntity());
-        } else {
-            gameplay.physicsEngine().addBoundLimits(player.getPhysicEntity(),0,0,scene.getWidth(),scene.getHeight());
-            Entity entity = matrix[row][col];
-            gameplay.physicsEngine().move(player.getPhysicEntity(), entity.getGraphicEntity().getX(), entity.getGraphicEntity().getY());
-            this.player = player;
-            levelEntities.add(player);
-            gameplay.graphicsEngine().addToScene(scene, this.player.getGraphicEntity());
-        }
+    public void spawnPlayer(int row, int col) {
+        Pacman pacman = gameplay.getPlayer();
+        gameplay.physicsEngine().addBoundLimits(pacman.getPhysicEntity(),0,0,scene.getWidth(),scene.getHeight());
+        Entity entity = matrix[row][col];
+        gameplay.physicsEngine().move(pacman.getPhysicEntity(), entity.getGraphicEntity().getX(), entity.getGraphicEntity().getY());
+        gameplay.graphicsEngine().addToScene(scene, pacman.getGraphicEntity());
+    }
+
+    /**
+     * Faire apparaitre un fantome à un endroit
+     * @param ghost fantome
+     * @param row ligne
+     * @param col colonne
+     */
+    public void spawnGhost(Ghost ghost, int row, int col) {
+        gameplay.physicsEngine().addBoundLimits(ghost.getPhysicEntity(),0,0,scene.getWidth(),scene.getHeight());
+        Entity entity = matrix[row][col];
+        gameplay.physicsEngine().move(ghost.getPhysicEntity(), entity.getGraphicEntity().getX(), entity.getGraphicEntity().getY());
+        gameplay.graphicsEngine().addToScene(scene, ghost.getGraphicEntity());
     }
 
     // GETTERS //
