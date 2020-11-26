@@ -31,7 +31,7 @@ public class SwingListener {
      * @param listener écouteur
      */
     public void addKeyListener(KeyListener listener) {
-        SwingWindow.getWindow().addKeyListener(listener);
+        SwingWindow.getInstance().getWindow().addKeyListener(listener);
     }
 
     /**
@@ -39,7 +39,7 @@ public class SwingListener {
      * @param listener écouteur
      */
     public void removeKeyListener(KeyListener listener) {
-        SwingWindow.getWindow().removeKeyListener(listener);
+        SwingWindow.getInstance().getWindow().removeKeyListener(listener);
     }
 
     /**
@@ -47,7 +47,7 @@ public class SwingListener {
      * @param listener écouteur
      */
     public void addMouseListener(MouseListener listener) {
-        SwingWindow.getWindow().addMouseListener(listener);
+        SwingWindow.getInstance().getWindow().addMouseListener(listener);
     }
 
     /**
@@ -55,6 +55,6 @@ public class SwingListener {
      * @param listener écouteur
      */
     public void removeMouseListener(MouseListener listener) {
-        SwingWindow.getWindow().removeMouseListener(listener);
+        SwingWindow.getInstance().getWindow().removeMouseListener(listener);
     }
 }

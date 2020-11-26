@@ -20,7 +20,7 @@ public class SwingWindow {
      * Récupérer l'instance
      * @return instance
      */
-    protected static SwingWindow getInstance() {
+    public static SwingWindow getInstance() {
         if (instance == null) instance = new SwingWindow();
         return instance;
     }
@@ -28,13 +28,13 @@ public class SwingWindow {
     /**
      * Fenêtre
      */
-    private static final JFrame window = new JFrame();
+    private final JFrame window = new JFrame();
 
     /**
      * Initialiser la fenêtre
      * @param title titre
      */
-    public static void initWindow(String title) {
+    public void initWindow(String title) {
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setResizable(false);
         window.setTitle(title);
@@ -42,24 +42,16 @@ public class SwingWindow {
     }
 
     /**
-     * Savoir si la fenêtre est en cours d'exécution
-     * @return booléen
-     */
-    public static boolean isWindowOpen() {
-        return window != null;
-    }
-
-    /**
      * Terminer l'exécution de la fenêtre
      */
-    public static void stopWindow() {
+    public void stopWindow() {
         window.dispose();
     }
 
     /**
      * Rafraichir la fenêtre
      */
-    public static void refreshWindow() {
+    public void refreshWindow() {
         getCurrentScene().revalidate();
         getCurrentScene().repaint();
     }
@@ -68,7 +60,7 @@ public class SwingWindow {
      * Afficher une scène
      * @param scene scène
      */
-    public static void showScene(SwingScene scene) {
+    public void showScene(SwingScene scene) {
         //Supprimer la scène courante
         if (window.getContentPane().getComponents().length > 0)
             window.getContentPane().remove(0);
@@ -82,7 +74,7 @@ public class SwingWindow {
      * Obtenir la scène courante
      * @return scène actuelle
      */
-    public static SwingScene getCurrentScene() {
+    public SwingScene getCurrentScene() {
         return (SwingScene) window.getContentPane().getComponent(0);
     }
 
@@ -90,5 +82,13 @@ public class SwingWindow {
      * Obtenir la fenêtre courante
      * @return fenêtre courante
      */
-    public static JFrame getWindow() { return window; }
+    public JFrame getWindow() { return window; }
+
+    /**
+     * Récupérer la marge supérieure inutile
+     * @return marge supérieure
+     */
+    public int getUselessTopGap() {
+        return window.getHeight()-window.getContentPane().getHeight();
+    }
 }

@@ -26,7 +26,7 @@ public class SwingRenderer {
      * Récupérer l'instance
      * @return instance
      */
-    protected static SwingRenderer getInstance() {
+    public static SwingRenderer getInstance() {
         if (instance == null) instance = new SwingRenderer();
         return instance;
     }
@@ -34,17 +34,17 @@ public class SwingRenderer {
     /**
      * Environnement graphique
      */
-    private static GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+    private GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 
     /**
      * Configuration graphique
      */
-    private static GraphicsConfiguration gc = ge.getDefaultScreenDevice().getDefaultConfiguration();
+    private GraphicsConfiguration gc = ge.getDefaultScreenDevice().getDefaultConfiguration();
 
     /**
      * Textures chargées
      */
-    private static Map<String,VolatileImage> loaded_textures = new HashMap<>();
+    private Map<String,VolatileImage> loaded_textures = new HashMap<>();
 
     /**
      * Générer un rectangle
@@ -54,7 +54,7 @@ public class SwingRenderer {
      * @param y position verticale
      * @param color couleur
      */
-    public static void renderRect(int height, int width, int x, int y, Color color) {
+    public void renderRect(int height, int width, int x, int y, Color color) {
         Graphics2D graphics2D = getCurrentGraphics();
         graphics2D.setColor(color);
         graphics2D.fillRect(x,y,width,height);
@@ -68,15 +68,34 @@ public class SwingRenderer {
      * @param y position verticale
      * @param link lien vers la texture
      */
-    public static void renderTexturedRect(int height, int width, int x, int y, String link) {
+    public void renderTexturedRect(int height, int width, int x, int y, String link) {
         getCurrentGraphics().drawImage(loaded_textures.get(link), x, y, width, height, null);
+    }
+
+    /**
+     * Générer un texte
+     * @param text texte
+     * @param color couleur
+     * @param fontSize taille de la police
+     * @param x position horizontale
+     * @param y position verticale
+     * @param height hauteur
+     * @param width largeur
+     */
+    public void renderText(String text, Color color, int fontSize, int x, int y, int height, int width) {
+        getCurrentGraphics().setFont(new Font("Arial", Font.PLAIN, fontSize));
+        FontMetrics metrics = getCurrentGraphics().getFontMetrics();
+        x = x + (width - metrics.stringWidth(text)) / 2;
+        y = y + ((height - metrics.getHeight()) / 2) + metrics.getAscent();
+        getCurrentGraphics().setColor(color);
+        getCurrentGraphics().drawString(text, x, y);
     }
 
     /**
      * Charger une texture
      * @param link lien du fichier
      */
-    public static void loadTexture(String link) {
+    public void loadTexture(String link) {
         BufferedImage texture = getBufferedImage(link);
         VolatileImage volatile_texture = generateVolatileImage(texture);
         loaded_textures.put(link, volatile_texture);
@@ -88,7 +107,7 @@ public class SwingRenderer {
      * @param sheet_height nombre de textures sur la hauteur
      * @param sheet_width nombre de textures sur la largeur
      */
-    public static void loadSpriteSheet(String link, int sheet_height, int sheet_width) {
+    public void loadSpriteSheet(String link, int sheet_height, int sheet_width) {
         BufferedImage texture = getBufferedImage(link);
         VolatileImage volatile_texture = generateVolatileImage(texture);
         loaded_textures.put(link, volatile_texture);
@@ -111,7 +130,7 @@ public class SwingRenderer {
      * @param link lien vers l'image
      * @return tampon
      */
-    private static BufferedImage getBufferedImage(String link) {
+    private BufferedImage getBufferedImage(String link) {
         BufferedImage texture = null;
         try {
             texture = ImageIO.read(SwingRenderer.class.getResourceAsStream("/" + link));
@@ -127,7 +146,7 @@ public class SwingRenderer {
      * @param image tampon de l'image
      * @return image volatile
      */
-    private static VolatileImage generateVolatileImage(BufferedImage image) {
+    private VolatileImage generateVolatileImage(BufferedImage image) {
         VolatileImage volatile_image =
                 gc.createCompatibleVolatileImage(image.getWidth(), image.getHeight(), Transparency.BITMASK);
         volatile_image.validate(gc);
@@ -145,7 +164,7 @@ public class SwingRenderer {
      * @param link lien de la texture
      * @return booléen
      */
-    public static boolean isTextureLoaded(String link) {
+    public boolean isTextureLoaded(String link) {
         return loaded_textures.containsKey(link);
     }
 
@@ -156,7 +175,7 @@ public class SwingRenderer {
      * @param blue bleu
      * @return couleur swing
      */
-    public static Color getSwingColor(int red, int green, int blue) {
+    public Color getSwingColor(int red, int green, int blue) {
         return new Color(red, green, blue);
     }
 
@@ -164,7 +183,7 @@ public class SwingRenderer {
      * Obtenir l'objet graphique courant
      * @return objet graphique
      */
-    private static Graphics2D getCurrentGraphics() {
-        return SwingWindow.getCurrentScene().get2DGraphics();
+    private Graphics2D getCurrentGraphics() {
+        return SwingWindow.getInstance().getCurrentScene().get2DGraphics();
     }
 }

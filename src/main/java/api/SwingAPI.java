@@ -25,6 +25,6 @@ public class SwingAPI {
      * @return instance SwingWindow
      */
     protected static SwingWindow getWindowMethods() {
-        return SwingWindow.getInstance();
+        return SwingWindow.getInstance().getInstance();
     }
 }
