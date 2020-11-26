@@ -159,6 +159,16 @@ public class PhysicsEngine {
         return null;
     }
 
+    public PhysicEntity isSomethingUpInLine(PhysicEntity entity,int loopSize) {
+        for (int i=1;i< loopSize;++i){
+            ArrayList<PhysicEntity> elements = getEntityAtPosition(entity.getX(), entity.getY() - i, entity.getHeight(), entity.getWidth());
+            for (PhysicEntity entity1 : elements)
+                if (entity.getCollisions().contains(entity1))
+                    return entity1;
+        }
+        return null;
+    }
+
     /**
      * Vérifier si une entité est présente à droite
      * @param entity entité
@@ -169,6 +179,15 @@ public class PhysicsEngine {
         for (PhysicEntity entity1 : elements)
             if (entity.getCollisions().contains(entity1))
                 return entity1;
+        return null;
+
+    } public PhysicEntity isSomethingRightInLine(PhysicEntity entity,int loopSize) {
+        for (int i=1;i< loopSize;++i){
+            ArrayList<PhysicEntity> elements = getEntityAtPosition(entity.getX() + i, entity.getY(), entity.getHeight(), entity.getWidth());
+            for (PhysicEntity entity1 : elements)
+                if (entity.getCollisions().contains(entity1))
+                    return entity1;
+        }
         return null;
     }
 
@@ -185,6 +204,16 @@ public class PhysicsEngine {
         return null;
     }
 
+    public PhysicEntity isSomethingDownInLine(PhysicEntity entity,int loopSize) {
+        for (int i=1;i< loopSize;++i){
+            ArrayList<PhysicEntity> elements = getEntityAtPosition(entity.getX(), entity.getY() + i, entity.getHeight(), entity.getWidth());
+            for (PhysicEntity entity1 : elements)
+                if (entity.getCollisions().contains(entity1))
+                    return entity1;
+        }
+        return null;
+    }
+
     /**
      * Vérifier si une entité est présente à gauche
      * @param entity entité
@@ -198,6 +227,16 @@ public class PhysicsEngine {
         return null;
     }
 
+    public PhysicEntity isSomethingLeftInLine(PhysicEntity entity,int loopSize) {
+        for (int i=1;i< loopSize;++i){
+            ArrayList<PhysicEntity> elements = getEntityAtPosition(entity.getX() - i, entity.getY(), entity.getHeight(), entity.getWidth());
+            for (PhysicEntity entity1 : elements)
+                if (entity.getCollisions().contains(entity1))
+                    return entity1;
+        }
+        return null;
+    }
+
     /**
      * Vérifier s'il y a une collision entre deux entités
      * @param entity1 entité 1
@@ -206,9 +245,9 @@ public class PhysicsEngine {
      */
     public boolean isInCollision(PhysicEntity entity1, PhysicEntity entity2) {
         return entity1.getX() + entity1.getWidth() > entity2.getX()
-            && entity1.getY() + entity1.getHeight() > entity2.getY()
-            && entity1.getX() < entity2.getX() + entity2.getWidth()
-            && entity1.getY() < entity2.getY() + entity2.getHeight();
+                && entity1.getY() + entity1.getHeight() > entity2.getY()
+                && entity1.getX() < entity2.getX() + entity2.getWidth()
+                && entity1.getY() < entity2.getY() + entity2.getHeight();
     }
 
     /**
@@ -219,9 +258,9 @@ public class PhysicsEngine {
      */
     public boolean isInside(PhysicEntity childE, PhysicEntity parentE) {
         return childE.getX() > parentE.getX()
-            && childE.getY() > parentE.getY()
-            && childE.getX() + childE.getWidth() < parentE.getX() + parentE.getWidth()
-            && childE.getY() + childE.getHeight() < parentE.getY() + parentE.getHeight();
+                && childE.getY() > parentE.getY()
+                && childE.getX() + childE.getWidth() < parentE.getX() + parentE.getWidth()
+                && childE.getY() + childE.getHeight() < parentE.getY() + parentE.getHeight();
     }
 
     /**
@@ -232,9 +271,9 @@ public class PhysicsEngine {
     public boolean isInBounds(PhysicEntity entity) {
         int[] boundLimits = entity.getBoundLimits();
         return boundLimits == null || entity.getX() >= boundLimits[0]
-            && entity.getX() + entity.getWidth() <= boundLimits[2]
-            && entity.getY() >= boundLimits[1]
-            && entity.getY() + entity.getHeight() <= boundLimits[3];
+                && entity.getX() + entity.getWidth() <= boundLimits[2]
+                && entity.getY() >= boundLimits[1]
+                && entity.getY() + entity.getHeight() <= boundLimits[3];
     }
 
     /**
@@ -245,7 +284,7 @@ public class PhysicsEngine {
      */
     public boolean isCentered(PhysicEntity e1, PhysicEntity e2) {
         return (e1.getX() + e1.getWidth()) / 2 == (e2.getX() + e2.getWidth()) / 2
-            && (e1.getY() + e1.getHeight()) / 2 == (e2.getY() + e2.getHeight()) / 2;
+                && (e1.getY() + e1.getHeight()) / 2 == (e2.getY() + e2.getHeight()) / 2;
     }
 
     /**
