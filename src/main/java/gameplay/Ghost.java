@@ -13,6 +13,11 @@ public class Ghost extends Player {
      * Constructeur
      * @param gameplay gameplay
      */
+    private boolean keepUp = false;
+    private boolean keepDown= false;
+    private boolean keepLeft= false;
+    private boolean keepRight= false;
+
     public Ghost(Gameplay gameplay) {
         super(gameplay.kernelEngine());
         this.gameplay = gameplay;
@@ -48,5 +53,25 @@ public class Ghost extends Player {
         gameplay.graphicsEngine().addFrameToAnimation(moveLEFT,3,5);
         gameplay.graphicsEngine().addFrameToAnimation(moveLEFT,3,6);
         animations.put(Gameplay.MoveDirection.LEFT.name(), moveLEFT);
+    }
+
+    public boolean isKeepDown() {
+        return keepDown;
+    }
+
+    public boolean isKeepLeft() {
+        return keepLeft;
+    }
+
+    public boolean isKeepRight() {
+        return keepRight;
+    }
+
+    public boolean isKeepUp() {
+        return keepUp;
+    }
+
+    public void setKeepUp(boolean keep){
+        keepUp = keep;
     }
 }
