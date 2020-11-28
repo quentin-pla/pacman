@@ -13,6 +13,8 @@ import engines.sound.SoundEngine;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Gameplay
@@ -53,7 +55,7 @@ public class Gameplay {
     /**
      * Fantomes
      */
-    private final ArrayList<Ghost> ghosts;
+    private final Map<String,Ghost> ghosts;
 
     /**
      * Constructeur
@@ -63,8 +65,8 @@ public class Gameplay {
         this.textures = kernelEngine.getGraphicsEngine().loadSpriteSheet("assets/sprite_sheet.png", 11, 11);
         this.levels = new ArrayList<>();
         this.pacman = new Pacman(this);
-        this.ghosts = new ArrayList<>();
-        ghosts.add(new Ghost(this));
+        this.ghosts = new HashMap<>();
+        ghosts.put("red",new Ghost(this));
         initGameplay();
     }
 
@@ -86,12 +88,10 @@ public class Gameplay {
      * Initialiser les évènements du jeu
      */
     private void initEvents() {
+        //Jouer un niveau
         kernelEngine.addEvent("playLevel", () -> playLevel(levels.get(0)));
-        //Déplacer un fantome
-        kernelEngine.addEvent("moveGhost", () -> {
-            for (Ghost ghost : ghosts)
-                updateGhostDirection(ghost);
-        });
+        //Déplacer le fantome rouge
+        kernelEngine.addEvent("moveRedGhost", () -> updateGhostDirection(ghosts.get("red")));
         //Se déplacer vers le haut
         kernelEngine.addEvent("pacmanGoUp", () -> switchPacmanDirection(MoveDirection.UP));
         //Se déplacer vers la droite
@@ -121,8 +121,7 @@ public class Gameplay {
         ioEngine().bindEventOnLastKey(KeyEvent.VK_LEFT, "pacmanGoLeft");
         ioEngine().bindEventKeyboardFree("pacmanBindDefaultTexture");
         physicsEngine().bindEventOnCollision(pacman.getPhysicEntity(), "pacmanOnCollision");
-        for (Ghost ghost : ghosts)
-            aiEngine().bindEvent(ghost.getAiEntity(), "moveGhost");
+        aiEngine().bindEvent(ghosts.get("red").getAiEntity(), "moveRedGhost");
     }
 
     /**
@@ -152,25 +151,170 @@ public class Gameplay {
      */
     private void initDefaultLevel() {
         //Level par défaut
-        Level defaultLevel = generateLevel(10,10);
+        Level defaultLevel = generateLevel(21,19);
+
         //Génération des murs
-        for (int j = 0; j < 6; j++) {
-            Entity wall = defaultLevel.getMatrix()[5][j];
-            graphicsEngine().bindColor(wall.getGraphicEntity(),0,0,255);
-            physicsEngine().addCollisions(pacman.getPhysicEntity(), wall.getPhysicEntity());
-            for (Ghost ghost : ghosts)
-                physicsEngine().addCollisions(ghost.getPhysicEntity(), wall.getPhysicEntity());
-        }
-        //Génération des boules
-        for (int j = 0; j < 6; j++) {
-            Entity ball = defaultLevel.getMatrix()[6][j];
-            graphicsEngine().bindTexture(ball.getGraphicEntity(),getTexturesFile(),10,2);
-            kernelEngine().addEvent("eraseBall" + j,() -> {
-                kernelEngine().removeEntity(ball);
-                soundEngine().playSound("munch");
-            });
-            physicsEngine().bindEventOnSameLocation(pacman.getPhysicEntity(), ball.getPhysicEntity(), "eraseBall" + j);
-        }
+        for (int j = 0; j < 19; j++) defaultLevel.addWall(0,j);
+        for (int j = 0; j < 19; j++) defaultLevel.addWall(20,j);
+
+        for (int i = 0; i < 6; i++) defaultLevel.addWall(i,0);
+        defaultLevel.addWall(8,0);
+        defaultLevel.addWall(10,0);
+        for (int i = 12; i < 20; i++) defaultLevel.addWall(i,0);
+
+        for (int i = 0; i < 6; i++) defaultLevel.addWall(i,18);
+        defaultLevel.addWall(8,18);
+        defaultLevel.addWall(10,18);
+        for (int i = 12; i < 20; i++) defaultLevel.addWall(i,18);
+
+        defaultLevel.addWall(1,9);
+
+        defaultLevel.addWall(2,2);
+        defaultLevel.addWall(2,3);
+        defaultLevel.addWall(2,5);
+        defaultLevel.addWall(2,6);
+        defaultLevel.addWall(2,7);
+        defaultLevel.addWall(2,9);
+        defaultLevel.addWall(2,11);
+        defaultLevel.addWall(2,12);
+        defaultLevel.addWall(2,13);
+        defaultLevel.addWall(2,15);
+        defaultLevel.addWall(2,16);
+
+        defaultLevel.addWall(4,2);
+        defaultLevel.addWall(4,3);
+        defaultLevel.addWall(4,5);
+        defaultLevel.addWall(4,7);
+        defaultLevel.addWall(4,8);
+        defaultLevel.addWall(4,9);
+        defaultLevel.addWall(4,10);
+        defaultLevel.addWall(4,11);
+        defaultLevel.addWall(4,13);
+        defaultLevel.addWall(4,15);
+        defaultLevel.addWall(4,16);
+
+        defaultLevel.addWall(5,5);
+        defaultLevel.addWall(5,9);
+        defaultLevel.addWall(5,13);
+
+        defaultLevel.addWall(6,0);
+        defaultLevel.addWall(6,1);
+        defaultLevel.addWall(6,2);
+        defaultLevel.addWall(6,3);
+        defaultLevel.addWall(6,5);
+        defaultLevel.addWall(6,6);
+        defaultLevel.addWall(6,7);
+        defaultLevel.addWall(6,9);
+        defaultLevel.addWall(6,11);
+        defaultLevel.addWall(6,12);
+        defaultLevel.addWall(6,13);
+        defaultLevel.addWall(6,15);
+        defaultLevel.addWall(6,16);
+        defaultLevel.addWall(6,17);
+        defaultLevel.addWall(6,18);
+
+        defaultLevel.addWall(7,3);
+        defaultLevel.addWall(7,5);
+        defaultLevel.addWall(7,13);
+        defaultLevel.addWall(7,15);
+
+        defaultLevel.addWall(8,1);
+        defaultLevel.addWall(8,2);
+        defaultLevel.addWall(8,3);
+        defaultLevel.addWall(8,5);
+        defaultLevel.addWall(8,7);
+        defaultLevel.addWall(8,8);
+        defaultLevel.addWall(8,9);
+        defaultLevel.addWall(8,10);
+        defaultLevel.addWall(8,11);
+        defaultLevel.addWall(8,13);
+        defaultLevel.addWall(8,15);
+        defaultLevel.addWall(8,16);
+        defaultLevel.addWall(8,17);
+
+        defaultLevel.addWall(9,7);
+        defaultLevel.addWall(9,11);
+
+        defaultLevel.addWall(10,1);
+        defaultLevel.addWall(10,2);
+        defaultLevel.addWall(10,3);
+        defaultLevel.addWall(10,5);
+        defaultLevel.addWall(10,7);
+        defaultLevel.addWall(10,8);
+        defaultLevel.addWall(10,9);
+        defaultLevel.addWall(10,10);
+        defaultLevel.addWall(10,11);
+        defaultLevel.addWall(10,13);
+        defaultLevel.addWall(10,15);
+        defaultLevel.addWall(10,16);
+        defaultLevel.addWall(10,17);
+
+        defaultLevel.addWall(11,3);
+        defaultLevel.addWall(11,5);
+        defaultLevel.addWall(11,13);
+        defaultLevel.addWall(11,15);
+
+        defaultLevel.addWall(12,1);
+        defaultLevel.addWall(12,2);
+        defaultLevel.addWall(12,3);
+        defaultLevel.addWall(12,5);
+        defaultLevel.addWall(12,7);
+        defaultLevel.addWall(12,8);
+        defaultLevel.addWall(12,9);
+        defaultLevel.addWall(12,10);
+        defaultLevel.addWall(12,11);
+        defaultLevel.addWall(12,13);
+        defaultLevel.addWall(12,15);
+        defaultLevel.addWall(12,16);
+        defaultLevel.addWall(12,17);
+
+        defaultLevel.addWall(13,9);
+
+        defaultLevel.addWall(14,2);
+        defaultLevel.addWall(14,3);
+        defaultLevel.addWall(14,5);
+        defaultLevel.addWall(14,6);
+        defaultLevel.addWall(14,7);
+        defaultLevel.addWall(14,9);
+        defaultLevel.addWall(14,11);
+        defaultLevel.addWall(14,12);
+        defaultLevel.addWall(14,13);
+        defaultLevel.addWall(14,15);
+        defaultLevel.addWall(14,16);
+
+        defaultLevel.addWall(15,3);
+        defaultLevel.addWall(15,15);
+
+        defaultLevel.addWall(16,1);
+        defaultLevel.addWall(16,3);
+        defaultLevel.addWall(16,5);
+        defaultLevel.addWall(16,7);
+        defaultLevel.addWall(16,8);
+        defaultLevel.addWall(16,9);
+        defaultLevel.addWall(16,10);
+        defaultLevel.addWall(16,11);
+        defaultLevel.addWall(16,13);
+        defaultLevel.addWall(16,15);
+        defaultLevel.addWall(16,17);
+
+        defaultLevel.addWall(17,5);
+        defaultLevel.addWall(17,9);
+        defaultLevel.addWall(17,13);
+
+        defaultLevel.addWall(18,2);
+        defaultLevel.addWall(18,3);
+        defaultLevel.addWall(18,4);
+        defaultLevel.addWall(18,5);
+        defaultLevel.addWall(18,6);
+        defaultLevel.addWall(18,7);
+        defaultLevel.addWall(18,9);
+        defaultLevel.addWall(18,11);
+        defaultLevel.addWall(18,12);
+        defaultLevel.addWall(18,13);
+        defaultLevel.addWall(18,14);
+        defaultLevel.addWall(18,15);
+        defaultLevel.addWall(18,16);
+
         levels.add(defaultLevel);
     }
 
@@ -370,8 +514,10 @@ public class Gameplay {
             default:
                 break;
         }
-        callEventFromDirection(entity, entity.getCurrentDirection());
-        graphicsEngine().bindAnimation(entity.getGraphicEntity(), entity.getAnimations().get(entity.getCurrentDirection().name()));
+        if (entity.getCurrentDirection() != null) {
+            callEventFromDirection(entity, entity.getCurrentDirection());
+            graphicsEngine().bindAnimation(entity.getGraphicEntity(), entity.getAnimations().get(entity.getCurrentDirection().name()));
+        }
     }
 
     /**
@@ -416,8 +562,7 @@ public class Gameplay {
     public void playLevel(Level level) {
         soundEngine().playSound("gameStart");
         level.spawnPlayer(1,1);
-        for (Ghost ghost : ghosts)
-            level.spawnGhost(ghost,9,5);
+        level.spawnGhost(ghosts.get("red"),9,5);
         graphicsEngine().bindScene(level.getScene());
         kernelEngine.start();
     }
@@ -448,5 +593,7 @@ public class Gameplay {
 
     public Pacman getPlayer() { return pacman; }
 
-    public ArrayList<Ghost> getGhosts() { return ghosts; }
+    public Map<String,Ghost> getGhosts() { return ghosts; }
+
+    public ArrayList<Level> getLevels() { return levels; }
 }

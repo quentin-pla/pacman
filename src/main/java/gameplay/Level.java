@@ -100,7 +100,7 @@ public class Level {
         Entity wall = matrix[row][col];
         gameplay.graphicsEngine().bindColor(wall.getGraphicEntity(),0,0,255);
         gameplay.physicsEngine().addCollisions(gameplay.getPlayer().getPhysicEntity(), wall.getPhysicEntity());
-        for (Ghost ghost : gameplay.getGhosts())
+        for (Ghost ghost : gameplay.getGhosts().values())
             gameplay.physicsEngine().addCollisions(ghost.getPhysicEntity(), wall.getPhysicEntity());
     }
 
