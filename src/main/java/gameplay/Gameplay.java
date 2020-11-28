@@ -419,6 +419,7 @@ public class Gameplay {
         for (Ghost ghost : ghosts)
             level.spawnGhost(ghost,9,5);
         graphicsEngine().bindScene(level.getScene());
+        kernelEngine.start();
     }
 
     /**

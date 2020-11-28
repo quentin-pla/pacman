@@ -23,6 +23,11 @@ public class Level {
     private Entity[][] matrix;
 
     /**
+     * Nombre de boules
+     */
+    private int balls;
+
+    /**
      * Chronomètre
      */
     private float timer;
@@ -84,6 +89,35 @@ public class Level {
         Entity entity = matrix[row][col];
         gameplay.physicsEngine().move(ghost.getPhysicEntity(), entity.getGraphicEntity().getX(), entity.getGraphicEntity().getY());
         gameplay.graphicsEngine().addToScene(scene, ghost.getGraphicEntity());
+    }
+
+    /**
+     * Ajouter un mur à une position
+     * @param row ligne
+     * @param col colonne
+     */
+    public void addWall(int row, int col) {
+        Entity wall = matrix[row][col];
+        gameplay.graphicsEngine().bindColor(wall.getGraphicEntity(),0,0,255);
+        gameplay.physicsEngine().addCollisions(gameplay.getPlayer().getPhysicEntity(), wall.getPhysicEntity());
+        for (Ghost ghost : gameplay.getGhosts())
+            gameplay.physicsEngine().addCollisions(ghost.getPhysicEntity(), wall.getPhysicEntity());
+    }
+
+    /**
+     * Ajouter une boule
+     * @param row ligne
+     * @param col colonne
+     */
+    public void addBall(int row, int col) {
+        Entity ball = matrix[row][col];
+        gameplay.graphicsEngine().bindTexture(ball.getGraphicEntity(),gameplay.getTexturesFile(),10,2);
+        gameplay.kernelEngine().addEvent("eraseBall" + balls,() -> {
+            gameplay.kernelEngine().removeEntity(ball);
+            gameplay.soundEngine().playSound("munch");
+        });
+        gameplay.physicsEngine().bindEventOnSameLocation(gameplay.getPlayer().getPhysicEntity(), ball.getPhysicEntity(), "eraseBall" + balls);
+        ++balls;
     }
 
     // GETTERS //
