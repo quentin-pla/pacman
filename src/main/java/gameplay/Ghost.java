@@ -20,7 +20,7 @@ public class Ghost extends Player {
         this.gameplay = gameplay;
         this.defaultTextureCoords = new int[]{3, 1};
         gameplay.physicsEngine().resize(getPhysicEntity(), 30, 30);
-        gameplay.physicsEngine().setSpeed(getPhysicEntity(), 2);
+        gameplay.physicsEngine().setSpeed(getPhysicEntity(), 3);
         gameplay.graphicsEngine().bindTexture(getGraphicEntity(),
                 gameplay.getTexturesFile(), defaultTextureCoords[0], defaultTextureCoords[1]);
         initAnimations(gameplay.getTexturesFile());

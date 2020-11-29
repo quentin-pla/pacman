@@ -52,8 +52,8 @@ public class SwingWindow {
      * Rafraichir la fenêtre
      */
     public void refreshWindow() {
-        getCurrentScene().revalidate();
         getCurrentScene().repaint();
+        getCurrentScene().revalidate();
     }
 
     /**

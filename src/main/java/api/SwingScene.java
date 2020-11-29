@@ -25,7 +25,7 @@ public class SwingScene extends JPanel {
     /**
      * Couleur de fond
      */
-    private Color background_color = Color.BLACK;
+    protected Color backgroundColor;
 
     /**
      * Constructeur
@@ -35,6 +35,7 @@ public class SwingScene extends JPanel {
     protected SwingScene(int height, int width) {
         this.height = height;
         this.width = width;
+        this.backgroundColor = Color.black;
     }
 
     /**
@@ -44,7 +45,7 @@ public class SwingScene extends JPanel {
      * @param blue bleu
      */
     public void setBackgroundColor(int red, int green, int blue) {
-        background_color = new Color(red, green, blue);
+        backgroundColor = new Color(red, green, blue);
     }
 
     @Override
@@ -55,10 +56,11 @@ public class SwingScene extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        graphics = (Graphics2D) g;
-        graphics.setColor(background_color);
+        graphics = (Graphics2D) g.create();
+        graphics.setColor(backgroundColor);
         graphics.fillRect(0, 0, width, height);
+        graphics.dispose();
     }
 
-    public Graphics2D get2DGraphics() { return graphics;}
+    public Graphics2D get2DGraphics() { return graphics; }
 }

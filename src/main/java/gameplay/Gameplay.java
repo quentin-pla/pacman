@@ -50,12 +50,12 @@ public class Gameplay {
     /**
      * Joueur
      */
-    private final Pacman pacman;
+    private Pacman pacman;
 
     /**
      * Fantomes
      */
-    private final Map<String,Ghost> ghosts;
+    private Map<String,Ghost> ghosts;
 
     /**
      * Constructeur
@@ -64,9 +64,6 @@ public class Gameplay {
         this.kernelEngine = new KernelEngine();
         this.textures = kernelEngine.getGraphicsEngine().loadSpriteSheet("assets/sprite_sheet.png", 12, 11);
         this.levels = new ArrayList<>();
-        this.pacman = new Pacman(this);
-        this.ghosts = new HashMap<>();
-        ghosts.put("red",new Ghost(this));
         initGameplay();
     }
 
@@ -77,6 +74,8 @@ public class Gameplay {
         //Activation des entrées / sorties
         ioEngine().enableKeyboardIO();
         ioEngine().enableMouseIO();
+        //Initialiser les joueurs
+        initPlayers();
         //Initialiser les évènements
         initEvents();
         //Initialiser les sons
@@ -147,6 +146,15 @@ public class Gameplay {
         graphicsEngine().bindText(button.getGraphicEntity(), "Jouer", new Color(255,255,255), 20);
         graphicsEngine().addToScene(menuView, button.getGraphicEntity());
         ioEngine().bindEventOnClick(button,"playLevel");
+    }
+
+    /**
+     * Initialiser les joueurs
+     */
+    private void initPlayers() {
+        pacman = new Pacman(this);
+        ghosts = new HashMap<>();
+        ghosts.put("red",new Ghost(this));
     }
 
     /**

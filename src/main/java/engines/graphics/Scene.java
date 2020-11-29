@@ -15,11 +15,6 @@ public class Scene extends SwingScene {
     private final GraphicsEngine graphicsEngine;
 
     /**
-     * Couleur de fond
-     */
-    private Color background_color;
-
-    /**
      * Liste des entités présentes dans la scène
      */
     private final ArrayList<GraphicEntity> entities = new ArrayList<>();
@@ -57,17 +52,15 @@ public class Scene extends SwingScene {
      */
     protected void setBackgroundColor(Color color) {
         super.setBackgroundColor(color.getRed(), color.getGreen(), color.getBlue());
-        background_color = color;
     }
 
     @Override
     protected void paintComponent(java.awt.Graphics g) {
         super.paintComponent(g);
-        graphics = (Graphics2D) g;
-        for (GraphicEntity entity : entities) {
-            graphicsEngine.update(entity);
+        graphics = (Graphics2D) g.create();
+        for (GraphicEntity entity : entities)
             graphicsEngine.draw(entity);
-        }
+        graphics.dispose();
     }
 
     // GETTERS //
@@ -83,6 +76,4 @@ public class Scene extends SwingScene {
     public ArrayList<GraphicEntity> getEntities() {
         return entities;
     }
-
-    public Color getBackgroundColor() { return background_color; }
 }

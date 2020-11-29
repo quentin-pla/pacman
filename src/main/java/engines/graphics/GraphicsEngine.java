@@ -57,16 +57,11 @@ public class GraphicsEngine {
      */
     public void draw(GraphicEntity entity) {
         if (entity.getColor() != null) entity.getColor().cover(entity);
-        if (entity.getTexture() != null) entity.getTexture().cover(entity);
+        if (entity.getTexture() != null) {
+            entity.getTexture().update();
+            entity.getTexture().cover(entity);
+        }
         if (entity.getText() != null) entity.getText().cover(entity);
-    }
-
-    /**
-     * Met à jour une entité graphique
-     * @param entity entité à mettre à jour
-     */
-    public void update(GraphicEntity entity) {
-        if (entity.getTexture() != null) entity.getTexture().update();
     }
 
     /**

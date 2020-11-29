@@ -18,7 +18,7 @@ public class Pacman extends Player {
         this.gameplay = gameplay;
         this.defaultTextureCoords = new int[]{1, 3};
         gameplay.physicsEngine().resize(getPhysicEntity(), 30, 30);
-        gameplay.physicsEngine().setSpeed(getPhysicEntity(), 2);
+        gameplay.physicsEngine().setSpeed(getPhysicEntity(), 3);
         initAnimations(gameplay.getTexturesFile());
     }
 
@@ -27,7 +27,7 @@ public class Pacman extends Player {
      * @param spriteSheetID identifiant du fichier de textures
      */
     private void initAnimations(int spriteSheetID) {
-        int animationsSpeed = 4;
+        int animationsSpeed = 3;
 
         int moveUP = gameplay.graphicsEngine().generateAnimation(spriteSheetID, animationsSpeed, true);
         gameplay.graphicsEngine().addFrameToAnimation(moveUP,1,3);
