@@ -5,9 +5,7 @@ import gameplay.Gameplay;
  */
 public class Main {
     public static void main(String[] args) {
-        //Gameplay
         Gameplay gameplay = new Gameplay();
-
-        gameplay.playLevel(gameplay.getLevels().get(0));
+        gameplay.start();
     }
 }

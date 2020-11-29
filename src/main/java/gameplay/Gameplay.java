@@ -323,154 +323,79 @@ public class Gameplay {
      * @param ghost fantôme
      */
     protected void updateGhostDirection(Ghost ghost) {
-
-
         PhysicEntity playerPhysic = pacman.getPhysicEntity();
         PhysicEntity ghostPhysic = ghost.getPhysicEntity();
 
-
-        int playerXmiddle = (playerPhysic.getX() + playerPhysic.getWidth())/2;
-        int playerYmiddle = (playerPhysic.getY() + playerPhysic.getHeight())/2;
-        int ghostXmiddle = (ghostPhysic.getX() + ghostPhysic.getWidth())/2;
-        int ghostYmiddle = (ghostPhysic.getY() + ghostPhysic.getHeight())/2;
+        int playerXmiddle = (playerPhysic.getX() + playerPhysic.getWidth()) / 2;
+        int playerYmiddle = (playerPhysic.getY() + playerPhysic.getHeight()) / 2;
+        int ghostXmiddle = (ghostPhysic.getX() + ghostPhysic.getWidth()) / 2;
+        int ghostYmiddle = (ghostPhysic.getY() + ghostPhysic.getHeight()) / 2;
         int xDistance = playerXmiddle - ghostXmiddle;
         int yDistance = playerYmiddle - ghostYmiddle;
 
-        MoveDirection direction = null;
-        PhysicEntity entityOnTheWay;
-        PhysicEntity secondEntityOnTheWay;
+        MoveDirection xDirection = xDistance == 0 ? null : xDistance < 0 ? MoveDirection.LEFT : MoveDirection.RIGHT;
+        MoveDirection yDirection = yDistance == 0 ? null : yDistance < 0 ? MoveDirection.UP : MoveDirection.DOWN;
 
-        //inutiles pour l'instant mais peut etre utilisables plus tard pour faire en sorte que le fantome continue au moins jusqu'a la prochaine intersection
-        if (ghost.isKeepDown()){
-            direction = MoveDirection.DOWN;
-            setEntityNextDirection(ghost,direction);
-            return;
+        MoveDirection nextDirection = Math.abs(xDistance) > Math.abs(yDistance) ? xDirection : yDirection;
+
+        boolean somethingUP     = physicsEngine().isSomethingUp(ghost.getPhysicEntity()) != null;
+        boolean somethingRIGHT  = physicsEngine().isSomethingRight(ghost.getPhysicEntity()) != null;
+        boolean somethingDOWN   = physicsEngine().isSomethingDown(ghost.getPhysicEntity()) != null;
+        boolean somethingLEFT   = physicsEngine().isSomethingLeft(ghost.getPhysicEntity()) != null;
+
+        if (yDirection == MoveDirection.UP && ghost.getLastDirection() != MoveDirection.UP && !somethingUP) {
+            ghost.setCurrentDirection(MoveDirection.UP);
+            ghost.setLastDirection(null);
         }
-
-        if (ghost.isKeepUp()){
-            direction = MoveDirection.UP;
-            setEntityNextDirection(ghost,direction);
-            return;
+        else if (yDirection == MoveDirection.DOWN && ghost.getLastDirection() != MoveDirection.DOWN && !somethingDOWN) {
+            ghost.setCurrentDirection(MoveDirection.DOWN);
+            ghost.setLastDirection(null);
         }
-
-        if (ghost.isKeepLeft()){
-            direction = MoveDirection.LEFT;
-            setEntityNextDirection(ghost,direction);
-            return;
+        else if (xDirection == MoveDirection.LEFT && ghost.getLastDirection() != MoveDirection.LEFT && !somethingLEFT) {
+            ghost.setCurrentDirection(MoveDirection.LEFT);
+            ghost.setLastDirection(null);
         }
-
-        if (ghost.isKeepRight()){
-            direction = MoveDirection.RIGHT;
-            setEntityNextDirection(ghost,direction);
-            return;
+        else if (xDirection == MoveDirection.RIGHT && ghost.getLastDirection() != MoveDirection.RIGHT && !somethingRIGHT) {
+            ghost.setCurrentDirection(MoveDirection.RIGHT);
+            ghost.setLastDirection(null);
         }
-
-        //condition finie et commentée pour le up
-        if (Math.abs(xDistance) > Math.abs(yDistance)) {
-            if (xDistance < 0) {
-                entityOnTheWay = physicsEngine().isSomethingLeftInLine(ghostPhysic,Math.abs(xDistance));
-                if (entityOnTheWay != null){
-                    int entityOnTheWayXMiddle = (entityOnTheWay.getX() + entityOnTheWay.getWidth())/2;
-                    int xDistanceWithWall =  entityOnTheWayXMiddle - ghostXmiddle;
-
-                    //a vérifier selon comportement : peut etre a ajouter dans le if (Math.abs(xDistance) > Math.abs(xDistanceWithWall)) &&
-                    if ((Math.abs(xDistanceWithWall) <= (ghostPhysic.getWidth()/2 + entityOnTheWay.getWidth()/2)/2)){ //si la distance entre fantome et pacman est inférieure a la distance entre fantome et mur
-                        if (yDistance < 0) direction = MoveDirection.UP;
-                        else direction = MoveDirection.DOWN;
-                    }
-                    else {
-                        direction = MoveDirection.LEFT;
-                    }
+        else {
+            if (nextDirection == MoveDirection.UP && somethingUP || nextDirection == MoveDirection.DOWN && somethingDOWN) {
+                if (!somethingLEFT) {
+                    ghost.setLastDirection(MoveDirection.RIGHT);
+                    ghost.setCurrentDirection(MoveDirection.LEFT);
+                } else if (!somethingRIGHT) {
+                    ghost.setLastDirection(MoveDirection.LEFT);
+                    ghost.setCurrentDirection(MoveDirection.RIGHT);
+                } else {
+                    if (nextDirection == MoveDirection.UP) ghost.setCurrentDirection(MoveDirection.DOWN);
+                    else ghost.setCurrentDirection(MoveDirection.UP);
+                    ghost.setLastDirection(nextDirection);
                 }
-                else {
-                    direction = MoveDirection.LEFT;
-                }
-            }
-            else {
-                entityOnTheWay = physicsEngine().isSomethingRightInLine(ghostPhysic,Math.abs(xDistance));
-                if (entityOnTheWay != null){
-                    int entityOnTheWayXMiddle = (entityOnTheWay.getX() + entityOnTheWay.getWidth())/2;
-                    int xDistanceWithWall =  entityOnTheWayXMiddle - ghostXmiddle;
-                    if ((Math.abs(xDistanceWithWall) <= (ghostPhysic.getWidth()/2 + entityOnTheWay.getWidth()/2)/2)){ //si la distance entre fantome et pacman est inférieure a la distance entre fantome et mur
-                        if (yDistance <= 0) direction = MoveDirection.UP;
-                        else direction = MoveDirection.DOWN;
-                    }
-                    else {
-                        direction = MoveDirection.RIGHT;
-                    }
-                }
-                else {
-                    direction = MoveDirection.RIGHT;
-                }
-            }
-        } else {
-            //si yDistance < 0 signifie que pacman est au dessus du fantome donc on va globalement vouloir aller en haut
-            if (yDistance <= 0) {
-                //on check si une entité va se retrouver a un moment donné ou a un autre sur le chemin
-                entityOnTheWay = physicsEngine().isSomethingUpInLine(ghostPhysic,Math.abs(yDistance));
-                if (entityOnTheWay != null){
-                    //si oui on fait d'autres vérif
-                    // on enregistre la distance entre le fantome et l'entité
-                    int entityOnTheWayYMiddle = (entityOnTheWay.getY() + entityOnTheWay.getHeight())/2;
-                    int yDistanceWithWall =  entityOnTheWayYMiddle - ghostYmiddle;
-
-                    //on vérifie laquelle des distances entre pacman et le fantome et entre le mur et le fantome est la plus grande
-                    //si le fantome est plus proche du mur que de pacman on entre dans d'autres vérifications
-                    if ((Math.abs(yDistanceWithWall) <= ((ghostPhysic.getHeight()/2 + entityOnTheWay.getHeight()/2)/2))){ //si la distance entre fantome et pacman est inférieure a la distance entre fantome et mur
-                        //si xDistance < 0 signifie que pacman est a gauche du fantome
-                        if (xDistance <= 0){
-                            //on vérifie si il y a encore un mur sur le chemin en allant a gauche (au moins sur la longueur de
-                            // celui qui blogue le passage initialement et si il y en a un pn va donc a droite
-                            secondEntityOnTheWay = physicsEngine().isSomethingLeftInLine(ghostPhysic,Math.abs(entityOnTheWay.getX() + ghostPhysic.getWidth()));
-                            if (secondEntityOnTheWay != null){
-                                direction = MoveDirection.RIGHT;
-                            }
-                            //s'il n'y a pas d'entité on vérifie si on touche le mur de limite
-                            else {
-                                if(entityOnTheWay.getX()- ghostPhysic.getWidth() <= 0){
-                                    //si sur toute la longueur du bloc on va toucher la limite a un moment on va a droite
-                                    //System.out.println("right");
-                                    direction = MoveDirection.RIGHT;
-                                } else {
-                                    direction = MoveDirection.LEFT;
-                                }
-                                //si on a pas décidés d'aller a droite on a gauche
-                            }
-                            //si sur le chemin il n'y a aucun moyen d'aller vers le haut en allant a gauche alors aller a droite
-                        }
-                        else {
-                            //faut tester maitenant quand on est juste en dessous de pacman x distance = 0 et x distance > 0
-                            direction = MoveDirection.RIGHT;
-                        }
-                    }
-                    else {
-                        direction = MoveDirection.UP;
-                    }
-                }
-                //s'il n'y a aucune entité sur le chemin on va droit vers pacman
-                else {
-                    direction = MoveDirection.UP;
-                }
-            }
-            else {
-                entityOnTheWay = physicsEngine().isSomethingDownInLine(ghostPhysic,Math.abs(yDistance));
-                if (entityOnTheWay != null){
-                    int entityOnTheWayYMiddle = (entityOnTheWay.getY() + entityOnTheWay.getHeight())/2;
-                    int yDistanceWithWall =  entityOnTheWayYMiddle - ghostYmiddle;
-                    if ((Math.abs(yDistanceWithWall) <= (ghostPhysic.getHeight()/2 + entityOnTheWay.getHeight()/2)/2)){ //si la distance entre fantome et pacman est inférieure a la distance entre fantome et mur
-                        if (xDistance <= 0) direction = MoveDirection.LEFT;
-                        else direction = MoveDirection.RIGHT;
-                    }
-                    else {
-                        direction = MoveDirection.DOWN;
-                    }
-                }
-                else {
-                    direction = MoveDirection.DOWN;
+            } else if (nextDirection == MoveDirection.LEFT && somethingLEFT || nextDirection == MoveDirection.RIGHT && somethingRIGHT) {
+                if (!somethingUP) {
+                    ghost.setLastDirection(MoveDirection.DOWN);
+                    ghost.setCurrentDirection(MoveDirection.UP);
+                } else if (!somethingDOWN) {
+                    ghost.setLastDirection(MoveDirection.UP);
+                    ghost.setCurrentDirection(MoveDirection.DOWN);
+                } else {
+                    if (nextDirection == MoveDirection.LEFT) ghost.setCurrentDirection(MoveDirection.RIGHT);
+                    else ghost.setCurrentDirection(MoveDirection.LEFT);
+                    ghost.setLastDirection(nextDirection);
                 }
             }
         }
-        setEntityNextDirection(ghost,direction);
+
+        if (Math.abs(xDistance) <= 1 && Math.abs(yDistance) <= 1) {
+            ghost.setLastDirection(null);
+            ghost.setCurrentDirection(null);
+        }
+
+        if (ghost.getCurrentDirection() != null) {
+            callEventFromDirection(ghost, ghost.getCurrentDirection());
+            graphicsEngine().bindAnimation(ghost.getGraphicEntity(), ghost.getAnimations().get(ghost.getCurrentDirection().name()));
+        }
     }
 
     /**
@@ -562,9 +487,8 @@ public class Gameplay {
     public void playLevel(Level level) {
         soundEngine().playSound("gameStart");
         level.spawnPlayer(1,1);
-        level.spawnGhost(ghosts.get("red"),9,5);
+        level.spawnGhost(ghosts.get("red"),7,9);
         graphicsEngine().bindScene(level.getScene());
-        kernelEngine.start();
     }
 
     /**

@@ -159,16 +159,6 @@ public class PhysicsEngine {
         return null;
     }
 
-    public PhysicEntity isSomethingUpInLine(PhysicEntity entity,int loopSize) {
-        for (int i=1;i< loopSize;++i){
-            ArrayList<PhysicEntity> elements = getEntityAtPosition(entity.getX(), entity.getY() - i, entity.getHeight(), entity.getWidth());
-            for (PhysicEntity entity1 : elements)
-                if (entity.getCollisions().contains(entity1))
-                    return entity1;
-        }
-        return null;
-    }
-
     /**
      * Vérifier si une entité est présente à droite
      * @param entity entité
@@ -179,15 +169,6 @@ public class PhysicsEngine {
         for (PhysicEntity entity1 : elements)
             if (entity.getCollisions().contains(entity1))
                 return entity1;
-        return null;
-
-    } public PhysicEntity isSomethingRightInLine(PhysicEntity entity,int loopSize) {
-        for (int i=1;i< loopSize;++i){
-            ArrayList<PhysicEntity> elements = getEntityAtPosition(entity.getX() + i, entity.getY(), entity.getHeight(), entity.getWidth());
-            for (PhysicEntity entity1 : elements)
-                if (entity.getCollisions().contains(entity1))
-                    return entity1;
-        }
         return null;
     }
 
@@ -204,16 +185,6 @@ public class PhysicsEngine {
         return null;
     }
 
-    public PhysicEntity isSomethingDownInLine(PhysicEntity entity,int loopSize) {
-        for (int i=1;i< loopSize;++i){
-            ArrayList<PhysicEntity> elements = getEntityAtPosition(entity.getX(), entity.getY() + i, entity.getHeight(), entity.getWidth());
-            for (PhysicEntity entity1 : elements)
-                if (entity.getCollisions().contains(entity1))
-                    return entity1;
-        }
-        return null;
-    }
-
     /**
      * Vérifier si une entité est présente à gauche
      * @param entity entité
@@ -224,16 +195,6 @@ public class PhysicsEngine {
         for (PhysicEntity entity1 : elements)
             if (entity.getCollisions().contains(entity1))
                 return entity1;
-        return null;
-    }
-
-    public PhysicEntity isSomethingLeftInLine(PhysicEntity entity,int loopSize) {
-        for (int i=1;i< loopSize;++i){
-            ArrayList<PhysicEntity> elements = getEntityAtPosition(entity.getX() - i, entity.getY(), entity.getHeight(), entity.getWidth());
-            for (PhysicEntity entity1 : elements)
-                if (entity.getCollisions().contains(entity1))
-                    return entity1;
-        }
         return null;
     }
 

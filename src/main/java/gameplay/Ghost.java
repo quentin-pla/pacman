@@ -9,21 +9,20 @@ public class Ghost extends Player {
      */
     private Gameplay gameplay;
 
+    private Gameplay.MoveDirection lastDirection;
+
     /**
      * Constructeur
      * @param gameplay gameplay
      */
-    private boolean keepUp = false;
-    private boolean keepDown= false;
-    private boolean keepLeft= false;
-    private boolean keepRight= false;
-
     public Ghost(Gameplay gameplay) {
         super(gameplay.kernelEngine());
         this.gameplay = gameplay;
         this.defaultTextureCoords = new int[]{3, 1};
         gameplay.physicsEngine().resize(getPhysicEntity(), 30, 30);
-        gameplay.physicsEngine().setSpeed(getPhysicEntity(), 1);
+        gameplay.physicsEngine().setSpeed(getPhysicEntity(), 2);
+        gameplay.graphicsEngine().bindTexture(getGraphicEntity(),
+                gameplay.getTexturesFile(), defaultTextureCoords[0], defaultTextureCoords[1]);
         initAnimations(gameplay.getTexturesFile());
     }
 
@@ -55,23 +54,11 @@ public class Ghost extends Player {
         animations.put(Gameplay.MoveDirection.LEFT.name(), moveLEFT);
     }
 
-    public boolean isKeepDown() {
-        return keepDown;
+    public Gameplay.MoveDirection getLastDirection() {
+        return lastDirection;
     }
 
-    public boolean isKeepLeft() {
-        return keepLeft;
-    }
-
-    public boolean isKeepRight() {
-        return keepRight;
-    }
-
-    public boolean isKeepUp() {
-        return keepUp;
-    }
-
-    public void setKeepUp(boolean keep){
-        keepUp = keep;
+    public void setLastDirection(Gameplay.MoveDirection lastDirection) {
+        this.lastDirection = lastDirection;
     }
 }
