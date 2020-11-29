@@ -62,7 +62,7 @@ public class Gameplay {
      */
     public Gameplay() {
         this.kernelEngine = new KernelEngine();
-        this.textures = kernelEngine.getGraphicsEngine().loadSpriteSheet("assets/sprite_sheet.png", 11, 11);
+        this.textures = kernelEngine.getGraphicsEngine().loadSpriteSheet("assets/sprite_sheet.png", 12, 11);
         this.levels = new ArrayList<>();
         this.pacman = new Pacman(this);
         this.ghosts = new HashMap<>();
@@ -77,10 +77,13 @@ public class Gameplay {
         //Activation des entrées / sorties
         ioEngine().enableKeyboardIO();
         ioEngine().enableMouseIO();
-
+        //Initialiser les évènements
         initEvents();
+        //Initialiser les sons
         initSounds();
+        //Initialiser le menu
         initMenu();
+        //Initialiser le niveau par défaut
         initDefaultLevel();
     }
 
@@ -314,6 +317,8 @@ public class Gameplay {
         defaultLevel.addWall(18,14);
         defaultLevel.addWall(18,15);
         defaultLevel.addWall(18,16);
+
+        defaultLevel.applyWallTextures();
 
         levels.add(defaultLevel);
     }

@@ -3,6 +3,8 @@ package gameplay;
 import engines.graphics.Scene;
 import engines.kernel.Entity;
 
+import java.util.Arrays;
+
 /**
  * Niveau de jeu
  */
@@ -21,6 +23,8 @@ public class Level {
      * Matrice d'entités graphiques
      */
     private Entity[][] matrix;
+
+    private boolean[][] walls;
 
     /**
      * Nombre de boules
@@ -45,6 +49,9 @@ public class Level {
     protected Level(Gameplay gameplay, int rows, int cols) {
         this.gameplay = gameplay;
         this.matrix = new Entity[rows][cols];
+        this.walls = new boolean[rows][cols];
+        for (int i = 0; i < rows; i++)
+            Arrays.fill(walls[i],false);
         this.scene = gameplay.graphicsEngine().generateScene(rows * 30,cols * 30);
         fillMatrix();
     }
@@ -98,10 +105,10 @@ public class Level {
      */
     public void addWall(int row, int col) {
         Entity wall = matrix[row][col];
-        gameplay.graphicsEngine().bindColor(wall.getGraphicEntity(),0,0,255);
         gameplay.physicsEngine().addCollisions(gameplay.getPlayer().getPhysicEntity(), wall.getPhysicEntity());
         for (Ghost ghost : gameplay.getGhosts().values())
             gameplay.physicsEngine().addCollisions(ghost.getPhysicEntity(), wall.getPhysicEntity());
+        walls[row][col] = true;
     }
 
     /**
@@ -118,6 +125,56 @@ public class Level {
         });
         gameplay.physicsEngine().bindEventOnSameLocation(gameplay.getPlayer().getPhysicEntity(), ball.getPhysicEntity(), "eraseBall" + balls);
         ++balls;
+    }
+
+    /**
+     * Appliquer la texture de chaque mur
+     */
+    public void applyWallTextures() {
+        for (int row = 0; row < matrix.length; row++) {
+            for (int col = 0; col < matrix[row].length; col++) {
+                if (walls[row][col]) {
+                    Entity wall = matrix[row][col];
+                    boolean isWallUp = row > 0 && walls[row - 1][col];
+                    boolean isWallRight = col < walls[0].length - 1 && walls[row][col + 1];
+                    boolean isWallDown = row < walls.length - 1 && walls[row + 1][col];
+                    boolean isWallLeft = col > 0 && walls[row][col - 1];
+                    if (isWallUp && isWallRight && isWallDown && isWallLeft) {
+                        gameplay.graphicsEngine().bindTexture(wall.getGraphicEntity(), gameplay.getTexturesFile(), 12, 5);
+                    } else if (isWallUp && isWallRight && isWallDown) {
+                        gameplay.graphicsEngine().bindTexture(wall.getGraphicEntity(), gameplay.getTexturesFile(), 12, 6);
+                    } else if (isWallRight && isWallDown && isWallLeft) {
+                        gameplay.graphicsEngine().bindTexture(wall.getGraphicEntity(), gameplay.getTexturesFile(), 12, 7);
+                    } else if (isWallDown && isWallLeft && isWallUp) {
+                        gameplay.graphicsEngine().bindTexture(wall.getGraphicEntity(), gameplay.getTexturesFile(), 12, 8);
+                    } else if (isWallLeft && isWallUp && isWallRight) {
+                        gameplay.graphicsEngine().bindTexture(wall.getGraphicEntity(), gameplay.getTexturesFile(), 12, 9);
+                    } else if (isWallUp && isWallRight) {
+                        gameplay.graphicsEngine().bindTexture(wall.getGraphicEntity(), gameplay.getTexturesFile(), 11, 8);
+                    } else if (isWallRight && isWallDown) {
+                        gameplay.graphicsEngine().bindTexture(wall.getGraphicEntity(), gameplay.getTexturesFile(), 11, 10);
+                    } else if (isWallDown && isWallLeft) {
+                        gameplay.graphicsEngine().bindTexture(wall.getGraphicEntity(), gameplay.getTexturesFile(), 11, 11);
+                    } else if (isWallLeft && isWallUp) {
+                        gameplay.graphicsEngine().bindTexture(wall.getGraphicEntity(), gameplay.getTexturesFile(), 11, 9);
+                    } else if (isWallUp && isWallDown) {
+                        gameplay.graphicsEngine().bindTexture(wall.getGraphicEntity(), gameplay.getTexturesFile(), 12, 11);
+                    } else if (isWallLeft && isWallRight) {
+                        gameplay.graphicsEngine().bindTexture(wall.getGraphicEntity(), gameplay.getTexturesFile(), 12, 10);
+                    } else if (isWallUp) {
+                        gameplay.graphicsEngine().bindTexture(wall.getGraphicEntity(), gameplay.getTexturesFile(), 12, 4);
+                    } else if (isWallRight) {
+                        gameplay.graphicsEngine().bindTexture(wall.getGraphicEntity(), gameplay.getTexturesFile(), 12, 1);
+                    } else if (isWallDown) {
+                        gameplay.graphicsEngine().bindTexture(wall.getGraphicEntity(), gameplay.getTexturesFile(), 12, 2);
+                    } else if (isWallLeft) {
+                        gameplay.graphicsEngine().bindTexture(wall.getGraphicEntity(), gameplay.getTexturesFile(), 12, 3);
+                    } else {
+                        gameplay.graphicsEngine().bindTexture(wall.getGraphicEntity(), gameplay.getTexturesFile(), 11, 7);
+                    }
+                }
+            }
+        }
     }
 
     // GETTERS //
