@@ -135,6 +135,17 @@ public class Level {
     }
 
     /**
+     * Ajouter la barrière pour les fantomes
+     * @param row ligne
+     * @param col colonne
+     */
+    public void addFence(int row, int col) {
+        Entity fence = matrix[row][col];
+        gameplay.physicsEngine().addCollisions(gameplay.getPlayer().getPhysicEntity(), fence.getPhysicEntity());
+        gameplay.graphicsEngine().bindTexture(fence,gameplay.getTexturesFile(),11,6);
+    }
+
+    /**
      * Ajouter une boule
      * @param row ligne
      * @param col colonne

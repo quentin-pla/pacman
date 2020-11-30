@@ -173,218 +173,65 @@ public class Gameplay {
         Level defaultLevel = generateLevel(21,19);
 
         //Génération des murs
-        for (int j = 0; j < 19; j++) {
-            defaultLevel.addWall(0,j);
-            defaultLevel.addBall(1,j);
-        }
-        for (int j = 0; j < 19; j++) {
-            defaultLevel.addWall(20, j);
-            defaultLevel.addBall(19,j);
-        }
+        Map<Integer,int[]> wallRows = new HashMap<>();
 
-        for (int i = 0; i < 6; i++) {
-            defaultLevel.addWall(i, 0);
-            defaultLevel.addBall(i,1);
-        }
+        wallRows.put(0, new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18});
+        wallRows.put(1, new int[]{0, 9, 18});
+        wallRows.put(2, new int[]{0, 2, 3, 5, 6, 7, 9, 11, 12, 13, 15, 16, 18});
+        wallRows.put(3, new int[]{0, 18});
+        wallRows.put(4, new int[]{0, 2, 3, 5, 7, 8, 9, 10, 11, 13, 15, 16, 18});
+        wallRows.put(5, new int[]{0, 5, 9, 13, 18});
+        wallRows.put(6, new int[]{0, 1, 2, 3, 5, 6, 7, 9, 11, 12, 13, 15, 16, 17, 18});
+        wallRows.put(7, new int[]{3, 5, 13, 15});
+        wallRows.put(8, new int[]{0, 1, 2, 3, 5, 7, 8, 10, 11, 13, 15, 16, 17, 18});
+        wallRows.put(9, new int[]{7, 11});
+        wallRows.put(10, new int[]{0, 1, 2, 3, 5, 7, 8, 9, 10, 11, 13, 15, 16, 17, 18});
+        wallRows.put(11, new int[]{3, 5, 13, 15});
+        wallRows.put(12, new int[]{0, 1, 2, 3, 5, 7, 8, 9, 10, 11, 13, 15, 16, 17, 18});
+        wallRows.put(13, new int[]{0, 9, 18});
+        wallRows.put(14, new int[]{0, 2, 3, 5, 6, 7, 9, 11, 12, 13, 15, 16, 18});
+        wallRows.put(15, new int[]{0, 3, 15, 18});
+        wallRows.put(16, new int[]{0, 1, 3, 5, 7, 8, 9, 10, 11, 13, 15, 17, 18});
+        wallRows.put(17, new int[]{0, 5, 9, 13, 18});
+        wallRows.put(18, new int[]{0, 2, 3, 4, 5, 6, 7, 9, 11, 12, 13, 14, 15, 16, 18});
+        wallRows.put(19, new int[]{0, 18});
+        wallRows.put(20, new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18});
 
-        defaultLevel.addWall(8,0);
-        defaultLevel.addWall(10,0);
+        for (Map.Entry<Integer,int[]> row : wallRows.entrySet())
+            for (int col : row.getValue())
+                defaultLevel.addWall(row.getKey(),col);
 
-        for (int i = 12; i < 20; i++) {
-            defaultLevel.addWall(i, 0);
-            defaultLevel.addBall(i,1);
-        }
-
-        for (int i = 0; i < 6; i++) {
-            defaultLevel.addWall(i, 18);
-            defaultLevel.addBall(i,17);
-        }
-        defaultLevel.addWall(8,18);
-        defaultLevel.addWall(10,18);
-
-        for (int i = 12; i < 20; i++) {
-            defaultLevel.addWall(i, 18);
-            defaultLevel.addBall(i,17);
-        }
-
-        defaultLevel.addWall(1,9);
-
-
-
-        defaultLevel.addWall(2,2);
-        defaultLevel.addWall(2,3);
-        defaultLevel.addBall(2,4);
-        defaultLevel.addWall(2,5);
-        defaultLevel.addWall(2,6);
-        defaultLevel.addWall(2,7);
-        defaultLevel.addBall(2,8);
-        defaultLevel.addWall(2,9);
-        defaultLevel.addBall(2,10);
-        defaultLevel.addWall(2,11);
-        defaultLevel.addWall(2,12);
-        defaultLevel.addWall(2,13);
-        defaultLevel.addWall(2,15);
-        defaultLevel.addWall(2,16);
-
-
-
-
-        defaultLevel.addWall(4,2);
-        defaultLevel.addWall(4,3);
-        defaultLevel.addWall(4,5);
-        defaultLevel.addWall(4,7);
-        defaultLevel.addWall(4,8);
-        defaultLevel.addWall(4,9);
-        defaultLevel.addWall(4,10);
-        defaultLevel.addWall(4,11);
-        defaultLevel.addWall(4,13);
-        defaultLevel.addWall(4,15);
-        defaultLevel.addWall(4,16);
-
-        defaultLevel.addWall(5,5);
-        defaultLevel.addWall(5,9);
-        defaultLevel.addWall(5,13);
-
-        defaultLevel.addWall(6,0);
-        defaultLevel.addWall(6,1);
-        defaultLevel.addWall(6,2);
-        defaultLevel.addWall(6,3);
-        defaultLevel.addWall(6,5);
-        defaultLevel.addWall(6,6);
-        defaultLevel.addWall(6,7);
-        defaultLevel.addWall(6,9);
-        defaultLevel.addWall(6,11);
-        defaultLevel.addWall(6,12);
-        defaultLevel.addWall(6,13);
-        defaultLevel.addWall(6,15);
-        defaultLevel.addWall(6,16);
-        defaultLevel.addWall(6,17);
-        defaultLevel.addWall(6,18);
-
-        defaultLevel.addWall(7,3);
-        defaultLevel.addWall(7,5);
-        defaultLevel.addWall(7,13);
-        defaultLevel.addWall(7,15);
-
-        defaultLevel.addWall(8,1);
-        defaultLevel.addWall(8,2);
-        defaultLevel.addWall(8,3);
-        defaultLevel.addWall(8,5);
-        defaultLevel.addWall(8,7);
-        defaultLevel.addWall(8,8);
-        defaultLevel.addWall(8,9);
-        defaultLevel.addWall(8,10);
-        defaultLevel.addWall(8,11);
-        defaultLevel.addWall(8,13);
-        defaultLevel.addWall(8,15);
-        defaultLevel.addWall(8,16);
-        defaultLevel.addWall(8,17);
-
-        defaultLevel.addWall(9,7);
-        for (int i = 4; i < 7; i++) defaultLevel.addBall(9,i);
-        defaultLevel.addWall(9,11);
-        for (int i = 12; i < 15; i++) defaultLevel.addBall(9,i);
-
-        defaultLevel.addWall(10,1);
-        defaultLevel.addWall(10,2);
-        defaultLevel.addWall(10,3);
-        defaultLevel.addWall(10,5);
-        defaultLevel.addWall(10,7);
-        defaultLevel.addWall(10,8);
-        //defaultLevel.addWall(10,9);
-        defaultLevel.addWall(10,10);
-        defaultLevel.addWall(10,11);
-        defaultLevel.addWall(10,13);
-        defaultLevel.addWall(10,15);
-        defaultLevel.addWall(10,16);
-        defaultLevel.addWall(10,17);
-
-        defaultLevel.addBall(10,4);
-        defaultLevel.addBall(10,6);
-        defaultLevel.addBall(10,12);
-        defaultLevel.addBall(10,14);
-
-        defaultLevel.addWall(11,3);
-        defaultLevel.addWall(11,5);
-        defaultLevel.addWall(11,13);
-        defaultLevel.addWall(11,15);
-
-        defaultLevel.addWall(12,1);
-        defaultLevel.addWall(12,2);
-        defaultLevel.addWall(12,3);
-        defaultLevel.addWall(12,5);
-        defaultLevel.addWall(12,7);
-        defaultLevel.addWall(12,8);
-        defaultLevel.addWall(12,9);
-        defaultLevel.addWall(12,10);
-        defaultLevel.addWall(12,11);
-        defaultLevel.addWall(12,13);
-        defaultLevel.addWall(12,15);
-        defaultLevel.addWall(12,16);
-        defaultLevel.addWall(12,17);
-
-        defaultLevel.addWall(13,9);
-
-        defaultLevel.addWall(14,2);
-        defaultLevel.addWall(14,3);
-        defaultLevel.addWall(14,5);
-        defaultLevel.addWall(14,6);
-        defaultLevel.addWall(14,7);
-        defaultLevel.addWall(14,9);
-        defaultLevel.addWall(14,11);
-        defaultLevel.addWall(14,12);
-        defaultLevel.addWall(14,13);
-        defaultLevel.addWall(14,15);
-        defaultLevel.addWall(14,16);
-
-        defaultLevel.addWall(15,3);
-        for (int i = 2; i < 9; i++) defaultLevel.addBall(15, i);
-        for (int i = 10; i < 17; i++) defaultLevel.addBall(15, i);
-        defaultLevel.addWall(15,15);
-
-        defaultLevel.addWall(16,1);
-        defaultLevel.addWall(16,3);
-        defaultLevel.addWall(16,5);
-        defaultLevel.addWall(16,7);
-        defaultLevel.addWall(16,8);
-        defaultLevel.addWall(16,9);
-        defaultLevel.addWall(16,10);
-        defaultLevel.addWall(16,11);
-        defaultLevel.addWall(16,13);
-        defaultLevel.addWall(16,15);
-        defaultLevel.addWall(16,17);
-
-        defaultLevel.addWall(17,5);
-        defaultLevel.addWall(17,9);
-        defaultLevel.addWall(17,13);
-
-        defaultLevel.addWall(18,2);
-        defaultLevel.addWall(18,3);
-        defaultLevel.addWall(18,4);
-        defaultLevel.addWall(18,5);
-        defaultLevel.addWall(18,6);
-        defaultLevel.addWall(18,7);
-        defaultLevel.addWall(18,9);
-        defaultLevel.addWall(18,11);
-        defaultLevel.addWall(18,12);
-        defaultLevel.addWall(18,13);
-        defaultLevel.addWall(18,14);
-        defaultLevel.addWall(18,15);
-        defaultLevel.addWall(18,16);
-
-        int[] row1 = {1, 2, 3,4,5,6,8,12,13,14,16,17,18,19};
-
-        for (int i = 0; i < row1.length-1; i++) {
-            for (int j = 1; j < 18; j++) {
-                defaultLevel.addBall(row1[i], j);
-            }
-        }
-
-        for (int j = 4; j < 15; j++) {
-            defaultLevel.addBall(7, j);
-            defaultLevel.addBall(11, j);
-        }
         defaultLevel.applyWallTextures();
+
+        //Génération des balles
+        Map<Integer,int[]> ballRows = new HashMap<>();
+
+        ballRows.put(1, new int[]{1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17});
+        ballRows.put(2, new int[]{1, 4, 8, 10, 14, 17});
+        ballRows.put(3, new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17});
+        ballRows.put(4, new int[]{1, 4, 6, 12, 14, 17});
+        ballRows.put(5, new int[]{1, 2, 3, 4, 6, 7, 8, 10, 11, 12, 14, 15, 16, 17});
+        ballRows.put(6, new int[]{4, 8, 10, 14});
+        ballRows.put(7, new int[]{4, 6, 7, 8, 9, 10, 11, 12, 14});
+        ballRows.put(8, new int[]{4, 6, 12, 14});
+        ballRows.put(9, new int[]{4, 5, 6, 12, 13, 14});
+        ballRows.put(10, new int[]{4, 6, 12, 14});
+        ballRows.put(11, new int[]{4, 6, 7, 8, 9, 10, 11, 12, 14});
+        ballRows.put(12, new int[]{4, 6, 12, 14});
+        ballRows.put(13, new int[]{1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17});
+        ballRows.put(14, new int[]{1, 4, 8, 10, 14, 17});
+        ballRows.put(15, new int[]{1, 2, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 16, 17});
+        ballRows.put(16, new int[]{2, 4, 6, 12, 14, 16});
+        ballRows.put(17, new int[]{1, 2, 3, 4, 6, 7, 8, 10, 11, 12, 14, 15, 16, 17});
+        ballRows.put(18, new int[]{1, 8, 10, 17});
+        ballRows.put(19, new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17});
+
+        for (Map.Entry<Integer,int[]> row : ballRows.entrySet())
+            for (int col : row.getValue())
+                defaultLevel.addBall(row.getKey(),col);
+
+        //Ajout de la barrière
+        defaultLevel.addFence(8, 9);
 
         levels.add(defaultLevel);
     }
