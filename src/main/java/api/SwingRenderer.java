@@ -84,12 +84,14 @@ public class SwingRenderer {
      * @param height hauteur
      * @param width largeur
      */
-    public void renderText(String text, Color color, int fontSize, int x, int y, int height, int width) {
+    public void renderText(String text, Color color, int fontSize, boolean center, int x, int y, int height, int width) {
         Graphics2D graphics2D = (Graphics2D) getCurrentGraphics().create();
         graphics2D.setFont(new Font("Arial", Font.PLAIN, fontSize));
-        FontMetrics metrics = graphics2D.getFontMetrics();
-        x = x + (width - metrics.stringWidth(text)) / 2;
-        y = y + ((height - metrics.getHeight()) / 2) + metrics.getAscent();
+        if (center) {
+            FontMetrics metrics = graphics2D.getFontMetrics();
+            x = x + (width - metrics.stringWidth(text)) / 2;
+            y = y + ((height - metrics.getHeight()) / 2) + metrics.getAscent();
+        }
         graphics2D.setColor(color);
         graphics2D.drawString(text, x, y);
         graphics2D.dispose();

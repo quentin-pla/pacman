@@ -106,8 +106,8 @@ public class Gameplay {
         kernelEngine.addEvent("pacmanGoLeft", () -> switchPacmanDirection(MoveDirection.LEFT));
         //Attacher la texture par défaut au joueur
         kernelEngine.addEvent("pacmanBindDefaultTexture", () ->
-                graphicsEngine().bindTexture(pacman.getGraphicEntity(),
-                        textures, pacman.getDefaultTextureCoords()[0], pacman.getDefaultTextureCoords()[1]));
+                graphicsEngine().bindTexture(pacman, textures,
+                        pacman.getDefaultTextureCoords()[0], pacman.getDefaultTextureCoords()[1]));
         //Lorsqu'il y a une collision
         kernelEngine.addEvent("pacmanOnCollision", () -> {
             if (pacman.getCurrentAnimationID() != 0)
@@ -125,8 +125,8 @@ public class Gameplay {
         ioEngine().bindEventOnLastKey(KeyEvent.VK_LEFT, "pacmanGoLeft");
         ioEngine().bindEventKeyboardFree("pacmanBindDefaultTexture");
         physicsEngine().bindEventOnCollision(pacman.getPhysicEntity(), "pacmanOnCollision");
-        aiEngine().bindEvent(ghosts.get("red").getAiEntity(), "moveRedGhost");
-        aiEngine().bindEvent(ghosts.get("blue").getAiEntity(), "moveBlueGhost");
+        aiEngine().bindEvent(ghosts.get("red"), "moveRedGhost");
+        aiEngine().bindEvent(ghosts.get("blue"), "moveBlueGhost");
     }
 
     /**
@@ -143,18 +143,18 @@ public class Gameplay {
     private void initMenu() {
         menuView = graphicsEngine().generateScene(400,400);
         Entity button = kernelEngine.generateEntity();
-        physicsEngine().resize(button.getPhysicEntity(),100,50);
+        physicsEngine().resize(button,100,50);
         physicsEngine().move(button.getPhysicEntity(), 150,240);
-        graphicsEngine().bindColor(button.getGraphicEntity(),50,50,50);
-        graphicsEngine().bindText(button.getGraphicEntity(), "PLAY", new Color(255,255,255), 20);
-        graphicsEngine().addToScene(menuView, button.getGraphicEntity());
+        graphicsEngine().bindColor(button,50,50,50);
+        graphicsEngine().bindText(button, "PLAY", new Color(255,255,255), 20, true);
+        graphicsEngine().addToScene(menuView, button);
         ioEngine().bindEventOnClick(button,"playLevel");
         Entity menuLogo = kernelEngine.generateEntity();
         int logoTexture = kernelEngine.getGraphicsEngine().loadTexture("assets/menu_logo.png");
-        physicsEngine().resize(menuLogo.getPhysicEntity(),300,71);
+        physicsEngine().resize(menuLogo,300,71);
         physicsEngine().move(menuLogo.getPhysicEntity(), 50,120);
-        graphicsEngine().bindTexture(menuLogo.getGraphicEntity(),logoTexture);
-        graphicsEngine().addToScene(menuView, menuLogo.getGraphicEntity());
+        graphicsEngine().bindTexture(menuLogo,logoTexture);
+        graphicsEngine().addToScene(menuView, menuLogo);
     }
 
     /**
@@ -469,7 +469,7 @@ public class Gameplay {
 
         if (ghost.getCurrentDirection() != null) {
             callEventFromDirection(ghost, ghost.getCurrentDirection());
-            graphicsEngine().bindAnimation(ghost.getGraphicEntity(), ghost.getAnimations().get(ghost.getCurrentDirection().name()));
+            graphicsEngine().bindAnimation(ghost, ghost.getAnimations().get(ghost.getCurrentDirection().name()));
         }
     }
 
@@ -516,7 +516,7 @@ public class Gameplay {
         }
         if (entity.getCurrentDirection() != null) {
             callEventFromDirection(entity, entity.getCurrentDirection());
-            graphicsEngine().bindAnimation(entity.getGraphicEntity(), entity.getAnimations().get(entity.getCurrentDirection().name()));
+            graphicsEngine().bindAnimation(entity, entity.getAnimations().get(entity.getCurrentDirection().name()));
         }
     }
 
