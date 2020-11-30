@@ -25,6 +25,9 @@ public class Level {
      */
     private Entity[][] matrix;
 
+    /**
+     * Liste des murs du niveau
+     */
     private boolean[][] walls;
 
     /**
@@ -48,6 +51,15 @@ public class Level {
     private Entity scoreLabel;
 
     /**
+     * Nombre de vies
+     */
+    private int livesCount = 2;
+
+    /**
+     * Entités vies
+     */
+    private Entity[] livesEntity;
+    /**
      * Constructeur surchargé
      * @param rows nombre de lignes
      * @param cols nombre de colonnes
@@ -60,6 +72,7 @@ public class Level {
         this.scene = gameplay.graphicsEngine().generateScene(rows * 30 + 30,cols * 30);
         fillMatrix();
         initScore();
+        initLives();
     }
 
     /**
@@ -131,7 +144,7 @@ public class Level {
         gameplay.graphicsEngine().bindTexture(ball,gameplay.getTexturesFile(),10,2);
         gameplay.kernelEngine().addEvent("eraseBall" + balls,() -> {
             gameplay.kernelEngine().removeEntity(ball);
-            gameplay.soundEngine().playSound("munch");
+            gameplay.soundEngine().playSound(gameplay.getPlayer().getMunchSound());
             updateActualScore(actualScore + 10);
         });
         gameplay.physicsEngine().bindEventOnSameLocation(gameplay.getPlayer().getPhysicEntity(), ball.getPhysicEntity(), "eraseBall" + balls);
@@ -207,6 +220,35 @@ public class Level {
         gameplay.physicsEngine().resize(scoreLabel, 200, 50);
         gameplay.graphicsEngine().addToScene(scene,scoreLabel);
         updateActualScore(actualScore);
+    }
+
+    /**
+     * Initialiser les vies
+     */
+    public void initLives() {
+        Entity life = gameplay.kernelEngine().generateEntity();
+        gameplay.physicsEngine().resize(life,20,20);
+        gameplay.physicsEngine().move(life.getPhysicEntity(), scene.getWidth()-110,scene.getHeight()-28);
+        gameplay.graphicsEngine().bindTexture(life,
+        gameplay.getTexturesFile(),1 , 1);
+
+        Entity life2 = gameplay.kernelEngine().generateEntity();
+        gameplay.physicsEngine().resize(life2,20,20);
+        gameplay.physicsEngine().move(life2.getPhysicEntity(),scene.getWidth()-70,scene.getHeight()-28);
+        gameplay.graphicsEngine().bindTexture(life2,
+        gameplay.getTexturesFile(),1 , 1);
+
+        Entity life3 = gameplay.kernelEngine().generateEntity();
+        gameplay.physicsEngine().resize(life3,20,20);
+        gameplay.physicsEngine().move(life3.getPhysicEntity(),scene.getWidth()-30,scene.getHeight()-28);
+        gameplay.graphicsEngine().bindTexture(life3,
+        gameplay.getTexturesFile(),1 , 1);
+
+        gameplay.graphicsEngine().addToScene(scene, life);
+        gameplay.graphicsEngine().addToScene(scene, life2);
+        gameplay.graphicsEngine().addToScene(scene, life3);
+
+        livesEntity = new Entity[] {life, life2, life3};
     }
 
     // GETTERS //

@@ -9,6 +9,11 @@ import java.util.ArrayList;
  */
 public class KeyboardIO implements KeyListener {
     /**
+     * Moteur entrées / sorties
+     */
+    private final IOEngine ioEngine;
+
+    /**
      * Touches préssées
      */
     private final ArrayList<Integer> pressed_keys = new ArrayList<>();
@@ -21,7 +26,9 @@ public class KeyboardIO implements KeyListener {
     /**
      * Constructeur
      */
-    protected KeyboardIO() {}
+    protected KeyboardIO(IOEngine ioEngine) {
+        this.ioEngine = ioEngine;
+    }
 
     @Override
     public void keyTyped(KeyEvent e) {}
@@ -29,7 +36,7 @@ public class KeyboardIO implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
-        if (!pressed_keys.contains(key)) {
+        if (!pressed_keys.contains(key) && ioEngine.isKeyBindedToEvent(key)) {
             pressed_keys.add(key);
             last_pressed_key = key;
         }

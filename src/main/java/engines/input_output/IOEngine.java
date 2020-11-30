@@ -20,12 +20,12 @@ public class IOEngine extends SwingAPI {
     /**
      * Écouteur actions utilisateur clavier
      */
-    private final KeyboardIO keyboardIO = new KeyboardIO();
+    private final KeyboardIO keyboardIO = new KeyboardIO(this);
 
     /**
      * Écouteur actions utilisateur souris
      */
-    private final MouseIO mouseIO = new MouseIO();
+    private final MouseIO mouseIO = new MouseIO(this);
 
     /**
      * Constructeur
@@ -82,6 +82,20 @@ public class IOEngine extends SwingAPI {
      */
     public void disableKeyboardIO() {
         SwingAPI.getListenerMethods().removeKeyListener(keyboardIO);
+    }
+
+    /**
+     * Vérifier si une touche est associée à un évènement
+     * @param keyCode touche
+     */
+    protected boolean isKeyBindedToEvent(int keyCode) {
+        for (Integer code : bindedEvents.keySet())
+            if (code == keyCode)
+                return true;
+        for (Integer code : bindedEventsOnLastKey.keySet())
+            if (code == keyCode)
+                return true;
+        return false;
     }
 
     /**

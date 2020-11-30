@@ -104,10 +104,6 @@ public class Gameplay {
         kernelEngine.addEvent("pacmanGoDown", () -> switchPacmanDirection(MoveDirection.DOWN));
         //Se déplacer vers la gauche
         kernelEngine.addEvent("pacmanGoLeft", () -> switchPacmanDirection(MoveDirection.LEFT));
-        //Attacher la texture par défaut au joueur
-        kernelEngine.addEvent("pacmanBindDefaultTexture", () ->
-                graphicsEngine().bindTexture(pacman, textures,
-                        pacman.getDefaultTextureCoords()[0], pacman.getDefaultTextureCoords()[1]));
         //Lorsqu'il y a une collision
         kernelEngine.addEvent("pacmanOnCollision", () -> {
             if (pacman.getCurrentAnimationID() != 0)
@@ -123,7 +119,6 @@ public class Gameplay {
         ioEngine().bindEventOnLastKey(KeyEvent.VK_RIGHT, "pacmanGoRight");
         ioEngine().bindEventOnLastKey(KeyEvent.VK_DOWN, "pacmanGoDown");
         ioEngine().bindEventOnLastKey(KeyEvent.VK_LEFT, "pacmanGoLeft");
-        ioEngine().bindEventKeyboardFree("pacmanBindDefaultTexture");
         physicsEngine().bindEventOnCollision(pacman.getPhysicEntity(), "pacmanOnCollision");
         aiEngine().bindEvent(ghosts.get("red"), "moveRedGhost");
         aiEngine().bindEvent(ghosts.get("blue"), "moveBlueGhost");
@@ -133,7 +128,8 @@ public class Gameplay {
      * Initialiser les sons du jeu
      */
     private void initSounds() {
-        soundEngine().loadSound("munch.wav","munch");
+        soundEngine().loadSound("munch_1.wav","munch1");
+        soundEngine().loadSound("munch_2.wav","munch2");
         soundEngine().loadSound("game_start.wav","gameStart");
     }
 

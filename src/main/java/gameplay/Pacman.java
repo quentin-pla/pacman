@@ -10,6 +10,11 @@ public class Pacman extends Player {
     private Gameplay gameplay;
 
     /**
+     * Son joué lorsqu'une boule est mangée
+     */
+    private String munchSound;
+
+    /**
      * Constructeur
      * @param gameplay gameplay
      */
@@ -17,8 +22,11 @@ public class Pacman extends Player {
         super(gameplay.kernelEngine());
         this.gameplay = gameplay;
         this.defaultTextureCoords = new int[]{1, 3};
+        this.munchSound = "munch1";
         gameplay.physicsEngine().resize(this, 30, 30);
         gameplay.physicsEngine().setSpeed(this, 3);
+        gameplay.graphicsEngine().bindTexture(this,gameplay.getTexturesFile(),
+                defaultTextureCoords[0],defaultTextureCoords[1]);
         initAnimations(gameplay.getTexturesFile());
     }
 
@@ -52,5 +60,12 @@ public class Pacman extends Player {
         gameplay.graphicsEngine().addFrameToAnimation(moveLEFT,1,4);
         gameplay.graphicsEngine().addFrameToAnimation(moveLEFT,1,5);
         animations.put(Gameplay.MoveDirection.LEFT.name(), moveLEFT);
+    }
+
+    // GETTERS //
+
+    public String getMunchSound() {
+        munchSound = munchSound.equals("munch1") ? "munch2" : "munch1";
+        return munchSound;
     }
 }
