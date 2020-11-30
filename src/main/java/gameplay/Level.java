@@ -47,6 +47,10 @@ public class Level {
      */
     private Entity scoreLabel;
 
+
+    private int livesCount = 2;
+
+    private Entity[] livesEntity;
     /**
      * Constructeur surchargé
      * @param rows nombre de lignes
@@ -60,6 +64,7 @@ public class Level {
         this.scene = gameplay.graphicsEngine().generateScene(rows * 30 + 30,cols * 30);
         fillMatrix();
         initScore();
+        initLives();
     }
 
     /**
@@ -207,6 +212,33 @@ public class Level {
         gameplay.physicsEngine().resize(scoreLabel, 200, 50);
         gameplay.graphicsEngine().addToScene(scene,scoreLabel);
         updateActualScore(actualScore);
+    }
+
+    public void initLives() {
+
+        Entity life = this.gameplay.kernelEngine().generateEntity();
+        this.gameplay.physicsEngine().resize(life,20,20);
+        this.gameplay.physicsEngine().move(life.getPhysicEntity(), scene.getWidth()-110,this.scene.getHeight()-28);
+        this.gameplay.graphicsEngine().bindTexture(life,
+                this.gameplay.getTexturesFile(),1 , 1);
+
+        Entity life2 = this.gameplay.kernelEngine().generateEntity();
+        this.gameplay.physicsEngine().resize(life2,20,20);
+        this.gameplay.physicsEngine().move(life2.getPhysicEntity(), this.scene.getWidth()-70,this.scene.getHeight()-28);
+        this.gameplay.graphicsEngine().bindTexture(life2,
+                this.gameplay.getTexturesFile(),1 , 1);
+
+        Entity life3 = this.gameplay.kernelEngine().generateEntity();
+        this.gameplay.physicsEngine().resize(life3,20,20);
+        this.gameplay.physicsEngine().move(life3.getPhysicEntity(), this.scene.getWidth()-30,this.scene.getHeight()-28);
+        this.gameplay.graphicsEngine().bindTexture(life3,
+                this.gameplay.getTexturesFile(),1 , 1);
+
+        this.gameplay.graphicsEngine().addToScene(this.scene, life);
+        this.gameplay.graphicsEngine().addToScene(this.scene, life2);
+        this.gameplay.graphicsEngine().addToScene(this.scene, life3);
+
+        this.livesEntity = new Entity[] {life, life2, life3};
     }
 
     // GETTERS //
