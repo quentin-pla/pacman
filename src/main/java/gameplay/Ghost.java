@@ -86,7 +86,7 @@ public class Ghost extends Player {
         return lastDirection;
     }
 
-    public void setLastDirection(Gameplay.MoveDirection lastDirection) {
+    public void setForbiddenDirection(Gameplay.MoveDirection lastDirection) {
         this.lastDirection = lastDirection;
     }
 }

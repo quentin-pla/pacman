@@ -29,6 +29,8 @@ public class SoundEngine {
      */
     private final Map<String, Clip> sounds = new HashMap<>();
 
+    private float Globalvolume = 1;
+
     private final CopyOnWriteArrayList<Clip> playingSounds = new CopyOnWriteArrayList<>();
 
     /**
@@ -44,7 +46,7 @@ public class SoundEngine {
      * @param path chamin
      * @param soundName nom du son
      */
-    public Clip loadSound(String path,String soundName) {
+    public void loadSound(String path, String soundName) {
         Clip clip = null;
         try {
             clip = AudioSystem.getClip();
@@ -56,7 +58,6 @@ public class SoundEngine {
             e.printStackTrace();
         }
         sounds.put(soundName,clip);
-        return clip;
     }
 
     /**
@@ -118,7 +119,66 @@ public class SoundEngine {
         return playingSounds.contains(sounds.get(name));
     }
 
+    /**
+     * récupérer tous les souns
+     * @return
+     */
     public Map<String, Clip> getSounds() {
         return sounds;
+    }
+
+    /**
+     * récupérer le volume actuel
+     * @param name
+     * @return
+     */
+    public float getVolume(String name) {
+        Clip sound = sounds.get(name);
+        FloatControl gainControl = (FloatControl) sound.getControl(FloatControl.Type.MASTER_GAIN);
+        return (float) Math.pow(10f, gainControl.getValue() / 20f);
+    }
+
+    /**
+     * mettre un nouveau volume
+     * @param name
+     * @param volume
+     */
+    public void setVolume(String name,float volume) {
+        Clip sound = sounds.get(name);
+        if (volume < 0f || volume > 1f)
+            throw new IllegalArgumentException("Volume not valid: " + volume);
+        FloatControl gainControl = (FloatControl) sound.getControl(FloatControl.Type.MASTER_GAIN);
+        gainControl.setValue(20f * (float) Math.log10(volume));
+    }
+
+    public float getGlobalvolume(){
+        return Globalvolume;
+    }
+
+    public void setGlobalVolume(float volume) {
+        for(Map.Entry<String, Clip> entry : sounds.entrySet()) {
+            Clip clip = entry.getValue();
+            if (volume < 0f || volume > 1f)
+                throw new IllegalArgumentException("Volume not valid: " + volume);
+            FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            gainControl.setValue(20f * (float) Math.log10(volume));
+            Globalvolume = (float) Math.pow(10f, gainControl.getValue() / 20f);
+        }
+    }
+
+    public void incrementGlobalVolume(){
+        if (Globalvolume < 0.95){
+            setGlobalVolume((getGlobalvolume()*100+5)/100);
+        } else {
+            setGlobalVolume(1);
+        }
+    }
+
+    public void decrementGlobalVolume(){
+        if (Globalvolume > 0.05){
+            setGlobalVolume((getGlobalvolume()*100-5)/100);
+        } else {
+            setGlobalVolume(0);
+        }
     }
 }
