@@ -1,7 +1,5 @@
 package engines.sound;
 
-import engines.kernel.KernelEngine;
-
 import javax.sound.sampled.*;
 import java.io.IOException;
 import java.util.HashMap;
@@ -20,11 +18,6 @@ public class SoundEngine {
     private static ExecutorService executor = Executors.newFixedThreadPool(4);
 
     /**
-     * Moteur noyau
-     */
-    private KernelEngine kernelEngine;
-
-    /**
      * Liste des entités son référencées par leur nom
      */
     private final Map<String, Clip> sounds = new HashMap<>();
@@ -35,11 +28,8 @@ public class SoundEngine {
 
     /**
      * Constructeur
-     * @param kernelEngine moteur noyau
      */
-    public SoundEngine(KernelEngine kernelEngine) {
-        this.kernelEngine = kernelEngine;
-    }
+    public SoundEngine() {}
 
     /**
      * Précharger un son pour l'utiliser ultérieurement

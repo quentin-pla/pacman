@@ -1,7 +1,7 @@
 package engines.physics;
 
 import engines.kernel.Entity;
-import engines.kernel.KernelEngine;
+import engines.kernel.EventListener;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -12,12 +12,7 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * Moteur physique
  */
-public class PhysicsEngine {
-    /**
-     * Moteur noyau
-     */
-    private KernelEngine kernelEngine;
-
+public class PhysicsEngine implements CollisionEvent {
     /**
      * Liste des entités physiques
      */
@@ -34,11 +29,30 @@ public class PhysicsEngine {
     private final ConcurrentMap<PhysicEntity[], String> centeredEvents = new ConcurrentHashMap<>();
 
     /**
-     * Constructeur
-     * @param kernelEngine moteur noyau
+     * Liste des écouteurs d'évènements
      */
-    public PhysicsEngine(KernelEngine kernelEngine) {
-        this.kernelEngine = kernelEngine;
+    private final ArrayList<EventListener> eventsListeners = new ArrayList<>();
+
+    /**
+     * Constructeur
+     */
+    public PhysicsEngine() {}
+
+    @Override
+    public void notifyCollision(String event) {
+        for (EventListener listener : eventsListeners)
+            listener.onEvent(event);
+    }
+
+    @Override
+    public void notifyEntityUpdate(PhysicEntity entity) {
+        for (EventListener listener : eventsListeners)
+            listener.onEntityUpdate(entity);
+    }
+
+    @Override
+    public void subscribeEvents(EventListener listener) {
+        eventsListeners.add(listener);
     }
 
     /**
@@ -58,11 +72,11 @@ public class PhysicsEngine {
             if ((e2 == null && e1.isColliding())
                     || (e2 != null && e1.isColliding() && e2.isColliding())
                     || (e2 != null && isInCollision(e1, e2)))
-                kernelEngine.notifyEvent(event.getValue());
+                notifyCollision(event.getValue());
         }
         for (Map.Entry<PhysicEntity[],String> event : centeredEvents.entrySet()) {
             if (isCentered(event.getKey()[0],event.getKey()[1]))
-                kernelEngine.notifyEvent(event.getValue());
+                notifyCollision(event.getValue());
         }
     }
 
@@ -254,7 +268,7 @@ public class PhysicsEngine {
      */
     public void goUp(PhysicEntity entity) {
         translate(entity, 0, -entity.getSpeed());
-        kernelEngine.notifyEntityUpdate(entity);
+        notifyEntityUpdate(entity);
     }
 
     /**
@@ -263,7 +277,7 @@ public class PhysicsEngine {
      */
     public void goRight(PhysicEntity entity) {
         translate(entity, entity.getSpeed(), 0);
-        kernelEngine.notifyEntityUpdate(entity);
+        notifyEntityUpdate(entity);
     }
 
     /**
@@ -272,7 +286,7 @@ public class PhysicsEngine {
      */
     public void goLeft(PhysicEntity entity) {
         translate(entity, -entity.getSpeed(), 0);
-        kernelEngine.notifyEntityUpdate(entity);
+        notifyEntityUpdate(entity);
     }
 
     /**
@@ -281,7 +295,7 @@ public class PhysicsEngine {
      */
     public void goDown(PhysicEntity entity) {
         translate(entity, 0, entity.getSpeed());
-        kernelEngine.notifyEntityUpdate(entity);
+        notifyEntityUpdate(entity);
     }
 
     /**
@@ -295,7 +309,7 @@ public class PhysicsEngine {
         entity.setLastY(entity.getY());
         entity.setX(x);
         entity.setY(y);
-        kernelEngine.notifyEntityUpdate(entity);
+        notifyEntityUpdate(entity);
     }
 
     /**
@@ -309,7 +323,7 @@ public class PhysicsEngine {
         entity.setLastY(entity.getY());
         entity.setX(entity.getX() + x);
         entity.setY(entity.getY() + y);
-        kernelEngine.notifyEntityUpdate(entity);
+        notifyEntityUpdate(entity);
     }
 
     /**
@@ -322,7 +336,7 @@ public class PhysicsEngine {
     public void resize(Entity entity, int w, int h) {
         entity.getPhysicEntity().setWidth(w);
         entity.getPhysicEntity().setHeight(h);
-        kernelEngine.notifyEntityUpdate(entity.getPhysicEntity());
+        notifyEntityUpdate(entity.getPhysicEntity());
     }
 
     /**
@@ -332,7 +346,7 @@ public class PhysicsEngine {
      */
     public void resizeHeight(Entity entity, int h) {
         entity.getPhysicEntity().setHeight(h);
-        kernelEngine.notifyEntityUpdate(entity.getPhysicEntity());
+        notifyEntityUpdate(entity.getPhysicEntity());
     }
 
     /**
@@ -342,7 +356,7 @@ public class PhysicsEngine {
      */
     public void resizeWidth(Entity entity, int w) {
         entity.getPhysicEntity().setWidth(w);
-        kernelEngine.notifyEntityUpdate(entity.getPhysicEntity());
+        notifyEntityUpdate(entity.getPhysicEntity());
     }
 
     /**
@@ -352,7 +366,7 @@ public class PhysicsEngine {
      */
     public void setSpeed(Entity entity, int speed) {
         entity.getPhysicEntity().setSpeed(speed);
-        kernelEngine.notifyEntityUpdate(entity.getPhysicEntity());
+        notifyEntityUpdate(entity.getPhysicEntity());
     }
 
     /**

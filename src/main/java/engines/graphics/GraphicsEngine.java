@@ -2,8 +2,9 @@ package engines.graphics;
 
 import api.SwingRenderer;
 import engines.kernel.Entity;
-import engines.kernel.KernelEngine;
+import engines.kernel.EventListener;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,12 +14,7 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * Moteur graphique
  */
-public class GraphicsEngine {
-    /**
-     * Moteur noyau
-     */
-    private KernelEngine kernelEngine;
-
+public class GraphicsEngine implements GraphicEvent {
     /**
      * Liste des entités graphiques
      */
@@ -40,11 +36,30 @@ public class GraphicsEngine {
     private final Map<Integer,SpriteAnimation> animations = new HashMap<>();
 
     /**
-     * Constructeur
-     * @param kernelEngine moteur noyau
+     * Liste des écouteurs d'évènements
      */
-    public GraphicsEngine(KernelEngine kernelEngine) {
-        this.kernelEngine = kernelEngine;
+    private final ArrayList<EventListener> eventsListeners = new ArrayList<>();
+
+    /**
+     * Constructeur
+     */
+    public GraphicsEngine() {}
+
+    @Override
+    public void notifyEvent(String event) {
+        for (EventListener listener : eventsListeners)
+            listener.onEvent(event);
+    }
+
+    @Override
+    public void notifyEntityUpdate(GraphicEntity entity) {
+        for (EventListener listener : eventsListeners)
+            listener.onEntityUpdate(entity);
+    }
+
+    @Override
+    public void subscribeEvents(EventListener listener) {
+        eventsListeners.add(listener);
     }
 
     //-----------------------------------------------//
@@ -186,7 +201,7 @@ public class GraphicsEngine {
     public void move(Entity entity, int x, int y) {
         entity.getGraphicEntity().setX(x);
         entity.getGraphicEntity().setY(y);
-        kernelEngine.notifyEntityUpdate(entity.getGraphicEntity());
+        notifyEntityUpdate(entity.getGraphicEntity());
     }
 
     /**
@@ -198,7 +213,7 @@ public class GraphicsEngine {
     public void translate(Entity entity, int x, int y) {
         entity.getGraphicEntity().setX(entity.getGraphicEntity().getX() + x);
         entity.getGraphicEntity().setY(entity.getGraphicEntity().getY() + y);
-        kernelEngine.notifyEntityUpdate(entity.getGraphicEntity());
+        notifyEntityUpdate(entity.getGraphicEntity());
     }
 
     /**
@@ -211,7 +226,7 @@ public class GraphicsEngine {
     public void resize(Entity entity, int w, int h) {
         entity.getGraphicEntity().setWidth(w);
         entity.getGraphicEntity().setHeight(h);
-        kernelEngine.notifyEntityUpdate(entity.getGraphicEntity());
+        notifyEntityUpdate(entity.getGraphicEntity());
     }
 
     /**
@@ -221,7 +236,7 @@ public class GraphicsEngine {
      */
     public void resizeHeight(Entity entity, int h) {
         entity.getGraphicEntity().setHeight(h);
-        kernelEngine.notifyEntityUpdate(entity.getGraphicEntity());
+        notifyEntityUpdate(entity.getGraphicEntity());
     }
 
     /**
@@ -231,7 +246,7 @@ public class GraphicsEngine {
      */
     public void resizeWidth(Entity entity, int w) {
         entity.getGraphicEntity().setWidth(w);
-        kernelEngine.notifyEntityUpdate(entity.getGraphicEntity());
+        notifyEntityUpdate(entity.getGraphicEntity());
     }
 
     //-----------------------------------------------//
@@ -352,7 +367,7 @@ public class GraphicsEngine {
      */
     public void bindScene(Scene scene) {
         Window.bindScene(scene);
-        kernelEngine.updateFocusedEntities();
+        notifyEvent("updateFocusedEntities");
     }
 
     //-----------------------------------------------//

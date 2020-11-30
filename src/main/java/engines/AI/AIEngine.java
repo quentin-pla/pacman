@@ -1,28 +1,37 @@
 package engines.AI;
 
 import engines.kernel.Entity;
-import engines.kernel.KernelEngine;
+import engines.kernel.EventListener;
 
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class AIEngine {
-    /**
-     * Moteur noyau
-     */
-    private KernelEngine kernelEngine;
-
+public class AIEngine implements AIEvent {
     /**
      * Liste des entités utilisant de l'intelligence artificielle
      */
     private final ConcurrentMap<Integer, AIEntity> entities = new ConcurrentHashMap<>();
 
     /**
-     * Constructeur
-     * @param kernelEngine moteur noyau
+     * Liste des écouteurs d'évènements
      */
-    public AIEngine(KernelEngine kernelEngine) {
-        this.kernelEngine = kernelEngine;
+    private final ArrayList<EventListener> eventsListeners = new ArrayList<>();
+
+    /**
+     * Constructeur
+     */
+    public AIEngine() {}
+
+    @Override
+    public void notifyEvent(String event) {
+        for (EventListener listener : eventsListeners)
+            listener.onEvent(event);
+    }
+
+    @Override
+    public void subscribeEvents(EventListener listener) {
+        eventsListeners.add(listener);
     }
 
     /**
@@ -31,7 +40,7 @@ public class AIEngine {
     public void updateEntities() {
         for (AIEntity entity : entities.values())
             if (entity.getEvent() != null)
-                kernelEngine.notifyEvent(entity.getEvent());
+                notifyEvent(entity.getEvent());
     }
 
     /**

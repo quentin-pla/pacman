@@ -2,21 +2,17 @@ package engines.input_output;
 
 import api.SwingAPI;
 import engines.kernel.Entity;
-import engines.kernel.KernelEngine;
+import engines.kernel.EventListener;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Moteur entrées / sorties
  */
-public class IOEngine extends SwingAPI {
-    /**
-     * Moteur noyau
-     */
-    private KernelEngine kernelEngine;
-
+public class IOEngine extends SwingAPI implements IOEvent {
     /**
      * Écouteur actions utilisateur clavier
      */
@@ -28,11 +24,30 @@ public class IOEngine extends SwingAPI {
     private final MouseIO mouseIO = new MouseIO(this);
 
     /**
-     * Constructeur
-     * @param kernelEngine moteur noyau
+     * Liste des écouteurs d'évènements
      */
-    public IOEngine(KernelEngine kernelEngine) {
-        this.kernelEngine = kernelEngine;
+    private final ArrayList<EventListener> eventsListeners = new ArrayList<>();
+
+    /**
+     * Constructeur
+     */
+    public IOEngine() {}
+
+    @Override
+    public void notifyInput(String event) {
+        for (EventListener listener : eventsListeners)
+            listener.onEvent(event);
+    }
+
+    @Override
+    public void notifyClick(Entity entity, String event) {
+        for (EventListener listener : eventsListeners)
+            listener.onEntityEvent(entity, event);
+    }
+
+    @Override
+    public void subscribeEvents(EventListener listener) {
+        eventsListeners.add(listener);
     }
 
     //-------------------------------//
@@ -45,13 +60,13 @@ public class IOEngine extends SwingAPI {
     public void updateEntities() {
         for (Map.Entry<Integer,String> event : bindedEvents.entrySet())
             if ((event.getKey() == -1 && isKeyboardFree()) || isKeyPressed(event.getKey()))
-                kernelEngine.notifyEvent(event.getValue());
+                notifyInput(event.getValue());
         for (Map.Entry<Integer,String> event: bindedEventsOnLastKey.entrySet())
             if(lastPressedKey() == event.getKey())
-                kernelEngine.notifyEvent(event.getValue());
+                notifyInput(event.getValue());
         if (lastClickCoordinates() != null) {
             for (Map.Entry<Entity, String> event : bindedClickEvents.entrySet())
-                kernelEngine.checkClickEvent(event.getKey(), event.getValue());
+                notifyClick(event.getKey(), event.getValue());
             resetLastClick();
         }
     }

@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * Moteur noyau
  */
-public class KernelEngine {
+public class KernelEngine implements EventListener {
     /**
      * Moteur graphique
      */
@@ -69,11 +69,42 @@ public class KernelEngine {
      * Constructeur
      */
     public KernelEngine() {
-        this.graphicsEngine = new GraphicsEngine(this);
-        this.physicsEngine = new PhysicsEngine(this);
-        this.ioEngine = new IOEngine(this);
-        this.soundEngine = new SoundEngine(this);
-        this.aiEngine = new AIEngine(this);
+        this.graphicsEngine = new GraphicsEngine();
+        this.physicsEngine = new PhysicsEngine();
+        this.ioEngine = new IOEngine();
+        this.soundEngine = new SoundEngine();
+        this.aiEngine = new AIEngine();
+        initListeners();
+        initKernelEvents();
+    }
+
+    @Override
+    public void onEvent(String event) {
+        notifyEvent(event);
+    }
+
+    @Override
+    public void onEntityEvent(Entity entity, String eventName) {
+        checkClickEvent(entity, eventName);
+    }
+
+    @Override
+    public void onEntityUpdate(EngineEntity entity) {
+        notifyEntityUpdate(entity);
+    }
+
+    private void initListeners() {
+        graphicsEngine.subscribeEvents(this);
+        ioEngine.subscribeEvents(this);
+        physicsEngine.subscribeEvents(this);
+        aiEngine.subscribeEvents(this);
+    }
+
+    /**
+     * Initialiser les évènements noyaux
+     */
+    private void initKernelEvents() {
+        addEvent("updateFocusedEntities", this::updateFocusedEntities);
     }
 
     /**
