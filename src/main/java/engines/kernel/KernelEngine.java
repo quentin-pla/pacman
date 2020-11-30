@@ -167,9 +167,8 @@ public class KernelEngine {
     public void notifyEntityUpdate(EngineEntity entity) {
         if (entity instanceof PhysicEntity) {
             PhysicEntity physicEntity = (PhysicEntity) entity;
-            GraphicEntity graphicEntity = entity.getParent().getGraphicEntity();
-            graphicsEngine.move(graphicEntity, physicEntity.getX(), physicEntity.getY());
-            graphicsEngine.resize(graphicEntity, physicEntity.getWidth(), physicEntity.getHeight());
+            graphicsEngine.move(entity.getParent(), physicEntity.getX(), physicEntity.getY());
+            graphicsEngine.resize(entity.getParent(), physicEntity.getWidth(), physicEntity.getHeight());
         }
     }
 

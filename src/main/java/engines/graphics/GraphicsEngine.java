@@ -55,22 +55,25 @@ public class GraphicsEngine {
      * Dessine une entité graphique
      * @param entity entité à dessiner
      */
-    public void draw(GraphicEntity entity) {
-        if (entity.getColor() != null) entity.getColor().cover(entity);
-        if (entity.getTexture() != null) {
-            entity.getTexture().update();
-            entity.getTexture().cover(entity);
+    public void draw(Entity entity) {
+        GraphicEntity graphicEntity = entity.getGraphicEntity();
+        if (graphicEntity.getColor() != null)
+            graphicEntity.getColor().cover(graphicEntity);
+        if (graphicEntity.getTexture() != null) {
+            graphicEntity.getTexture().update();
+            graphicEntity.getTexture().cover(graphicEntity);
         }
-        if (entity.getText() != null) entity.getText().cover(entity);
+        if (graphicEntity.getText() != null)
+            graphicEntity.getText().cover(graphicEntity);
     }
 
     /**
      * Supprime une entité graphique de sa scène
      * @param entity entité à supprimer
      */
-    public void erase(GraphicEntity entity) {
-        Scene scene = entity.getScene();
-        scene.removeEntity(entity);
+    public void erase(Entity entity) {
+        Scene scene = entity.getGraphicEntity().getScene();
+        scene.removeEntity(entity.getGraphicEntity());
     }
 
     /**
@@ -80,8 +83,8 @@ public class GraphicsEngine {
      * @param g intensité de vert
      * @param b intensité de bleu
      */
-    public void bindColor(GraphicEntity entity, int r, int g, int b) {
-        entity.setColor(new Color(r,g,b));
+    public void bindColor(Entity entity, int r, int g, int b) {
+        entity.getGraphicEntity().setColor(new Color(r,g,b));
     }
 
     /**
@@ -89,16 +92,16 @@ public class GraphicsEngine {
      * @param entity entité à colorer
      * @param color couleur à ajouter
      */
-    public void bindColor(GraphicEntity entity, Color color) {
-        entity.setColor(color);
+    public void bindColor(Entity entity, Color color) {
+        entity.getGraphicEntity().setColor(color);
     }
 
     /**
      * Suppression de la couleur d'une entité graphique
      * @param entity entité à décolorer
      */
-    public void unbindColor(GraphicEntity entity) {
-        entity.setColor(null);
+    public void unbindColor(Entity entity) {
+        entity.getGraphicEntity().setColor(null);
     }
 
     /**
@@ -108,16 +111,16 @@ public class GraphicsEngine {
      * @param color couleur
      * @param fontSize taille police
      */
-    public void bindText(GraphicEntity entity, String text, Color color, int fontSize) {
-        entity.setText(new Text(text,color.getSwingColor(),fontSize));
+    public void bindText(Entity entity, String text, Color color, int fontSize, boolean center) {
+        entity.getGraphicEntity().setText(new Text(text,color.getSwingColor(),fontSize,center));
     }
 
     /**
      * Suppression du texte d'une entité graphique
      * @param entity entité à décolorer
      */
-    public void unbindText(GraphicEntity entity) {
-        entity.setText(null);
+    public void unbindText(Entity entity) {
+        entity.getGraphicEntity().setText(null);
     }
 
     /**
@@ -125,8 +128,8 @@ public class GraphicsEngine {
      * @param entity entité à texturer
      * @param textureID identifiant de la texture
      */
-    public void bindTexture(GraphicEntity entity, int textureID) {
-        entity.setTexture(textures.get(textureID));
+    public void bindTexture(Entity entity, int textureID) {
+        entity.getGraphicEntity().setTexture(textures.get(textureID));
     }
 
     /**
@@ -136,8 +139,8 @@ public class GraphicsEngine {
      * @param row ligne
      * @param col colonne
      */
-    public void bindTexture(GraphicEntity entity, int spriteSheetID, int row, int col) {
-        entity.setTexture(spriteSheets.get(spriteSheetID).getSprite(row, col));
+    public void bindTexture(Entity entity, int spriteSheetID, int row, int col) {
+        entity.getGraphicEntity().setTexture(spriteSheets.get(spriteSheetID).getSprite(row, col));
     }
 
     /**
@@ -145,24 +148,24 @@ public class GraphicsEngine {
      * @param entity entité
      * @param animationID identifiant de l'animation
      */
-    public void bindAnimation(GraphicEntity entity, int animationID) {
-        entity.setTexture(animations.get(animationID));
+    public void bindAnimation(Entity entity, int animationID) {
+        entity.getGraphicEntity().setTexture(animations.get(animationID));
     }
 
     /**
      * Suppression de la texture d'une entité graphique
      * @param entity entité à détexturer
      */
-    public void unbindTexture(GraphicEntity entity) {
-        entity.setTexture(null);
+    public void unbindTexture(Entity entity) {
+        entity.getGraphicEntity().setTexture(null);
     }
 
     /**
      * Ajouter une entité à la scène courante
      * @param entity entité
      */
-    public void addToCurrentScene(GraphicEntity entity) {
-        Window.getActualScene().addEntity(entity);
+    public void addToCurrentScene(Entity entity) {
+        Window.getActualScene().addEntity(entity.getGraphicEntity());
     }
 
     /**
@@ -170,8 +173,8 @@ public class GraphicsEngine {
      * @param scene scène
      * @param entity entité
      */
-    public void addToScene(Scene scene, GraphicEntity entity) {
-        scene.addEntity(entity);
+    public void addToScene(Scene scene, Entity entity) {
+        scene.addEntity(entity.getGraphicEntity());
     }
 
     /**
@@ -180,10 +183,10 @@ public class GraphicsEngine {
      * @param x position x
      * @param y position y
      */
-    public void move(GraphicEntity entity, int x, int y) {
-        entity.setX(x);
-        entity.setY(y);
-        kernelEngine.notifyEntityUpdate(entity);
+    public void move(Entity entity, int x, int y) {
+        entity.getGraphicEntity().setX(x);
+        entity.getGraphicEntity().setY(y);
+        kernelEngine.notifyEntityUpdate(entity.getGraphicEntity());
     }
 
     /**
@@ -192,10 +195,10 @@ public class GraphicsEngine {
      * @param x position horizontale
      * @param y position verticale
      */
-    public void translate(GraphicEntity entity, int x, int y) {
-        entity.setX(entity.getX() + x);
-        entity.setY(entity.getY() + y);
-        kernelEngine.notifyEntityUpdate(entity);
+    public void translate(Entity entity, int x, int y) {
+        entity.getGraphicEntity().setX(entity.getGraphicEntity().getX() + x);
+        entity.getGraphicEntity().setY(entity.getGraphicEntity().getY() + y);
+        kernelEngine.notifyEntityUpdate(entity.getGraphicEntity());
     }
 
     /**
@@ -205,10 +208,10 @@ public class GraphicsEngine {
      * @param w largeur
      * @param h hauteur
      */
-    public void resize(GraphicEntity entity, int w, int h) {
-        entity.setWidth(w);
-        entity.setHeight(h);
-        kernelEngine.notifyEntityUpdate(entity);
+    public void resize(Entity entity, int w, int h) {
+        entity.getGraphicEntity().setWidth(w);
+        entity.getGraphicEntity().setHeight(h);
+        kernelEngine.notifyEntityUpdate(entity.getGraphicEntity());
     }
 
     /**
@@ -216,9 +219,9 @@ public class GraphicsEngine {
      * @param entity entité à redimensionner
      * @param h hauteur
      */
-    public void resizeHeight(GraphicEntity entity, int h) {
-        entity.setHeight(h);
-        kernelEngine.notifyEntityUpdate(entity);
+    public void resizeHeight(Entity entity, int h) {
+        entity.getGraphicEntity().setHeight(h);
+        kernelEngine.notifyEntityUpdate(entity.getGraphicEntity());
     }
 
     /**
@@ -226,9 +229,9 @@ public class GraphicsEngine {
      * @param entity entité à redimensionner
      * @param w largeur
      */
-    public void resizeWidth(GraphicEntity entity, int w) {
-        entity.setWidth(w);
-        kernelEngine.notifyEntityUpdate(entity);
+    public void resizeWidth(Entity entity, int w) {
+        entity.getGraphicEntity().setWidth(w);
+        kernelEngine.notifyEntityUpdate(entity.getGraphicEntity());
     }
 
     //-----------------------------------------------//
@@ -392,7 +395,7 @@ public class GraphicsEngine {
      */
     public void removeEntity(Entity entity) {
         entities.remove(entity.getId());
-        erase(entity.getGraphicEntity());
+        erase(entity);
     }
 
     // GETTERS & SETTERS //

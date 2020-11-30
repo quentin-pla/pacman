@@ -17,8 +17,8 @@ public class Pacman extends Player {
         super(gameplay.kernelEngine());
         this.gameplay = gameplay;
         this.defaultTextureCoords = new int[]{1, 3};
-        gameplay.physicsEngine().resize(getPhysicEntity(), 30, 30);
-        gameplay.physicsEngine().setSpeed(getPhysicEntity(), 3);
+        gameplay.physicsEngine().resize(this, 30, 30);
+        gameplay.physicsEngine().setSpeed(this, 3);
         initAnimations(gameplay.getTexturesFile());
     }
 

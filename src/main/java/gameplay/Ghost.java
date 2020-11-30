@@ -19,10 +19,9 @@ public class Ghost extends Player {
         super(gameplay.kernelEngine());
         this.gameplay = gameplay;
         this.defaultTextureCoords = new int[]{4, 1};
-        gameplay.physicsEngine().resize(getPhysicEntity(), 30, 30);
-        gameplay.physicsEngine().setSpeed(getPhysicEntity(), 3);
-        gameplay.graphicsEngine().bindTexture(getGraphicEntity(),
-                gameplay.getTexturesFile(), 4, 1);
+        gameplay.physicsEngine().resize(this, 30, 30);
+        gameplay.physicsEngine().setSpeed(this, 3);
+        gameplay.graphicsEngine().bindTexture(this, gameplay.getTexturesFile(), 4, 1);
         initAnimations(gameplay.getTexturesFile());
     }
 
@@ -34,8 +33,8 @@ public class Ghost extends Player {
     public Ghost(Gameplay gameplay, String color) {
         super(gameplay.kernelEngine());
         this.gameplay = gameplay;
-        gameplay.physicsEngine().resize(getPhysicEntity(), 30, 30);
-        gameplay.physicsEngine().setSpeed(getPhysicEntity(), 3);
+        gameplay.physicsEngine().resize(this, 30, 30);
+        gameplay.physicsEngine().setSpeed(this, 3);
         switch (color) {
             case "red" :
                 this.defaultTextureCoords = new int[]{3, 1};
@@ -50,8 +49,8 @@ public class Ghost extends Player {
                 this.defaultTextureCoords = new int[]{6, 1};
                 break;
         }
-        gameplay.graphicsEngine().bindTexture(getGraphicEntity(),
-                gameplay.getTexturesFile(), defaultTextureCoords[0], defaultTextureCoords[1]);
+        gameplay.graphicsEngine().bindTexture(this, gameplay.getTexturesFile(),
+                defaultTextureCoords[0], defaultTextureCoords[1]);
         initAnimations(gameplay.getTexturesFile());
     }
 

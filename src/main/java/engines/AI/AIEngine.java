@@ -39,8 +39,8 @@ public class AIEngine {
      * @param entity entité
      * @param event évènement
      */
-    public void bindEvent(AIEntity entity, String event) {
-        entity.setEvent(event);
+    public void bindEvent(Entity entity, String event) {
+        entity.getAiEntity().setEvent(event);
     }
 
     /**

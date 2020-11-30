@@ -59,7 +59,7 @@ public class Scene extends SwingScene {
         super.paintComponent(g);
         graphics = (Graphics2D) g.create();
         for (GraphicEntity entity : entities)
-            graphicsEngine.draw(entity);
+            graphicsEngine.draw(entity.getParent());
         graphics.dispose();
     }
 

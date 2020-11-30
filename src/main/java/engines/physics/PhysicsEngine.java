@@ -319,10 +319,10 @@ public class PhysicsEngine {
      * @param w largeur
      * @param h hauteur
      */
-    public void resize(PhysicEntity entity, int w, int h) {
-        entity.setWidth(w);
-        entity.setHeight(h);
-        kernelEngine.notifyEntityUpdate(entity);
+    public void resize(Entity entity, int w, int h) {
+        entity.getPhysicEntity().setWidth(w);
+        entity.getPhysicEntity().setHeight(h);
+        kernelEngine.notifyEntityUpdate(entity.getPhysicEntity());
     }
 
     /**
@@ -330,9 +330,9 @@ public class PhysicsEngine {
      * @param entity entité à redimensionner
      * @param h hauteur
      */
-    public void resizeHeight(PhysicEntity entity, int h) {
-        entity.setHeight(h);
-        kernelEngine.notifyEntityUpdate(entity);
+    public void resizeHeight(Entity entity, int h) {
+        entity.getPhysicEntity().setHeight(h);
+        kernelEngine.notifyEntityUpdate(entity.getPhysicEntity());
     }
 
     /**
@@ -340,9 +340,9 @@ public class PhysicsEngine {
      * @param entity entité à redimensionner
      * @param w largeur
      */
-    public void resizeWidth(PhysicEntity entity, int w) {
-        entity.setWidth(w);
-        kernelEngine.notifyEntityUpdate(entity);
+    public void resizeWidth(Entity entity, int w) {
+        entity.getPhysicEntity().setWidth(w);
+        kernelEngine.notifyEntityUpdate(entity.getPhysicEntity());
     }
 
     /**
@@ -350,9 +350,9 @@ public class PhysicsEngine {
      * @param entity entité physique
      * @param speed vitesse
      */
-    public void setSpeed(PhysicEntity entity, int speed) {
-        entity.setSpeed(speed);
-        kernelEngine.notifyEntityUpdate(entity);
+    public void setSpeed(Entity entity, int speed) {
+        entity.getPhysicEntity().setSpeed(speed);
+        kernelEngine.notifyEntityUpdate(entity.getPhysicEntity());
     }
 
     /**
