@@ -25,6 +25,8 @@ public class Pacman extends Player {
         this.munchSound = "munch1";
         gameplay.physicsEngine().resize(this, 30, 30);
         gameplay.physicsEngine().setSpeed(this, 3);
+        gameplay.graphicsEngine().bindTexture(this,gameplay.getTexturesFile(),
+                defaultTextureCoords[0],defaultTextureCoords[1]);
         initAnimations(gameplay.getTexturesFile());
     }
 

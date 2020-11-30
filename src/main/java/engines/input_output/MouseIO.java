@@ -12,6 +12,11 @@ import java.util.ArrayList;
  */
 public class MouseIO implements MouseListener {
     /**
+     * Moteur entrées / sorties
+     */
+    private final IOEngine ioEngine;
+
+    /**
      * Boutons pressés
      */
     private ArrayList<Integer> pressedButtons = new ArrayList<>();
@@ -29,7 +34,9 @@ public class MouseIO implements MouseListener {
     /**
      * Constructeur privé
      */
-    protected MouseIO() {}
+    protected MouseIO(IOEngine ioEngine) {
+        this.ioEngine = ioEngine;
+    }
 
     @Override
     public void mouseClicked(MouseEvent e) {
