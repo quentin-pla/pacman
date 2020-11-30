@@ -514,15 +514,21 @@ public class Gameplay {
         setEntityNextDirection(pacman,direction);
     }
 
+    /**
+     * Incrémente le volume 5 par 5
+     */
     protected void incrementGlobalVolume(){
         soundEngine().incrementGlobalVolume();
-        float volume = soundEngine().getGlobalvolume();
         graphicsEngine().bindText(currentVolume, "Volume is : " + (int)(soundEngine().getGlobalvolume()*100), new Color(255,255,255), 20, true);
     }
 
+    /**
+     * Décrémente le son 5 par 5
+     * le son étant un logarithme la décrémentation ne se fait pas très bien et
+     * nous nous retrouvons avec des nombre du style 24 de volume  mais cela n'est pas important
+     */
     protected void decrementGlobalVolume(){
         soundEngine().decrementGlobalVolume();
-        float volume = soundEngine().getGlobalvolume();
         graphicsEngine().bindText(currentVolume, "Volume is : " + (int)(soundEngine().getGlobalvolume()*100), new Color(255,255,255), 20, true);
     }
 
