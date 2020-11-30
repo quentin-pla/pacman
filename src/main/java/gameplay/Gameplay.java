@@ -416,50 +416,50 @@ public class Gameplay {
 
         if (yDirection == MoveDirection.UP && ghost.getLastDirection() != MoveDirection.UP && !somethingUP) {
             ghost.setCurrentDirection(MoveDirection.UP);
-            ghost.setLastDirection(null);
+            ghost.setForbiddenDirection(null);
         }
         else if (yDirection == MoveDirection.DOWN && ghost.getLastDirection() != MoveDirection.DOWN && !somethingDOWN) {
             ghost.setCurrentDirection(MoveDirection.DOWN);
-            ghost.setLastDirection(null);
+            ghost.setForbiddenDirection(null);
         }
         else if (xDirection == MoveDirection.LEFT && ghost.getLastDirection() != MoveDirection.LEFT && !somethingLEFT) {
             ghost.setCurrentDirection(MoveDirection.LEFT);
-            ghost.setLastDirection(null);
+            ghost.setForbiddenDirection(null);
         }
         else if (xDirection == MoveDirection.RIGHT && ghost.getLastDirection() != MoveDirection.RIGHT && !somethingRIGHT) {
             ghost.setCurrentDirection(MoveDirection.RIGHT);
-            ghost.setLastDirection(null);
+            ghost.setForbiddenDirection(null);
         }
         else {
             if (nextDirection == MoveDirection.UP && somethingUP || nextDirection == MoveDirection.DOWN && somethingDOWN) {
                 if (!somethingLEFT) {
-                    ghost.setLastDirection(MoveDirection.RIGHT);
+                    ghost.setForbiddenDirection(MoveDirection.RIGHT);
                     ghost.setCurrentDirection(MoveDirection.LEFT);
                 } else if (!somethingRIGHT) {
-                    ghost.setLastDirection(MoveDirection.LEFT);
+                    ghost.setForbiddenDirection(MoveDirection.LEFT);
                     ghost.setCurrentDirection(MoveDirection.RIGHT);
                 } else {
                     if (nextDirection == MoveDirection.UP) ghost.setCurrentDirection(MoveDirection.DOWN);
                     else ghost.setCurrentDirection(MoveDirection.UP);
-                    ghost.setLastDirection(nextDirection);
+                    ghost.setForbiddenDirection(nextDirection);
                 }
             } else if (nextDirection == MoveDirection.LEFT && somethingLEFT || nextDirection == MoveDirection.RIGHT && somethingRIGHT) {
                 if (!somethingUP) {
-                    ghost.setLastDirection(MoveDirection.DOWN);
+                    ghost.setForbiddenDirection(MoveDirection.DOWN);
                     ghost.setCurrentDirection(MoveDirection.UP);
                 } else if (!somethingDOWN) {
-                    ghost.setLastDirection(MoveDirection.UP);
+                    ghost.setForbiddenDirection(MoveDirection.UP);
                     ghost.setCurrentDirection(MoveDirection.DOWN);
                 } else {
                     if (nextDirection == MoveDirection.LEFT) ghost.setCurrentDirection(MoveDirection.RIGHT);
                     else ghost.setCurrentDirection(MoveDirection.LEFT);
-                    ghost.setLastDirection(nextDirection);
+                    ghost.setForbiddenDirection(nextDirection);
                 }
             }
         }
 
         if (Math.abs(xDistance) <= 1 && Math.abs(yDistance) <= 1) {
-            ghost.setLastDirection(null);
+            ghost.setForbiddenDirection(null);
             ghost.setCurrentDirection(null);
         }
 
