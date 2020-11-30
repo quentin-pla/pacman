@@ -141,11 +141,17 @@ public class Gameplay {
         menuView = graphicsEngine().generateScene(400,400);
         Entity button = kernelEngine.generateEntity();
         physicsEngine().resize(button.getPhysicEntity(),100,50);
-        physicsEngine().move(button.getPhysicEntity(), 150,175);
-        graphicsEngine().bindColor(button.getGraphicEntity(),255,0,0);
-        graphicsEngine().bindText(button.getGraphicEntity(), "Jouer", new Color(255,255,255), 20);
+        physicsEngine().move(button.getPhysicEntity(), 150,240);
+        graphicsEngine().bindColor(button.getGraphicEntity(),50,50,50);
+        graphicsEngine().bindText(button.getGraphicEntity(), "PLAY", new Color(255,255,255), 20);
         graphicsEngine().addToScene(menuView, button.getGraphicEntity());
         ioEngine().bindEventOnClick(button,"playLevel");
+        Entity menuLogo = kernelEngine.generateEntity();
+        int logoTexture = kernelEngine.getGraphicsEngine().loadTexture("assets/menu_logo.png");
+        physicsEngine().resize(menuLogo.getPhysicEntity(),300,71);
+        physicsEngine().move(menuLogo.getPhysicEntity(), 50,120);
+        graphicsEngine().bindTexture(menuLogo.getGraphicEntity(),logoTexture);
+        graphicsEngine().addToScene(menuView, menuLogo.getGraphicEntity());
     }
 
     /**
