@@ -25,6 +25,9 @@ public class Level {
      */
     private Entity[][] matrix;
 
+    /**
+     * Liste des murs du niveau
+     */
     private boolean[][] walls;
 
     /**
@@ -131,7 +134,7 @@ public class Level {
         gameplay.graphicsEngine().bindTexture(ball,gameplay.getTexturesFile(),10,2);
         gameplay.kernelEngine().addEvent("eraseBall" + balls,() -> {
             gameplay.kernelEngine().removeEntity(ball);
-            gameplay.soundEngine().playSound("munch");
+            gameplay.soundEngine().playSound(gameplay.getPlayer().getMunchSound());
             updateActualScore(actualScore + 10);
         });
         gameplay.physicsEngine().bindEventOnSameLocation(gameplay.getPlayer().getPhysicEntity(), ball.getPhysicEntity(), "eraseBall" + balls);

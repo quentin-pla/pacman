@@ -133,7 +133,8 @@ public class Gameplay {
      * Initialiser les sons du jeu
      */
     private void initSounds() {
-        soundEngine().loadSound("munch.wav","munch");
+        soundEngine().loadSound("munch_1.wav","munch1");
+        soundEngine().loadSound("munch_2.wav","munch2");
         soundEngine().loadSound("game_start.wav","gameStart");
     }
 
