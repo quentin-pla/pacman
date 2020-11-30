@@ -177,20 +177,43 @@ public class Gameplay {
         Level defaultLevel = generateLevel(21,19);
 
         //Génération des murs
-        for (int j = 0; j < 19; j++) defaultLevel.addWall(0,j);
-        for (int j = 0; j < 19; j++) defaultLevel.addWall(20,j);
+        for (int j = 0; j < 19; j++) {
+            defaultLevel.addWall(0,j);
+            defaultLevel.addBall(1,j);
+        }
+        for (int j = 0; j < 19; j++) {
+            defaultLevel.addWall(20, j);
+            defaultLevel.addBall(19,j);
+        }
 
-        for (int i = 0; i < 6; i++) defaultLevel.addWall(i,0);
+        for (int i = 0; i < 6; i++) {
+            defaultLevel.addWall(i, 0);
+            defaultLevel.addBall(i, 1);
+        }
+
         defaultLevel.addWall(8,0);
         defaultLevel.addWall(10,0);
-        for (int i = 12; i < 20; i++) defaultLevel.addWall(i,0);
 
-        for (int i = 0; i < 6; i++) defaultLevel.addWall(i,18);
+        for (int i = 12; i < 20; i++) {
+            defaultLevel.addWall(i, 0);
+            defaultLevel.addBall(i, 1);
+        }
+
+        for (int i = 0; i < 6; i++) {
+            defaultLevel.addWall(i, 18);
+            defaultLevel.addBall(i, 17);
+        }
         defaultLevel.addWall(8,18);
         defaultLevel.addWall(10,18);
-        for (int i = 12; i < 20; i++) defaultLevel.addWall(i,18);
+
+        for (int i = 12; i < 20; i++) {
+            defaultLevel.addWall(i, 18);
+            defaultLevel.addBall(i, 17);
+        }
 
         defaultLevel.addWall(1,9);
+
+
 
         defaultLevel.addWall(2,2);
         defaultLevel.addWall(2,3);

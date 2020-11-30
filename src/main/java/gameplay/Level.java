@@ -131,6 +131,7 @@ public class Level {
         gameplay.kernelEngine().addEvent("eraseBall" + balls,() -> {
             gameplay.kernelEngine().removeEntity(ball);
             gameplay.soundEngine().playSound("munch");
+            this.setActualScore(this.actualScore + 10);
         });
         gameplay.physicsEngine().bindEventOnSameLocation(gameplay.getPlayer().getPhysicEntity(), ball.getPhysicEntity(), "eraseBall" + balls);
         ++balls;
