@@ -154,7 +154,10 @@ public class Gameplay {
     private void initPlayers() {
         pacman = new Pacman(this);
         ghosts = new HashMap<>();
-        ghosts.put("red",new Ghost(this));
+        ghosts.put("red", new Ghost(this, "red"));
+        ghosts.put("blue", new Ghost(this, "blue"));
+        ghosts.put("pink", new Ghost(this, "pink"));
+        ghosts.put("orange", new Ghost(this, "orange"));
     }
 
     /**
@@ -252,7 +255,7 @@ public class Gameplay {
         defaultLevel.addWall(10,5);
         defaultLevel.addWall(10,7);
         defaultLevel.addWall(10,8);
-        defaultLevel.addWall(10,9);
+        //defaultLevel.addWall(10,9);
         defaultLevel.addWall(10,10);
         defaultLevel.addWall(10,11);
         defaultLevel.addWall(10,13);
@@ -501,6 +504,9 @@ public class Gameplay {
         soundEngine().playSound("gameStart");
         level.spawnPlayer(1,1);
         level.spawnGhost(ghosts.get("red"),7,9);
+        level.spawnGhost(ghosts.get("blue"),9,8);
+        level.spawnGhost(ghosts.get("pink"),9,9);
+        level.spawnGhost(ghosts.get("orange"),9,10);
         graphicsEngine().bindScene(level.getScene());
     }
 
