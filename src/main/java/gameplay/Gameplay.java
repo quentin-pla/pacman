@@ -155,16 +155,16 @@ public class Gameplay {
         physicsEngine().resize(volumePlus,50,25);
         physicsEngine().move(volumePlus.getPhysicEntity(), 20,350);
         graphicsEngine().bindColor(volumePlus,50,50,50);
-        graphicsEngine().bindText(volumePlus, "+", new Color(255,255,255), 20, true);
+        graphicsEngine().bindText(volumePlus, "-", new Color(255,255,255), 20, true);
         graphicsEngine().addToScene(menuView, volumePlus);
-        ioEngine().bindEventOnClick(volumePlus,"augmentVolume");
+        ioEngine().bindEventOnClick(volumePlus,"downVolume");
 
         physicsEngine().resize(volumeMinus,50,25);
         physicsEngine().move(volumeMinus.getPhysicEntity(), 330,350);
         graphicsEngine().bindColor(volumeMinus,50,50,50);
-        graphicsEngine().bindText(volumeMinus, "-", new Color(255,255,255), 20, true);
+        graphicsEngine().bindText(volumeMinus, "+", new Color(255,255,255), 20, true);
         graphicsEngine().addToScene(menuView, volumeMinus);
-        ioEngine().bindEventOnClick(volumeMinus,"downVolume");
+        ioEngine().bindEventOnClick(volumeMinus,"augmentVolume");
 
         physicsEngine().resize(currentVolume,200,50);
         physicsEngine().move(currentVolume.getPhysicEntity(), 100,337);
