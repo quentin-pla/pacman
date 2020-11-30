@@ -1,8 +1,11 @@
 package gameplay;
 
 import engines.graphics.Scene;
+import engines.graphics.Text;
 import engines.kernel.Entity;
 
+import javax.swing.*;
+import java.awt.*;
 import java.util.Arrays;
 
 /**
@@ -41,6 +44,8 @@ public class Level {
      */
     private int actualScore;
 
+    private JLabel scoreLabel;
+
     /**
      * Constructeur surchargé
      * @param rows nombre de lignes
@@ -50,10 +55,14 @@ public class Level {
         this.gameplay = gameplay;
         this.matrix = new Entity[rows][cols];
         this.walls = new boolean[rows][cols];
+        this.actualScore = 0;
         for (int i = 0; i < rows; i++)
             Arrays.fill(walls[i],false);
-        this.scene = gameplay.graphicsEngine().generateScene(rows * 30,cols * 30);
+        this.scene = gameplay.graphicsEngine().generateScene(rows * 30 + 70,cols * 30);
         fillMatrix();
+
+        this.scoreLabel = new JLabel("Score : " + Integer.toString(this.actualScore));
+        this.addScore();
     }
 
     /**
@@ -175,6 +184,20 @@ public class Level {
                 }
             }
         }
+    }
+
+    public void setActualScore(int score) {
+        this.actualScore = score;
+        this.scoreLabel.setText("Score : " + Integer.toString(this.actualScore));
+    }
+
+    public void addScore() {
+        this.scene.setLayout(null);
+        this.scene.add(scoreLabel);
+        scoreLabel.setLocation(10,this.scene.getHeight()-80);
+        scoreLabel.setSize(100,50);
+        scoreLabel.setFont(new Font("Plain", Font.PLAIN, 17));
+        scoreLabel.setForeground(Color.WHITE);
     }
 
     // GETTERS //

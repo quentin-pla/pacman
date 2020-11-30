@@ -94,6 +94,8 @@ public class Gameplay {
         kernelEngine.addEvent("playLevel", () -> playLevel(levels.get(0)));
         //Déplacer le fantome rouge
         kernelEngine.addEvent("moveRedGhost", () -> updateGhostDirection(ghosts.get("red")));
+        //Déplacer le fantome rouge
+        kernelEngine.addEvent("moveBlueGhost", () -> updateGhostDirection(ghosts.get("blue")));
         //Se déplacer vers le haut
         kernelEngine.addEvent("pacmanGoUp", () -> switchPacmanDirection(MoveDirection.UP));
         //Se déplacer vers la droite
@@ -124,6 +126,7 @@ public class Gameplay {
         ioEngine().bindEventKeyboardFree("pacmanBindDefaultTexture");
         physicsEngine().bindEventOnCollision(pacman.getPhysicEntity(), "pacmanOnCollision");
         aiEngine().bindEvent(ghosts.get("red").getAiEntity(), "moveRedGhost");
+        aiEngine().bindEvent(ghosts.get("blue").getAiEntity(), "moveBlueGhost");
     }
 
     /**
@@ -508,7 +511,7 @@ public class Gameplay {
      */
     public void playLevel(Level level) {
         soundEngine().playSound("gameStart");
-        level.spawnPlayer(1,1);
+        level.spawnPlayer(15,9);
         level.spawnGhost(ghosts.get("red"),7,9);
         level.spawnGhost(ghosts.get("blue"),9,8);
         level.spawnGhost(ghosts.get("pink"),9,9);

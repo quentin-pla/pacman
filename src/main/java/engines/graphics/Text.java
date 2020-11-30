@@ -29,7 +29,7 @@ public class Text extends Cover {
      * @param color couleur
      * @param fontSize taille police
      */
-    protected Text(String content, Color color, int fontSize) {
+    public Text(String content, Color color, int fontSize) {
         this.content = content;
         this.color = color;
         this.fontSize = fontSize;
