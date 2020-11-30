@@ -48,6 +48,11 @@ public class Gameplay {
     private ArrayList<Level> levels;
 
     /**
+     * Niveau courant
+     */
+    private Level currentLevel;
+
+    /**
      * Affichage du volume
      */
     private Entity currentVolume;
@@ -115,15 +120,51 @@ public class Gameplay {
 
         //Lorsqu'il y a une collision
         kernelEngine.addEvent("pacmanOnCollision", () -> {
-            if (pacman.getCurrentAnimationID() != 0)
-                if (graphicsEngine().getAnimation(pacman.getCurrentAnimationID()).isPlaying())
+
+            PhysicEntity entity = null;
+            switch (pacman.getCurrentDirection()) {
+                case UP:
+                    entity = physicsEngine().isSomethingUp(pacman.getPhysicEntity());
+                    break;
+                case DOWN:
+                    entity = physicsEngine().isSomethingDown(pacman.getPhysicEntity());
+                    break;
+                case LEFT:
+                    entity = physicsEngine().isSomethingLeft(pacman.getPhysicEntity());
+                    break;
+                case RIGHT:
+                    entity = physicsEngine().isSomethingRight(pacman.getPhysicEntity());
+                    break;
+            }
+
+
+
+            if (pacman.getCurrentAnimationID() != 0) {
+                if (graphicsEngine().getAnimation(pacman.getCurrentAnimationID()).isPlaying()) {
                     graphicsEngine().playPauseAnimation(pacman.getCurrentAnimationID());
+                    if (entity != null) {
+                        for (Ghost ghost : ghosts.values()) {
+                            if (entity.equals(ghost.getPhysicEntity())) {
+                                System.out.println("oui");
+                                currentLevel.updateLives();
+                                soundEngine().playSound(pacman.getDeathSound());
+                                playLevel(currentLevel);
+                            }
+                        }
+                    }
+                }
+            }
         });
+
+
+
         //Rejouer l'animation courante
         kernelEngine.addEvent("pacmanPlayCurrentAnimation", () -> {
             if (!graphicsEngine().getAnimation(pacman.getCurrentAnimationID()).isPlaying())
                 graphicsEngine().playPauseAnimation(pacman.getCurrentAnimationID());
         });
+
+
         ioEngine().bindEventOnLastKey(KeyEvent.VK_UP, "pacmanGoUp");
         ioEngine().bindEventOnLastKey(KeyEvent.VK_RIGHT, "pacmanGoRight");
         ioEngine().bindEventOnLastKey(KeyEvent.VK_DOWN, "pacmanGoDown");
@@ -140,6 +181,7 @@ public class Gameplay {
         soundEngine().loadSound("munch_1.wav","munch1");
         soundEngine().loadSound("munch_2.wav","munch2");
         soundEngine().loadSound("game_start.wav","gameStart");
+        soundEngine().loadSound("death_1.wav","death_1");
     }
 
     /**
@@ -268,6 +310,7 @@ public class Gameplay {
         //Ajout de la barrière
         defaultLevel.addFence(8, 9);
 
+        this.currentLevel = defaultLevel;
         levels.add(defaultLevel);
     }
 
@@ -456,13 +499,15 @@ public class Gameplay {
      * @param level level
      */
     public void playLevel(Level level) {
-        soundEngine().playSound("gameStart");
-        level.spawnPlayer(15,9);
-        level.spawnGhost(ghosts.get("red"),7,9);
-        level.spawnGhost(ghosts.get("blue"),9,8);
-        level.spawnGhost(ghosts.get("pink"),9,9);
-        level.spawnGhost(ghosts.get("orange"),9,10);
-        graphicsEngine().bindScene(level.getScene());
+        this.currentLevel = level;
+        if (this.currentLevel.getLivesCount() == 3)
+            soundEngine().playSound("gameStart");
+        this.currentLevel.spawnPlayer(15,9);
+        this.currentLevel.spawnGhost(ghosts.get("red"),11,9);
+        this.currentLevel.spawnGhost(ghosts.get("blue"),9,8);
+        this.currentLevel.spawnGhost(ghosts.get("pink"),9,9);
+        this.currentLevel.spawnGhost(ghosts.get("orange"),9,10);
+        graphicsEngine().bindScene(this.currentLevel.getScene());
     }
 
     /**

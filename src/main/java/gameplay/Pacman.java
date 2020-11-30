@@ -68,4 +68,8 @@ public class Pacman extends Player {
         munchSound = munchSound.equals("munch1") ? "munch2" : "munch1";
         return munchSound;
     }
+
+    public String getDeathSound() {
+        return "death_1";
+    }
 }

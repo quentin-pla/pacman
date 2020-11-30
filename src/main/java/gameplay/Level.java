@@ -53,7 +53,7 @@ public class Level {
     /**
      * Nombre de vies
      */
-    private int livesCount = 2;
+    private int livesCount = 3;
 
     /**
      * Entités vies
@@ -115,6 +115,7 @@ public class Level {
      */
     public void spawnGhost(Ghost ghost, int row, int col) {
         gameplay.physicsEngine().addBoundLimits(ghost.getPhysicEntity(),0,0,scene.getWidth(),scene.getHeight());
+        gameplay.physicsEngine().addCollisions(gameplay.getPlayer().getPhysicEntity(), ghost.getPhysicEntity());
         Entity entity = matrix[row][col];
         gameplay.physicsEngine().move(ghost.getPhysicEntity(),
                 entity.getPhysicEntity().getX(), entity.getPhysicEntity().getY());
@@ -223,6 +224,18 @@ public class Level {
     }
 
     /**
+     * Mettre à jour les vies restantes de pacman
+     */
+    public void updateLives() {
+        if (livesCount > 0) {
+            gameplay.kernelEngine().removeEntity(livesEntity[livesCount-1]);
+            livesCount--;
+        }
+
+        //if(livesCount == 0) //todo arrêter le niveau
+    }
+
+    /**
      * Initialiser le score
      */
     public void initScore() {
@@ -265,4 +278,6 @@ public class Level {
     // GETTERS //
 
     public Scene getScene() { return scene; }
+
+    public int getLivesCount() { return this.livesCount; }
 }
