@@ -35,7 +35,7 @@ public class Pacman extends Player {
      * @param spriteSheetID identifiant du fichier de textures
      */
     private void initAnimations(int spriteSheetID) {
-        int animationsSpeed = 3;
+        int animationsSpeed = 4;
 
         int moveUP = gameplay.graphicsEngine().generateAnimation(spriteSheetID, animationsSpeed, true);
         gameplay.graphicsEngine().addFrameToAnimation(moveUP,1,3);
