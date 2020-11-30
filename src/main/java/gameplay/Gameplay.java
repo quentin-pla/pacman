@@ -48,6 +48,10 @@ public class Gameplay {
     private ArrayList<Level> levels;
 
     /**
+     * Affichage du volume
+     */
+    private Entity currentVolume;
+    /**
      * Joueur
      */
     private Pacman pacman;
@@ -104,6 +108,11 @@ public class Gameplay {
         kernelEngine.addEvent("pacmanGoDown", () -> switchPacmanDirection(MoveDirection.DOWN));
         //Se déplacer vers la gauche
         kernelEngine.addEvent("pacmanGoLeft", () -> switchPacmanDirection(MoveDirection.LEFT));
+        //Augmenter le volume
+        kernelEngine.addEvent("augmentVolume", this::incrementGlobalVolume);
+        //Baisser le volume
+        kernelEngine.addEvent("downVolume", this::decrementGlobalVolume);
+
         //Lorsqu'il y a une collision
         kernelEngine.addEvent("pacmanOnCollision", () -> {
             if (pacman.getCurrentAnimationID() != 0)
@@ -139,18 +148,44 @@ public class Gameplay {
     private void initMenu() {
         menuView = graphicsEngine().generateScene(400,400);
         Entity button = kernelEngine.generateEntity();
+        Entity volumePlus = kernelEngine.generateEntity();
+        Entity volumeMinus = kernelEngine.generateEntity();
+        currentVolume = kernelEngine.generateEntity();
+
+        physicsEngine().resize(volumePlus,50,25);
+        physicsEngine().move(volumePlus.getPhysicEntity(), 20,350);
+        graphicsEngine().bindColor(volumePlus,50,50,50);
+        graphicsEngine().bindText(volumePlus, "+", new Color(255,255,255), 20, true);
+        graphicsEngine().addToScene(menuView, volumePlus);
+        ioEngine().bindEventOnClick(volumePlus,"augmentVolume");
+
+        physicsEngine().resize(volumeMinus,50,25);
+        physicsEngine().move(volumeMinus.getPhysicEntity(), 330,350);
+        graphicsEngine().bindColor(volumeMinus,50,50,50);
+        graphicsEngine().bindText(volumeMinus, "-", new Color(255,255,255), 20, true);
+        graphicsEngine().addToScene(menuView, volumeMinus);
+        ioEngine().bindEventOnClick(volumeMinus,"downVolume");
+
+        physicsEngine().resize(currentVolume,200,50);
+        physicsEngine().move(currentVolume.getPhysicEntity(), 100,337);
+        graphicsEngine().bindColor(currentVolume,50,50,50);
+        graphicsEngine().bindText(currentVolume, "Volume is : " + (int) soundEngine().getGlobalvolume()*100, new Color(255,255,255), 20, true);
+        graphicsEngine().addToScene(menuView, currentVolume);
+
         physicsEngine().resize(button,100,50);
         physicsEngine().move(button.getPhysicEntity(), 150,240);
         graphicsEngine().bindColor(button,50,50,50);
         graphicsEngine().bindText(button, "PLAY", new Color(255,255,255), 20, true);
         graphicsEngine().addToScene(menuView, button);
         ioEngine().bindEventOnClick(button,"playLevel");
+
         Entity menuLogo = kernelEngine.generateEntity();
         int logoTexture = kernelEngine.getGraphicsEngine().loadTexture("assets/menu_logo.png");
         physicsEngine().resize(menuLogo,300,71);
         physicsEngine().move(menuLogo.getPhysicEntity(), 50,120);
         graphicsEngine().bindTexture(menuLogo,logoTexture);
         graphicsEngine().addToScene(menuView, menuLogo);
+
     }
 
     /**
@@ -477,6 +512,18 @@ public class Gameplay {
         pacman.setCurrentAnimationID(pacman.getAnimations().get(direction.name()));
         kernelEngine().notifyEvent("pacmanPlayCurrentAnimation");
         setEntityNextDirection(pacman,direction);
+    }
+
+    protected void incrementGlobalVolume(){
+        soundEngine().incrementGlobalVolume();
+        float volume = soundEngine().getGlobalvolume();
+        graphicsEngine().bindText(currentVolume, "Volume is : " + (int)(soundEngine().getGlobalvolume()*100), new Color(255,255,255), 20, true);
+    }
+
+    protected void decrementGlobalVolume(){
+        soundEngine().decrementGlobalVolume();
+        float volume = soundEngine().getGlobalvolume();
+        graphicsEngine().bindText(currentVolume, "Volume is : " + (int)(soundEngine().getGlobalvolume()*100), new Color(255,255,255), 20, true);
     }
 
     /**
