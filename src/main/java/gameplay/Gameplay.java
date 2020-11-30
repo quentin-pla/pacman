@@ -188,7 +188,7 @@ public class Gameplay {
 
         for (int i = 0; i < 6; i++) {
             defaultLevel.addWall(i, 0);
-            defaultLevel.addBall(i, 1);
+            defaultLevel.addBall(i,1);
         }
 
         defaultLevel.addWall(8,0);
@@ -196,19 +196,19 @@ public class Gameplay {
 
         for (int i = 12; i < 20; i++) {
             defaultLevel.addWall(i, 0);
-            defaultLevel.addBall(i, 1);
+            defaultLevel.addBall(i,1);
         }
 
         for (int i = 0; i < 6; i++) {
             defaultLevel.addWall(i, 18);
-            defaultLevel.addBall(i, 17);
+            defaultLevel.addBall(i,17);
         }
         defaultLevel.addWall(8,18);
         defaultLevel.addWall(10,18);
 
         for (int i = 12; i < 20; i++) {
             defaultLevel.addWall(i, 18);
-            defaultLevel.addBall(i, 17);
+            defaultLevel.addBall(i,17);
         }
 
         defaultLevel.addWall(1,9);
@@ -217,15 +217,21 @@ public class Gameplay {
 
         defaultLevel.addWall(2,2);
         defaultLevel.addWall(2,3);
+        defaultLevel.addBall(2,4);
         defaultLevel.addWall(2,5);
         defaultLevel.addWall(2,6);
         defaultLevel.addWall(2,7);
+        defaultLevel.addBall(2,8);
         defaultLevel.addWall(2,9);
+        defaultLevel.addBall(2,10);
         defaultLevel.addWall(2,11);
         defaultLevel.addWall(2,12);
         defaultLevel.addWall(2,13);
         defaultLevel.addWall(2,15);
         defaultLevel.addWall(2,16);
+
+
+
 
         defaultLevel.addWall(4,2);
         defaultLevel.addWall(4,3);
@@ -279,7 +285,9 @@ public class Gameplay {
         defaultLevel.addWall(8,17);
 
         defaultLevel.addWall(9,7);
+        for (int i = 4; i < 7; i++) defaultLevel.addBall(9,i);
         defaultLevel.addWall(9,11);
+        for (int i = 12; i < 15; i++) defaultLevel.addBall(9,i);
 
         defaultLevel.addWall(10,1);
         defaultLevel.addWall(10,2);
@@ -294,6 +302,11 @@ public class Gameplay {
         defaultLevel.addWall(10,15);
         defaultLevel.addWall(10,16);
         defaultLevel.addWall(10,17);
+
+        defaultLevel.addBall(10,4);
+        defaultLevel.addBall(10,6);
+        defaultLevel.addBall(10,12);
+        defaultLevel.addBall(10,14);
 
         defaultLevel.addWall(11,3);
         defaultLevel.addWall(11,5);
@@ -329,6 +342,8 @@ public class Gameplay {
         defaultLevel.addWall(14,16);
 
         defaultLevel.addWall(15,3);
+        for (int i = 2; i < 9; i++) defaultLevel.addBall(15, i);
+        for (int i = 10; i < 17; i++) defaultLevel.addBall(15, i);
         defaultLevel.addWall(15,15);
 
         defaultLevel.addWall(16,1);
@@ -361,6 +376,18 @@ public class Gameplay {
         defaultLevel.addWall(18,15);
         defaultLevel.addWall(18,16);
 
+        int[] row1 = {1, 2, 3,4,5,6,8,12,13,14,16,17,18,19};
+
+        for (int i = 0; i < row1.length-1; i++) {
+            for (int j = 1; j < 18; j++) {
+                defaultLevel.addBall(row1[i], j);
+            }
+        }
+
+        for (int j = 4; j < 15; j++) {
+            defaultLevel.addBall(7, j);
+            defaultLevel.addBall(11, j);
+        }
         defaultLevel.applyWallTextures();
 
         levels.add(defaultLevel);
