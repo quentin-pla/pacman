@@ -76,12 +76,18 @@ public class Gameplay {
     private Map<String,Ghost> ghosts;
 
     /**
+     * Booléen pour savoir si les fantômes sont appeurés
+     */
+    private boolean ghostFear;
+
+    /**
      * Constructeur
      */
     public Gameplay() {
         this.kernelEngine = new KernelEngine();
         this.textures = kernelEngine.getGraphicsEngine().loadSpriteSheet("assets/sprite_sheet.png", 12, 11);
         this.levels = new ArrayList<>();
+        this.ghostFear = false;
         initGameplay();
     }
 
@@ -323,9 +329,6 @@ public class Gameplay {
         // Ajout des super gommes
         defaultLevel.addGomme(1,17);
         defaultLevel.addGomme(19,17);
-
-
-
     }
 
     /**
@@ -435,29 +438,35 @@ public class Gameplay {
 
         for (Ghost ghost : ghosts.values()) {
             if (collidingEntities.contains(ghost.getPhysicEntity())) {
-                currentLevel.updateLives();
-                soundEngine().playSound(pacman.getDeath1Sound());
-                soundEngine().getSounds().get(pacman.getDeath1Sound()).addLineListener(e -> {
-                    if (e.getType() == LineEvent.Type.STOP) {
-                        soundEngine().playSound(pacman.getDeath2Sound());
-                    }
-                });
-                kernelEngine.pauseEvents();
-                graphicsEngine().bindAnimation(pacman, pacman.getAnimations().get("DEATH"));
-                new Thread(() -> {
-                    try {
-                        sleep(2000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    kernelEngine.resumeEvents();
-                    if (currentLevel.getLivesCount() > 0) {
-                        playLevel(currentLevel);
-                    }
-                    else {
-                        showEndGameView();
-                    }
-                }).start();
+
+                if (ghostFear) {
+                    this.currentLevel.updateActualScore(this.currentLevel.getActualScore() + 250);
+                }
+                else {
+                    currentLevel.updateLives();
+                    soundEngine().playSound(pacman.getDeath1Sound());
+                    soundEngine().getSounds().get(pacman.getDeath1Sound()).addLineListener(e -> {
+                        if (e.getType() == LineEvent.Type.STOP) {
+                            soundEngine().playSound(pacman.getDeath2Sound());
+                        }
+                    });
+
+                    kernelEngine.pauseEvents();
+                    graphicsEngine().bindAnimation(pacman, pacman.getAnimations().get("DEATH"));
+                    new Thread(() -> {
+                        try {
+                            sleep(2000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        kernelEngine.resumeEvents();
+                        if (currentLevel.getLivesCount() > 0) {
+                            playLevel(currentLevel);
+                        } else {
+                            showEndGameView();
+                        }
+                    }).start();
+                }
             }
         }
     }
@@ -625,4 +634,17 @@ public class Gameplay {
     public Map<String,Ghost> getGhosts() { return ghosts; }
 
     public ArrayList<Level> getLevels() { return levels; }
+
+    // SETTERS //
+
+    public void setGhostFear(boolean fear) {
+        this.ghostFear = fear;
+        /*for (Ghost ghost : ghosts.values()) {
+            graphicsEngine().bindTexture(ghost, textures, 8, 1);
+            graphicsEngine().clearFrameOfAnimation(ghost.getAnimations().get(MoveDirection.UP.name()));
+            graphicsEngine().clearFrameOfAnimation(ghost.getAnimations().get(MoveDirection.DOWN.name()));
+            graphicsEngine().clearFrameOfAnimation(ghost.getAnimations().get(MoveDirection.LEFT.name()));
+            graphicsEngine().clearFrameOfAnimation(ghost.getAnimations().get(MoveDirection.RIGHT.name()));
+        }*/
+    }
 }

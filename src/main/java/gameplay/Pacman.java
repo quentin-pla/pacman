@@ -90,4 +90,5 @@ public class Pacman extends Player {
     public String getDeath2Sound() {
         return "death_2";
     }
+
 }

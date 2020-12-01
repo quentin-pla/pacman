@@ -82,6 +82,10 @@ public class SpriteAnimation extends Cover {
         frames.add(spriteSheet.getSprite(row, col));
     }
 
+    protected void clearFrame() {
+        frames = new ArrayList<>();
+    }
+
     /**
      * Jouer / Mettre en pause l'animation
      */

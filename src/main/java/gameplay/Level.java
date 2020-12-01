@@ -35,6 +35,9 @@ public class Level {
      */
     private int balls;
 
+
+    private int gommes;
+
     /**
      * Chronomètre
      */
@@ -174,12 +177,14 @@ public class Level {
     public void addGomme(int row, int col) {
         Entity gomme = matrix[row] [col];
         gameplay.graphicsEngine().bindTexture(gomme, gameplay.getTexturesFile(), 10, 1);
-        gameplay.kernelEngine().addEvent("eraseGomme", () -> {
+        gameplay.kernelEngine().addEvent("eraseGomme" + gommes, () -> {
             gameplay.kernelEngine().removeEntity(gomme);
             gameplay.soundEngine().playSound(gameplay.getPlayer().getMunchSound());
             updateActualScore(actualScore + 50);
+            updateFear(true);
         });
-        gameplay.physicsEngine().bindEventOnSameLocation(gameplay.getPlayer().getPhysicEntity(), gomme.getPhysicEntity(), "eraseGomme");
+        gameplay.physicsEngine().bindEventOnSameLocation(gameplay.getPlayer().getPhysicEntity(), gomme.getPhysicEntity(), "eraseGomme" + gommes);
+        ++gommes;
     }
 
     /**
@@ -250,6 +255,14 @@ public class Level {
         if (livesCount > 0)
             gameplay.kernelEngine().removeEntity(livesEntity[livesCount-1]);
         livesCount--;
+    }
+
+    /**
+     * Mettre à jour la peur des fantômes
+     * @param fear les fantômes sont appeurés
+     */
+    public void updateFear(boolean fear) {
+        this.gameplay.setGhostFear(fear);
     }
 
     /**
