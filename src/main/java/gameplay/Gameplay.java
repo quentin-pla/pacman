@@ -596,6 +596,11 @@ public class Gameplay {
         graphicsEngine().bindScene(currentLevel.getScene());
     }
 
+    /**
+     * Mettre à jour les textures des fantômes selon s'ils
+     * sont appeurés ou non
+     */
+
     public void updateGhostSkin() {
 
         if (ghostFear) {
@@ -683,6 +688,13 @@ public class Gameplay {
 
     // SETTERS //
 
+    /**
+     * Mettre à jour la peur des fantômes
+     * et appel au changement de textures
+     *
+     * Mise en place d'un timer, à la fin de celui-ci les fantômes redeviennent normaux
+     * @param fear
+     */
     public void setGhostFear(boolean fear) {
         this.ghostFear = fear;
         updateGhostSkin();
