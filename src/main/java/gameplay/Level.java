@@ -56,6 +56,11 @@ public class Level {
     private int livesCount = 3;
 
     /**
+     * Barrière blanche
+     */
+    private Entity fence;
+
+    /**
      * Entités vies
      */
     private Entity[] livesEntity;
@@ -101,10 +106,12 @@ public class Level {
     public void spawnPlayer(int row, int col) {
         Pacman pacman = gameplay.getPlayer();
         gameplay.physicsEngine().addBoundLimits(pacman.getPhysicEntity(),0,0,scene.getWidth(),scene.getHeight());
+        pacman.bindDefaultTexture();
         Entity entity = matrix[row][col];
         gameplay.physicsEngine().move(pacman.getPhysicEntity(),
                 entity.getPhysicEntity().getX(), entity.getPhysicEntity().getY());
-        gameplay.graphicsEngine().addToScene(scene, pacman);
+        if (!scene.getEntities().contains(pacman.getGraphicEntity()))
+            gameplay.graphicsEngine().addToScene(scene, pacman);
     }
 
     /**
@@ -119,7 +126,8 @@ public class Level {
         Entity entity = matrix[row][col];
         gameplay.physicsEngine().move(ghost.getPhysicEntity(),
                 entity.getPhysicEntity().getX(), entity.getPhysicEntity().getY());
-        gameplay.graphicsEngine().addToScene(scene, ghost);
+        if (!scene.getEntities().contains(ghost.getGraphicEntity()))
+            gameplay.graphicsEngine().addToScene(scene, ghost);
     }
 
     /**
@@ -141,7 +149,7 @@ public class Level {
      * @param col colonne
      */
     public void addFence(int row, int col) {
-        Entity fence = matrix[row][col];
+        fence = matrix[row][col];
         gameplay.physicsEngine().addCollisions(gameplay.getPlayer().getPhysicEntity(), fence.getPhysicEntity());
         gameplay.graphicsEngine().bindTexture(fence,gameplay.getTexturesFile(),11,6);
     }
@@ -227,12 +235,8 @@ public class Level {
      * Mettre à jour les vies restantes de pacman
      */
     public void updateLives() {
-        if (livesCount > 0) {
-            gameplay.kernelEngine().removeEntity(livesEntity[livesCount-1]);
-            livesCount--;
-        }
-
-        //if(livesCount == 0) //todo arrêter le niveau
+        gameplay.kernelEngine().removeEntity(livesEntity[livesCount - 1]);
+        livesCount--;
     }
 
     /**
@@ -280,4 +284,8 @@ public class Level {
     public Scene getScene() { return scene; }
 
     public int getLivesCount() { return this.livesCount; }
+
+    public int getActualScore() { return actualScore; }
+
+    public Entity getFence() { return fence; }
 }

@@ -14,20 +14,6 @@ public class Ghost extends Player {
     /**
      * Constructeur
      * @param gameplay gameplay
-     */
-    public Ghost(Gameplay gameplay) {
-        super(gameplay.kernelEngine());
-        this.gameplay = gameplay;
-        this.defaultTextureCoords = new int[]{4, 1};
-        gameplay.physicsEngine().resize(this, 30, 30);
-        gameplay.physicsEngine().setSpeed(this, 3);
-        gameplay.graphicsEngine().bindTexture(this, gameplay.getTexturesFile(), 4, 1);
-        initAnimations(gameplay.getTexturesFile());
-    }
-
-    /**
-     * Constructeur surchargé
-     * @param gameplay gameplay
      * @param color couleur
      */
     public Ghost(Gameplay gameplay, String color) {
@@ -59,24 +45,24 @@ public class Ghost extends Player {
      * @param spriteSheetID identifiant du fichier de textures
      */
     private void initAnimations(int spriteSheetID) {
-        int animationsSpeed = 4;
+        int animationsDuration = 3;
 
-        int moveUP = gameplay.graphicsEngine().generateAnimation(spriteSheetID, animationsSpeed, true);
+        int moveUP = gameplay.graphicsEngine().generateAnimation(spriteSheetID, animationsDuration, true);
         gameplay.graphicsEngine().addFrameToAnimation(moveUP,defaultTextureCoords[0],7);
         gameplay.graphicsEngine().addFrameToAnimation(moveUP,defaultTextureCoords[0],8);
         animations.put(Gameplay.MoveDirection.UP.name(), moveUP);
 
-        int moveRIGHT = gameplay.graphicsEngine().generateAnimation(spriteSheetID, animationsSpeed, true);
+        int moveRIGHT = gameplay.graphicsEngine().generateAnimation(spriteSheetID, animationsDuration, true);
         gameplay.graphicsEngine().addFrameToAnimation(moveRIGHT,defaultTextureCoords[0],1);
         gameplay.graphicsEngine().addFrameToAnimation(moveRIGHT,defaultTextureCoords[0],2);
         animations.put(Gameplay.MoveDirection.RIGHT.name(), moveRIGHT);
 
-        int moveDOWN = gameplay.graphicsEngine().generateAnimation(spriteSheetID, animationsSpeed, true);
+        int moveDOWN = gameplay.graphicsEngine().generateAnimation(spriteSheetID, animationsDuration, true);
         gameplay.graphicsEngine().addFrameToAnimation(moveDOWN,defaultTextureCoords[0],3);
         gameplay.graphicsEngine().addFrameToAnimation(moveDOWN,defaultTextureCoords[0],4);
         animations.put(Gameplay.MoveDirection.DOWN.name(), moveDOWN);
 
-        int moveLEFT = gameplay.graphicsEngine().generateAnimation(spriteSheetID, animationsSpeed, true);
+        int moveLEFT = gameplay.graphicsEngine().generateAnimation(spriteSheetID, animationsDuration, true);
         gameplay.graphicsEngine().addFrameToAnimation(moveLEFT,defaultTextureCoords[0],5);
         gameplay.graphicsEngine().addFrameToAnimation(moveLEFT,defaultTextureCoords[0],6);
         animations.put(Gameplay.MoveDirection.LEFT.name(), moveLEFT);

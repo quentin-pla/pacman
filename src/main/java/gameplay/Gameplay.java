@@ -2,6 +2,7 @@ package gameplay;
 
 import engines.AI.AIEngine;
 import engines.graphics.Color;
+import engines.graphics.GraphicEntity;
 import engines.graphics.GraphicsEngine;
 import engines.graphics.Scene;
 import engines.input_output.IOEngine;
@@ -15,6 +16,8 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import static java.lang.Thread.sleep;
 
 /**
  * Gameplay
@@ -38,9 +41,14 @@ public class Gameplay {
     private final int textures;
 
     /**
-     * Identifiant scène
+     * Scène menu principal
      */
     private Scene menuView;
+
+    /**
+     * Scène fin de jeu
+     */
+    private Scene endGameView;
 
     /**
      * Niveaux disponibles
@@ -91,6 +99,8 @@ public class Gameplay {
         initSounds();
         //Initialiser le menu
         initMenu();
+        //Initialiser la vue de fin de jeu
+        initEndGameView();
         //Initialiser le niveau par défaut
         initDefaultLevel();
     }
@@ -101,6 +111,12 @@ public class Gameplay {
     private void initEvents() {
         //Jouer un niveau
         kernelEngine.addEvent("playLevel", () -> playLevel(levels.get(0)));
+        //Jouer une nouvelle partie
+        kernelEngine.addEvent("newGame", () -> {
+            levels.remove(currentLevel);
+            initDefaultLevel();
+            playLevel(levels.get(0));
+        });
         //Déplacer le fantome rouge
         kernelEngine.addEvent("moveRedGhost", () -> updateGhostDirection(ghosts.get("red")));
         //Déplacer le fantome rouge
@@ -117,61 +133,17 @@ public class Gameplay {
         kernelEngine.addEvent("augmentVolume", this::incrementGlobalVolume);
         //Baisser le volume
         kernelEngine.addEvent("downVolume", this::decrementGlobalVolume);
-
         //Lorsqu'il y a une collision
-        kernelEngine.addEvent("pacmanOnCollision", () -> {
+        kernelEngine.addEvent("pacmanOnCollision", this::checkPacmanCollisions);
 
-            PhysicEntity entity = null;
-            switch (pacman.getCurrentDirection()) {
-                case UP:
-                    entity = physicsEngine().isSomethingUp(pacman.getPhysicEntity());
-                    break;
-                case DOWN:
-                    entity = physicsEngine().isSomethingDown(pacman.getPhysicEntity());
-                    break;
-                case LEFT:
-                    entity = physicsEngine().isSomethingLeft(pacman.getPhysicEntity());
-                    break;
-                case RIGHT:
-                    entity = physicsEngine().isSomethingRight(pacman.getPhysicEntity());
-                    break;
-            }
-
-
-
-            if (pacman.getCurrentAnimationID() != 0) {
-                if (graphicsEngine().getAnimation(pacman.getCurrentAnimationID()).isPlaying()) {
-                    graphicsEngine().playPauseAnimation(pacman.getCurrentAnimationID());
-                    if (entity != null) {
-                        for (Ghost ghost : ghosts.values()) {
-                            if (entity.equals(ghost.getPhysicEntity())) {
-                                System.out.println("oui");
-                                currentLevel.updateLives();
-                                soundEngine().playSound(pacman.getDeathSound());
-                                playLevel(currentLevel);
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-
-
-        //Rejouer l'animation courante
-        kernelEngine.addEvent("pacmanPlayCurrentAnimation", () -> {
-            if (!graphicsEngine().getAnimation(pacman.getCurrentAnimationID()).isPlaying())
-                graphicsEngine().playPauseAnimation(pacman.getCurrentAnimationID());
-        });
-
-
+        //Liaison des évènements du niveau
         ioEngine().bindEventOnLastKey(KeyEvent.VK_UP, "pacmanGoUp");
         ioEngine().bindEventOnLastKey(KeyEvent.VK_RIGHT, "pacmanGoRight");
         ioEngine().bindEventOnLastKey(KeyEvent.VK_DOWN, "pacmanGoDown");
         ioEngine().bindEventOnLastKey(KeyEvent.VK_LEFT, "pacmanGoLeft");
         physicsEngine().bindEventOnCollision(pacman.getPhysicEntity(), "pacmanOnCollision");
         aiEngine().bindEvent(ghosts.get("red"), "moveRedGhost");
-        aiEngine().bindEvent(ghosts.get("blue"), "moveBlueGhost");
+        //aiEngine().bindEvent(ghosts.get("blue"), "moveBlueGhost");
     }
 
     /**
@@ -228,6 +200,32 @@ public class Gameplay {
         graphicsEngine().bindTexture(menuLogo,logoTexture);
         graphicsEngine().addToScene(menuView, menuLogo);
 
+    }
+
+    /**
+     * Initialiser la page en fin de jeu
+     */
+    private void initEndGameView() {
+        endGameView = graphicsEngine().generateScene(400,400);
+
+        Entity youLost = kernelEngine.generateEntity();
+        physicsEngine().resize(youLost,100,50);
+        physicsEngine().move(youLost.getPhysicEntity(), 150,50);
+        graphicsEngine().bindText(youLost, "YOU LOST !", new Color(255,50,0), 25, true);
+        graphicsEngine().addToScene(endGameView, youLost);
+
+        Entity score = kernelEngine.generateEntity();
+        physicsEngine().resize(score,200,50);
+        physicsEngine().move(score.getPhysicEntity(), 100,150);
+        graphicsEngine().addToScene(endGameView, score);
+
+        Entity newGame = kernelEngine.generateEntity();
+        physicsEngine().resize(newGame,200,50);
+        physicsEngine().move(newGame.getPhysicEntity(), 100,240);
+        graphicsEngine().bindColor(newGame,50,50,50);
+        graphicsEngine().bindText(newGame, "NEW GAME", new Color(255,255,255), 20, true);
+        graphicsEngine().addToScene(endGameView, newGame);
+        ioEngine().bindEventOnClick(newGame,"newGame");
     }
 
     /**
@@ -309,16 +307,13 @@ public class Gameplay {
 
         //Ajout de la barrière
         defaultLevel.addFence(8, 9);
-
-        this.currentLevel = defaultLevel;
-        levels.add(defaultLevel);
     }
 
     /**
      * Mettre à jour la position d'un fanôme
      * @param ghost fantôme
      */
-    protected void updateGhostDirection(Ghost ghost) {
+    private void updateGhostDirection(Ghost ghost) {
         PhysicEntity playerPhysic = pacman.getPhysicEntity();
         PhysicEntity ghostPhysic = ghost.getPhysicEntity();
 
@@ -398,16 +393,42 @@ public class Gameplay {
      * Changer la direction de pacman
      * @param direction direction
      */
-    protected void switchPacmanDirection(MoveDirection direction) {
+    private void switchPacmanDirection(MoveDirection direction) {
         pacman.setCurrentAnimationID(pacman.getAnimations().get(direction.name()));
-        kernelEngine().notifyEvent("pacmanPlayCurrentAnimation");
+        if (!graphicsEngine().getAnimation(pacman.getCurrentAnimationID()).isPlaying())
+            graphicsEngine().playPauseAnimation(pacman.getCurrentAnimationID());
         setEntityNextDirection(pacman,direction);
+    }
+
+    /**
+     * Vérifier les collisions de Pacman
+     */
+    private void checkPacmanCollisions() {
+        ArrayList<PhysicEntity> collidingEntities = new ArrayList<>();
+        collidingEntities.add(physicsEngine().isSomethingUp(pacman.getPhysicEntity()));
+        collidingEntities.add(physicsEngine().isSomethingRight(pacman.getPhysicEntity()));
+        collidingEntities.add(physicsEngine().isSomethingDown(pacman.getPhysicEntity()));
+        collidingEntities.add(physicsEngine().isSomethingLeft(pacman.getPhysicEntity()));
+
+        if (pacman.getCurrentAnimationID() != 0)
+            if (graphicsEngine().getAnimation(pacman.getCurrentAnimationID()).isPlaying())
+                graphicsEngine().playPauseAnimation(pacman.getCurrentAnimationID());
+
+        for (Ghost ghost : ghosts.values()) {
+            if (collidingEntities.contains(ghost.getPhysicEntity())) {
+                currentLevel.updateLives();
+                soundEngine().playSound(pacman.getDeathSound());
+                if (currentLevel.getLivesCount() > 0)
+                    playLevel(currentLevel);
+                else showEndGameView();
+            }
+        }
     }
 
     /**
      * Incrémente le volume 5 par 5
      */
-    protected void incrementGlobalVolume(){
+    private void incrementGlobalVolume(){
         soundEngine().incrementGlobalVolume();
         graphicsEngine().bindText(currentVolume, "Volume is : " + (int)(soundEngine().getGlobalvolume()*100), new Color(255,255,255), 20, true);
     }
@@ -417,7 +438,7 @@ public class Gameplay {
      * le son étant un logarithme la décrémentation ne se fait pas très bien et
      * nous nous retrouvons avec des nombre du style 24 de volume  mais cela n'est pas important
      */
-    protected void decrementGlobalVolume(){
+    private void decrementGlobalVolume(){
         soundEngine().decrementGlobalVolume();
         graphicsEngine().bindText(currentVolume, "Volume is : " + (int)(soundEngine().getGlobalvolume()*100), new Color(255,255,255), 20, true);
     }
@@ -488,26 +509,54 @@ public class Gameplay {
      * @param rows nombre de lignes
      * @param cols nombre de colonnes
      */
-    public Level generateLevel(int rows, int cols) {
+    protected Level generateLevel(int rows, int cols) {
         Level level = new Level(this,rows,cols);
-        this.levels.add(level);
+        levels.add(level);
         return level;
+    }
+
+    /**
+     * Faire apparaitre les joueurs sur le niveau actuel
+     */
+    protected void spawnPlayersOnLevel() {
+        currentLevel.spawnPlayer(15,9);
+        currentLevel.spawnGhost(ghosts.get("red"),7,9);
+        currentLevel.spawnGhost(ghosts.get("blue"),9,8);
+        currentLevel.spawnGhost(ghosts.get("pink"),9,9);
+        currentLevel.spawnGhost(ghosts.get("orange"),9,10);
     }
 
     /**
      * Jouer un niveau
      * @param level level
      */
-    public void playLevel(Level level) {
-        this.currentLevel = level;
-        if (this.currentLevel.getLivesCount() == 3)
+    protected void playLevel(Level level) {
+        ioEngine().resetLastPressedKey();
+        currentLevel = level;
+        if (currentLevel.getLivesCount() == 3) {
             soundEngine().playSound("gameStart");
-        this.currentLevel.spawnPlayer(15,9);
-        this.currentLevel.spawnGhost(ghosts.get("red"),11,9);
-        this.currentLevel.spawnGhost(ghosts.get("blue"),9,8);
-        this.currentLevel.spawnGhost(ghosts.get("pink"),9,9);
-        this.currentLevel.spawnGhost(ghosts.get("orange"),9,10);
-        graphicsEngine().bindScene(this.currentLevel.getScene());
+            kernelEngine.pauseEvents();
+            new Thread(() -> {
+                try {
+                    sleep(4000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                kernelEngine.resumeEvents();
+            }).start();
+        }
+        spawnPlayersOnLevel();
+        graphicsEngine().bindScene(currentLevel.getScene());
+    }
+
+    /**
+     * Afficher la vue de fin de jeu
+     */
+    protected void showEndGameView() {
+        GraphicEntity score = endGameView.getEntities().get(1);
+        graphicsEngine().bindText(score.getParent(), "Score : " + currentLevel.getActualScore(),
+                new Color(255,255,255), 20, true);
+        graphicsEngine().bindScene(endGameView);
     }
 
     /**
