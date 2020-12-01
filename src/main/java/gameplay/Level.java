@@ -35,6 +35,9 @@ public class Level {
      */
     private int balls;
 
+
+    private int gommes;
+
     /**
      * Chronomètre
      */
@@ -171,6 +174,19 @@ public class Level {
         ++balls;
     }
 
+    public void addGomme(int row, int col) {
+        Entity gomme = matrix[row] [col];
+        gameplay.graphicsEngine().bindTexture(gomme, gameplay.getTexturesFile(), 10, 1);
+        gameplay.kernelEngine().addEvent("eraseGomme" + gommes, () -> {
+            gameplay.kernelEngine().removeEntity(gomme);
+            gameplay.soundEngine().playSound(gameplay.getPlayer().getMunchSound());
+            updateActualScore(actualScore + 50);
+            updateFear(true);
+        });
+        gameplay.physicsEngine().bindEventOnSameLocation(gameplay.getPlayer().getPhysicEntity(), gomme.getPhysicEntity(), "eraseGomme" + gommes);
+        ++gommes;
+    }
+
     /**
      * Appliquer la texture de chaque mur
      */
@@ -235,8 +251,18 @@ public class Level {
      * Mettre à jour les vies restantes de pacman
      */
     public void updateLives() {
-        gameplay.kernelEngine().removeEntity(livesEntity[livesCount - 1]);
+
+        if (livesCount > 0)
+            gameplay.kernelEngine().removeEntity(livesEntity[livesCount-1]);
         livesCount--;
+    }
+
+    /**
+     * Mettre à jour la peur des fantômes
+     * @param fear les fantômes sont appeurés
+     */
+    public void updateFear(boolean fear) {
+        this.gameplay.setGhostFear(fear);
     }
 
     /**

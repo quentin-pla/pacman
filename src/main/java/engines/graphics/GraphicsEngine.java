@@ -320,6 +320,10 @@ public class GraphicsEngine implements GraphicEvent {
         animations.get(id).addFrame(row, col);
     }
 
+    public void clearFrameOfAnimation(int id) {
+        animations.get(id).clearFrame();
+    }
+
     /**
      * Jouer / Arrêter une animation
      * @param id identifiant de l'animation

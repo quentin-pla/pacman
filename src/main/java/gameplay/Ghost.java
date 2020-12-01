@@ -18,6 +18,11 @@ public class Ghost extends Player {
     private final Set<Gameplay.MoveDirection> forbiddenDirection;
 
     /**
+     * Mangé
+     */
+    private boolean eaten;
+
+    /**
      * Constructeur
      * @param gameplay gameplay
      * @param color couleur
@@ -26,6 +31,7 @@ public class Ghost extends Player {
         super(gameplay.kernelEngine());
         this.gameplay = gameplay;
         this.forbiddenDirection = new HashSet<>();
+        this.eaten = false;
         gameplay.physicsEngine().resize(this, 30, 30);
         gameplay.physicsEngine().setSpeed(this, 2);
         switch (color) {
@@ -76,4 +82,8 @@ public class Ghost extends Player {
     }
 
     public Set<Gameplay.MoveDirection> getForbiddenDirection() { return forbiddenDirection; }
+
+    public boolean getEaten() { return this.eaten; }
+
+    public void setEaten(boolean eaten) { this.eaten = eaten; }
 }

@@ -14,6 +14,7 @@ public class Pacman extends Player {
      */
     private String munchSound;
 
+
     /**
      * Constructeur
      * @param gameplay gameplay
@@ -67,6 +68,12 @@ public class Pacman extends Player {
         gameplay.graphicsEngine().addFrameToAnimation(moveLEFT,1,4);
         gameplay.graphicsEngine().addFrameToAnimation(moveLEFT,1,5);
         animations.put(Gameplay.MoveDirection.LEFT.name(), moveLEFT);
+
+        int death = gameplay.graphicsEngine().generateAnimation(spriteSheetID, animationsDuration, false);
+        gameplay.graphicsEngine().addFrameToAnimation(death,1,3);
+        for (int i = 1; i < 12; i++) gameplay.graphicsEngine().addFrameToAnimation(death,2,i);
+        animations.put("DEATH", death);
+
     }
 
     // GETTERS //
@@ -76,7 +83,12 @@ public class Pacman extends Player {
         return munchSound;
     }
 
-    public String getDeathSound() {
+    public String getDeath1Sound() {
         return "death_1";
     }
+
+    public String getDeath2Sound() {
+        return "death_2";
+    }
+
 }
