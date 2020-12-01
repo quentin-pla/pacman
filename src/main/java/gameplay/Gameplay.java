@@ -78,7 +78,7 @@ public class Gameplay {
     /**
      * Booléen pour savoir si les fantômes sont appeurés
      */
-    private boolean ghostFear;
+    private volatile boolean ghostFear;
 
     /**
      * Constructeur
@@ -441,6 +441,7 @@ public class Gameplay {
 
                 if (ghostFear) {
                     this.currentLevel.updateActualScore(this.currentLevel.getActualScore() + 250);
+
                 }
                 else {
                     currentLevel.updateLives();
@@ -595,6 +596,51 @@ public class Gameplay {
         graphicsEngine().bindScene(currentLevel.getScene());
     }
 
+    public void updateGhostSkin() {
+
+        if (ghostFear) {
+            for (Ghost ghost : ghosts.values()) {
+
+                graphicsEngine().bindTexture(ghost, textures, 8, 1);
+
+                int moveUP = ghost.getAnimations().get(MoveDirection.UP.name());
+                graphicsEngine().clearFrameOfAnimation(moveUP);
+                graphicsEngine().addFrameToAnimation(moveUP, 8, 1);
+                graphicsEngine().addFrameToAnimation(moveUP, 8, 2);
+
+                int moveDOWN = ghost.getAnimations().get(MoveDirection.DOWN.name());
+                graphicsEngine().clearFrameOfAnimation(moveDOWN);
+                graphicsEngine().addFrameToAnimation(moveDOWN, 8, 1);
+                graphicsEngine().addFrameToAnimation(moveDOWN, 8, 2);
+
+                int moveLEFT = ghost.getAnimations().get(MoveDirection.LEFT.name());
+                graphicsEngine().clearFrameOfAnimation(moveLEFT);
+                graphicsEngine().addFrameToAnimation(moveLEFT, 8, 1);
+                graphicsEngine().addFrameToAnimation(moveLEFT, 8, 2);
+
+                int moveRIGHT = ghost.getAnimations().get(MoveDirection.RIGHT.name());
+                graphicsEngine().clearFrameOfAnimation(moveRIGHT);
+                graphicsEngine().addFrameToAnimation(moveRIGHT, 8, 1);
+                graphicsEngine().addFrameToAnimation(moveRIGHT, 8, 2);
+            }
+        }
+
+        else {
+            for (Ghost ghost : ghosts.values()) {
+                int moveUP = ghost.getAnimations().get(MoveDirection.UP.name());
+                graphicsEngine().clearFrameOfAnimation(moveUP);
+                int moveDOWN = ghost.getAnimations().get(MoveDirection.DOWN.name());
+                graphicsEngine().clearFrameOfAnimation(moveDOWN);
+                int moveLEFT = ghost.getAnimations().get(MoveDirection.LEFT.name());
+                graphicsEngine().clearFrameOfAnimation(moveLEFT);
+                int moveRIGHT = ghost.getAnimations().get(MoveDirection.RIGHT.name());
+                graphicsEngine().clearFrameOfAnimation(moveRIGHT);
+
+                ghost.initAnimations(textures);
+            }
+        }
+    }
+
     /**
      * Afficher la vue de fin de jeu
      */
@@ -638,32 +684,15 @@ public class Gameplay {
     // SETTERS //
 
     public void setGhostFear(boolean fear) {
-
         this.ghostFear = fear;
+        updateGhostSkin();
 
-        for (Ghost ghost : ghosts.values()) {
-
-            graphicsEngine().bindTexture(ghost, textures, 8, 1);
-
-            int moveUP = ghost.getAnimations().get(MoveDirection.UP.name());
-            graphicsEngine().clearFrameOfAnimation(moveUP);
-            graphicsEngine().addFrameToAnimation(moveUP, 8, 1);
-            graphicsEngine().addFrameToAnimation(moveUP, 8, 2);
-
-            int moveDOWN = ghost.getAnimations().get(MoveDirection.DOWN.name());
-            graphicsEngine().clearFrameOfAnimation(moveDOWN);
-            graphicsEngine().addFrameToAnimation(moveDOWN, 8, 1);
-            graphicsEngine().addFrameToAnimation(moveDOWN, 8, 2);
-
-            int moveLEFT = ghost.getAnimations().get(MoveDirection.LEFT.name());
-            graphicsEngine().clearFrameOfAnimation(moveLEFT);
-            graphicsEngine().addFrameToAnimation(moveLEFT, 8, 1);
-            graphicsEngine().addFrameToAnimation(moveLEFT, 8, 2);
-
-            int moveRIGHT = ghost.getAnimations().get(MoveDirection.RIGHT.name());
-            graphicsEngine().clearFrameOfAnimation(moveRIGHT);
-            graphicsEngine().addFrameToAnimation(moveRIGHT, 8, 1);
-            graphicsEngine().addFrameToAnimation(moveRIGHT, 8, 2);
-        }
+        new Thread( () -> {
+            long startTime = System.currentTimeMillis();
+            while(((System.currentTimeMillis() - startTime)/1000) < 5) {;}
+            System.out.println("FIN DU TIMER");
+            this.ghostFear = false;
+            updateGhostSkin();
+        }).start();
     }
 }
