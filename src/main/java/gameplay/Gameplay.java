@@ -493,7 +493,7 @@ public class Gameplay {
                     new Thread( () -> {
                         long startTime = System.currentTimeMillis();
                         while(((System.currentTimeMillis() - startTime)/1000) < 7) {;}
-                        physicsEngine().addCollisions(pacman.getPhysicEntity(), ghost.getPhysicEntity());
+                        physicsEngine().addCollisions(pacman, ghost);
                         ghost.setEaten(false);
                         updateEatenGhostSkin();
                     }).start();
@@ -641,7 +641,7 @@ public class Gameplay {
             kernelEngine.pauseEvents();
             new Thread(() -> {
                 try {
-                    sleep(1);
+                    sleep(4000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -656,14 +656,9 @@ public class Gameplay {
      * Mettre à jour les textures des fantômes selon s'ils
      * sont appeurés ou non
      */
-
     public void updateFearGhostSkin() {
-
         if (ghostFear) {
-
-
             for (Ghost ghost : ghosts.values()) {
-
                 if (!ghost.getEaten()) {
                     graphicsEngine().bindTexture(ghost, textures, 8, 1);
 
@@ -689,11 +684,8 @@ public class Gameplay {
                 }
             }
         }
-
         else {
-
             for (Ghost ghost : ghosts.values()) {
-
                 if (!ghost.getEaten()) {
                     graphicsEngine().bindTexture(ghost, textures, ghost.defaultTextureCoords[0], ghost.defaultTextureCoords[1]);
                     int moveUP = ghost.getAnimations().get(MoveDirection.UP.name());
@@ -710,6 +702,9 @@ public class Gameplay {
         }
     }
 
+    /**
+     * Mettre à jour le skin d'un fantome mangé
+     */
     public void updateEatenGhostSkin() {
         for (Ghost ghost: ghosts.values()) {
             if (ghost.getEaten()) {
@@ -736,7 +731,6 @@ public class Gameplay {
                 graphicsEngine().addFrameToAnimation(moveRIGHT, 7, 2);
             }
             else {
-
                 graphicsEngine().bindTexture(ghost, textures, ghost.defaultTextureCoords[0], ghost.defaultTextureCoords[1]);
                 int moveUP = ghost.getAnimations().get(MoveDirection.UP.name());
                 graphicsEngine().clearFrameOfAnimation(moveUP);

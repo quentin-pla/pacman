@@ -174,6 +174,11 @@ public class Level {
         ++balls;
     }
 
+    /**
+     * Ajouter une grosse boule
+     * @param row ligne
+     * @param col colonne
+     */
     public void addGomme(int row, int col) {
         Entity gomme = matrix[row] [col];
         gameplay.graphicsEngine().bindTexture(gomme, gameplay.getTexturesFile(), 10, 1);
@@ -183,7 +188,7 @@ public class Level {
             updateActualScore(actualScore + 50);
             updateFear(true);
         });
-        gameplay.physicsEngine().bindEventOnSameLocation(gameplay.getPlayer().getPhysicEntity(), gomme.getPhysicEntity(), "eraseGomme" + gommes);
+        gameplay.physicsEngine().bindEventOnSameLocation(gameplay.getPlayer(), gomme, "eraseGomme" + gommes);
         ++gommes;
     }
 
@@ -251,7 +256,6 @@ public class Level {
      * Mettre à jour les vies restantes de pacman
      */
     public void updateLives() {
-
         if (livesCount > 0)
             gameplay.kernelEngine().removeEntity(livesEntity[livesCount-1]);
         livesCount--;

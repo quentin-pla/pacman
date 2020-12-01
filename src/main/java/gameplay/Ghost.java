@@ -57,7 +57,7 @@ public class Ghost extends Player {
      * Initialiser les animation
      * @param spriteSheetID identifiant du fichier de textures
      */
-    private void initAnimations(int spriteSheetID) {
+    void initAnimations(int spriteSheetID) {
         int animationsDuration = 3;
 
         int moveUP = gameplay.graphicsEngine().generateAnimation(spriteSheetID, animationsDuration, true);
