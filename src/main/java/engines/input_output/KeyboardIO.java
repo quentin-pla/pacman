@@ -16,12 +16,12 @@ public class KeyboardIO implements KeyListener {
     /**
      * Touches préssées
      */
-    private final ArrayList<Integer> pressed_keys = new ArrayList<>();
+    private final ArrayList<Integer> pressedKeys = new ArrayList<>();
 
     /**
      * Dernière touche pressée
      */
-    private static int last_pressed_key;
+    private int lastPressedKey;
 
     /**
      * Constructeur
@@ -36,24 +36,28 @@ public class KeyboardIO implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
-        if (!pressed_keys.contains(key) && ioEngine.isKeyBindedToEvent(key)) {
-            pressed_keys.add(key);
-            last_pressed_key = key;
+        if (!pressedKeys.contains(key) && ioEngine.isKeyBindedToEvent(key)) {
+            pressedKeys.add(key);
+            lastPressedKey = key;
         }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
         int key = e.getKeyCode();
-        if (pressed_keys.contains(key))
-            pressed_keys.remove((Integer) key);
+        if (pressedKeys.contains(key))
+            pressedKeys.remove((Integer) key);
     }
 
     // GETTERS //
 
     public ArrayList<Integer> getPressedKeys() {
-        return pressed_keys;
+        return pressedKeys;
     }
 
-    public int getLastPressedKey() { return last_pressed_key; }
+    public int getLastPressedKey() { return lastPressedKey; }
+
+    public void setLastPressedKey(int lastPressedKey) {
+        this.lastPressedKey = lastPressedKey;
+    }
 }
