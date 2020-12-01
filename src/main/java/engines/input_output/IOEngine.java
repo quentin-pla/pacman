@@ -71,6 +71,15 @@ public class IOEngine extends SwingAPI implements IOEvent {
         }
     }
 
+    /**
+     * Supprimer tous les évènements
+     */
+    public void clearEvents() {
+        bindedEvents.clear();
+        bindedEventsOnLastKey.clear();
+        bindedClickEvents.clear();
+    }
+
     //-------------------------------//
     //----------- CLAVIER -----------//
     //-------------------------------//
@@ -135,6 +144,11 @@ public class IOEngine extends SwingAPI implements IOEvent {
      * @return code de la touche
      */
     public int lastPressedKey() { return keyboardIO.getLastPressedKey(); }
+
+    /**
+     * Réinitialiser la dernière touche pressée
+     */
+    public void resetLastPressedKey() { keyboardIO.setLastPressedKey(-1); }
 
     /**
      * Attacher un évènement à une touche clavier

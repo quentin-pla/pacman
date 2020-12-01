@@ -56,6 +56,14 @@ public class PhysicsEngine implements CollisionEvent {
     }
 
     /**
+     * Supprimer tous les évènements
+     */
+    public void clearEvents() {
+        collisionsEvents.clear();
+        centeredEvents.clear();
+    }
+
+    /**
      * Mettre à jour les entités physiques
      */
     public void updateEntites() {

@@ -35,6 +35,14 @@ public class AIEngine implements AIEvent {
     }
 
     /**
+     * Supprimer tous les évènements
+     */
+    public void clearEvents() {
+        for (AIEntity entity : entities.values())
+            entity.setEvent(null);
+    }
+
+    /**
      * Rafraichir les entités
      */
     public void updateEntities() {
