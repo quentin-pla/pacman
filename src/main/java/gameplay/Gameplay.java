@@ -627,6 +627,7 @@ public class Gameplay {
 
         else {
             for (Ghost ghost : ghosts.values()) {
+                graphicsEngine().bindTexture(ghost, textures, ghost.defaultTextureCoords[0], ghost.defaultTextureCoords[1]);
                 int moveUP = ghost.getAnimations().get(MoveDirection.UP.name());
                 graphicsEngine().clearFrameOfAnimation(moveUP);
                 int moveDOWN = ghost.getAnimations().get(MoveDirection.DOWN.name());
@@ -635,7 +636,6 @@ public class Gameplay {
                 graphicsEngine().clearFrameOfAnimation(moveLEFT);
                 int moveRIGHT = ghost.getAnimations().get(MoveDirection.RIGHT.name());
                 graphicsEngine().clearFrameOfAnimation(moveRIGHT);
-
                 ghost.initAnimations(textures);
             }
         }
@@ -690,7 +690,7 @@ public class Gameplay {
         new Thread( () -> {
             long startTime = System.currentTimeMillis();
             while(((System.currentTimeMillis() - startTime)/1000) < 5) {;}
-            System.out.println("FIN DU TIMER");
+
             this.ghostFear = false;
             updateGhostSkin();
         }).start();
