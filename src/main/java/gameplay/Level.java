@@ -171,6 +171,17 @@ public class Level {
         ++balls;
     }
 
+    public void addGomme(int row, int col) {
+        Entity gomme = matrix[row] [col];
+        gameplay.graphicsEngine().bindTexture(gomme, gameplay.getTexturesFile(), 10, 1);
+        gameplay.kernelEngine().addEvent("eraseGomme", () -> {
+            gameplay.kernelEngine().removeEntity(gomme);
+            gameplay.soundEngine().playSound(gameplay.getPlayer().getMunchSound());
+            updateActualScore(actualScore + 50);
+        });
+        gameplay.physicsEngine().bindEventOnSameLocation(gameplay.getPlayer().getPhysicEntity(), gomme.getPhysicEntity(), "eraseGomme");
+    }
+
     /**
      * Appliquer la texture de chaque mur
      */

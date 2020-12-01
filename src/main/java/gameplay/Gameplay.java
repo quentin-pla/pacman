@@ -288,7 +288,7 @@ public class Gameplay {
         //Génération des balles
         Map<Integer,int[]> ballRows = new HashMap<>();
 
-        ballRows.put(1, new int[]{1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17});
+        ballRows.put(1, new int[]{2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16});
         ballRows.put(2, new int[]{1, 4, 8, 10, 14, 17});
         ballRows.put(3, new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17});
         ballRows.put(4, new int[]{1, 4, 6, 12, 14, 17});
@@ -306,7 +306,9 @@ public class Gameplay {
         ballRows.put(16, new int[]{2, 4, 6, 12, 14, 16});
         ballRows.put(17, new int[]{1, 2, 3, 4, 6, 7, 8, 10, 11, 12, 14, 15, 16, 17});
         ballRows.put(18, new int[]{1, 8, 10, 17});
-        ballRows.put(19, new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17});
+        ballRows.put(19, new int[]{2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16});
+
+
 
         for (Map.Entry<Integer,int[]> row : ballRows.entrySet())
             for (int col : row.getValue())
@@ -314,6 +316,16 @@ public class Gameplay {
 
         //Ajout de la barrière
         defaultLevel.addFence(8, 9);
+
+        defaultLevel.addGomme(1,1);
+        defaultLevel.addGomme(19,1);
+
+        // Ajout des super gommes
+        defaultLevel.addGomme(1,17);
+        defaultLevel.addGomme(19,17);
+
+
+
     }
 
     /**
