@@ -731,16 +731,18 @@ public class Gameplay {
                 graphicsEngine().addFrameToAnimation(moveRIGHT, 7, 2);
             }
             else {
-                graphicsEngine().bindTexture(ghost, textures, ghost.defaultTextureCoords[0], ghost.defaultTextureCoords[1]);
-                int moveUP = ghost.getAnimations().get(MoveDirection.UP.name());
-                graphicsEngine().clearFrameOfAnimation(moveUP);
-                int moveDOWN = ghost.getAnimations().get(MoveDirection.DOWN.name());
-                graphicsEngine().clearFrameOfAnimation(moveDOWN);
-                int moveLEFT = ghost.getAnimations().get(MoveDirection.LEFT.name());
-                graphicsEngine().clearFrameOfAnimation(moveLEFT);
-                int moveRIGHT = ghost.getAnimations().get(MoveDirection.RIGHT.name());
-                graphicsEngine().clearFrameOfAnimation(moveRIGHT);
-                ghost.initAnimations(textures);
+                if (!ghostFear) {
+                    graphicsEngine().bindTexture(ghost, textures, ghost.defaultTextureCoords[0], ghost.defaultTextureCoords[1]);
+                    int moveUP = ghost.getAnimations().get(MoveDirection.UP.name());
+                    graphicsEngine().clearFrameOfAnimation(moveUP);
+                    int moveDOWN = ghost.getAnimations().get(MoveDirection.DOWN.name());
+                    graphicsEngine().clearFrameOfAnimation(moveDOWN);
+                    int moveLEFT = ghost.getAnimations().get(MoveDirection.LEFT.name());
+                    graphicsEngine().clearFrameOfAnimation(moveLEFT);
+                    int moveRIGHT = ghost.getAnimations().get(MoveDirection.RIGHT.name());
+                    graphicsEngine().clearFrameOfAnimation(moveRIGHT);
+                    ghost.initAnimations(textures);
+                }
             }
         }
     }
