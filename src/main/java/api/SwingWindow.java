@@ -68,6 +68,8 @@ public class SwingWindow {
         window.getContentPane().add(scene);
         //Dimensionnement de la fenêtre à la scène
         window.pack();
+        //Centrer la fenêtre
+        window.setLocationRelativeTo(null);
     }
 
     /**
