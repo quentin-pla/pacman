@@ -95,7 +95,6 @@ public class SpriteAnimation extends Cover {
      * Réinitialiser l'animation
      */
     protected void reset() {
-        actual_frame = 0;
         time = 0;
     }
 

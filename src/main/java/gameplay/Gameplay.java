@@ -638,13 +638,32 @@ public class Gameplay {
     // SETTERS //
 
     public void setGhostFear(boolean fear) {
+
         this.ghostFear = fear;
-        /*for (Ghost ghost : ghosts.values()) {
+
+        for (Ghost ghost : ghosts.values()) {
+
             graphicsEngine().bindTexture(ghost, textures, 8, 1);
-            graphicsEngine().clearFrameOfAnimation(ghost.getAnimations().get(MoveDirection.UP.name()));
-            graphicsEngine().clearFrameOfAnimation(ghost.getAnimations().get(MoveDirection.DOWN.name()));
-            graphicsEngine().clearFrameOfAnimation(ghost.getAnimations().get(MoveDirection.LEFT.name()));
-            graphicsEngine().clearFrameOfAnimation(ghost.getAnimations().get(MoveDirection.RIGHT.name()));
-        }*/
+
+            int moveUP = ghost.getAnimations().get(MoveDirection.UP.name());
+            graphicsEngine().clearFrameOfAnimation(moveUP);
+            graphicsEngine().addFrameToAnimation(moveUP, 8, 1);
+            graphicsEngine().addFrameToAnimation(moveUP, 8, 2);
+
+            int moveDOWN = ghost.getAnimations().get(MoveDirection.DOWN.name());
+            graphicsEngine().clearFrameOfAnimation(moveDOWN);
+            graphicsEngine().addFrameToAnimation(moveDOWN, 8, 1);
+            graphicsEngine().addFrameToAnimation(moveDOWN, 8, 2);
+
+            int moveLEFT = ghost.getAnimations().get(MoveDirection.LEFT.name());
+            graphicsEngine().clearFrameOfAnimation(moveLEFT);
+            graphicsEngine().addFrameToAnimation(moveLEFT, 8, 1);
+            graphicsEngine().addFrameToAnimation(moveLEFT, 8, 2);
+
+            int moveRIGHT = ghost.getAnimations().get(MoveDirection.RIGHT.name());
+            graphicsEngine().clearFrameOfAnimation(moveRIGHT);
+            graphicsEngine().addFrameToAnimation(moveRIGHT, 8, 1);
+            graphicsEngine().addFrameToAnimation(moveRIGHT, 8, 2);
+        }
     }
 }
