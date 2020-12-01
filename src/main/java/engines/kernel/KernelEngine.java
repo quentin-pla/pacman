@@ -51,6 +51,11 @@ public class KernelEngine implements EventListener {
     private int lastID = 0;
 
     /**
+     * Mettre les évènements en pause
+     */
+    private boolean pauseEvents = false;
+
+    /**
      * Liste des évènements du jeu
      */
     private final Map<String, Runnable> events = new HashMap<>();
@@ -140,11 +145,27 @@ public class KernelEngine implements EventListener {
      * Rafraichir le jeu
      */
     private final ActionListener refresh = evt -> {
-        ioEngine.updateEntities();
-        aiEngine.updateEntities();
-        physicsEngine.updateEntites();
+        if (!pauseEvents) {
+            ioEngine.updateEntities();
+            aiEngine.updateEntities();
+            physicsEngine.updateEntites();
+        }
         graphicsEngine.refreshWindow();
     };
+
+    /**
+     * Mettre en pause les évènements
+     */
+    public void pauseEvents() {
+        pauseEvents = true;
+    }
+
+    /**
+     * Reprendre l'exécution des évènements
+     */
+    public void resumeEvents() {
+        pauseEvents = false;
+    }
 
     /**
      * Exécuter le moteur noyau
