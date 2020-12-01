@@ -1,5 +1,8 @@
 package gameplay;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Fantome
  */
@@ -9,7 +12,10 @@ public class Ghost extends Player {
      */
     private Gameplay gameplay;
 
-    private Gameplay.MoveDirection lastDirection;
+    /**
+     * Directions interdites
+     */
+    private final Set<Gameplay.MoveDirection> forbiddenDirection;
 
     /**
      * Constructeur
@@ -19,6 +25,7 @@ public class Ghost extends Player {
     public Ghost(Gameplay gameplay, String color) {
         super(gameplay.kernelEngine());
         this.gameplay = gameplay;
+        this.forbiddenDirection = new HashSet<>();
         gameplay.physicsEngine().resize(this, 30, 30);
         gameplay.physicsEngine().setSpeed(this, 2);
         switch (color) {
@@ -68,11 +75,5 @@ public class Ghost extends Player {
         animations.put(Gameplay.MoveDirection.LEFT.name(), moveLEFT);
     }
 
-    public Gameplay.MoveDirection getLastDirection() {
-        return lastDirection;
-    }
-
-    public void setForbiddenDirection(Gameplay.MoveDirection lastDirection) {
-        this.lastDirection = lastDirection;
-    }
+    public Set<Gameplay.MoveDirection> getForbiddenDirection() { return forbiddenDirection; }
 }

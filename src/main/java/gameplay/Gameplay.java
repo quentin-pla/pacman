@@ -13,9 +13,7 @@ import engines.physics.PhysicsEngine;
 import engines.sound.SoundEngine;
 
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static java.lang.Thread.sleep;
 
@@ -117,10 +115,8 @@ public class Gameplay {
             initDefaultLevel();
             playLevel(levels.get(0));
         });
-        //Déplacer le fantome rouge
-        kernelEngine.addEvent("moveRedGhost", () -> updateGhostDirection(ghosts.get("red")));
-        //Déplacer le fantome rouge
-        kernelEngine.addEvent("moveBlueGhost", () -> updateGhostDirection(ghosts.get("blue")));
+        //Déplacer le fantome rose
+        kernelEngine.addEvent("movePinkGhost", this::applyPinkGhostAI);
         //Se déplacer vers le haut
         kernelEngine.addEvent("pacmanGoUp", () -> switchPacmanDirection(MoveDirection.UP));
         //Se déplacer vers la droite
@@ -141,9 +137,8 @@ public class Gameplay {
         ioEngine().bindEventOnLastKey(KeyEvent.VK_RIGHT, "pacmanGoRight");
         ioEngine().bindEventOnLastKey(KeyEvent.VK_DOWN, "pacmanGoDown");
         ioEngine().bindEventOnLastKey(KeyEvent.VK_LEFT, "pacmanGoLeft");
-        physicsEngine().bindEventOnCollision(pacman.getPhysicEntity(), "pacmanOnCollision");
-        aiEngine().bindEvent(ghosts.get("red"), "moveRedGhost");
-        //aiEngine().bindEvent(ghosts.get("blue"), "moveBlueGhost");
+        physicsEngine().bindEventOnCollision(pacman, "pacmanOnCollision");
+        aiEngine().bindEvent(ghosts.get("pink"), "movePinkGhost");
     }
 
     /**
@@ -167,27 +162,27 @@ public class Gameplay {
         currentVolume = kernelEngine.generateEntity();
 
         physicsEngine().resize(volumePlus,50,25);
-        physicsEngine().move(volumePlus.getPhysicEntity(), 20,350);
+        physicsEngine().move(volumePlus, 20,350);
         graphicsEngine().bindColor(volumePlus,50,50,50);
         graphicsEngine().bindText(volumePlus, "-", new Color(255,255,255), 20, true);
         graphicsEngine().addToScene(menuView, volumePlus);
         ioEngine().bindEventOnClick(volumePlus,"downVolume");
 
         physicsEngine().resize(volumeMinus,50,25);
-        physicsEngine().move(volumeMinus.getPhysicEntity(), 330,350);
+        physicsEngine().move(volumeMinus, 330,350);
         graphicsEngine().bindColor(volumeMinus,50,50,50);
         graphicsEngine().bindText(volumeMinus, "+", new Color(255,255,255), 20, true);
         graphicsEngine().addToScene(menuView, volumeMinus);
         ioEngine().bindEventOnClick(volumeMinus,"augmentVolume");
 
         physicsEngine().resize(currentVolume,200,50);
-        physicsEngine().move(currentVolume.getPhysicEntity(), 100,337);
+        physicsEngine().move(currentVolume, 100,337);
         graphicsEngine().bindColor(currentVolume,50,50,50);
         graphicsEngine().bindText(currentVolume, "Volume is : " + (int) soundEngine().getGlobalvolume()*100, new Color(255,255,255), 20, true);
         graphicsEngine().addToScene(menuView, currentVolume);
 
         physicsEngine().resize(button,100,50);
-        physicsEngine().move(button.getPhysicEntity(), 150,240);
+        physicsEngine().move(button, 150,240);
         graphicsEngine().bindColor(button,50,50,50);
         graphicsEngine().bindText(button, "PLAY", new Color(255,255,255), 20, true);
         graphicsEngine().addToScene(menuView, button);
@@ -196,7 +191,7 @@ public class Gameplay {
         Entity menuLogo = kernelEngine.generateEntity();
         int logoTexture = kernelEngine.getGraphicsEngine().loadTexture("assets/menu_logo.png");
         physicsEngine().resize(menuLogo,300,71);
-        physicsEngine().move(menuLogo.getPhysicEntity(), 50,120);
+        physicsEngine().move(menuLogo, 50,120);
         graphicsEngine().bindTexture(menuLogo,logoTexture);
         graphicsEngine().addToScene(menuView, menuLogo);
 
@@ -210,18 +205,18 @@ public class Gameplay {
 
         Entity youLost = kernelEngine.generateEntity();
         physicsEngine().resize(youLost,100,50);
-        physicsEngine().move(youLost.getPhysicEntity(), 150,50);
+        physicsEngine().move(youLost, 150,50);
         graphicsEngine().bindText(youLost, "YOU LOST !", new Color(255,50,0), 25, true);
         graphicsEngine().addToScene(endGameView, youLost);
 
         Entity score = kernelEngine.generateEntity();
         physicsEngine().resize(score,200,50);
-        physicsEngine().move(score.getPhysicEntity(), 100,150);
+        physicsEngine().move(score, 100,150);
         graphicsEngine().addToScene(endGameView, score);
 
         Entity newGame = kernelEngine.generateEntity();
         physicsEngine().resize(newGame,200,50);
-        physicsEngine().move(newGame.getPhysicEntity(), 100,240);
+        physicsEngine().move(newGame, 100,240);
         graphicsEngine().bindColor(newGame,50,50,50);
         graphicsEngine().bindText(newGame, "NEW GAME", new Color(255,255,255), 20, true);
         graphicsEngine().addToScene(endGameView, newGame);
@@ -310,13 +305,15 @@ public class Gameplay {
     }
 
     /**
-     * Mettre à jour la position d'un fanôme
-     * @param ghost fantôme
+     * Appliquer l'intelligence artificielle au fantome rose
      */
-    private void updateGhostDirection(Ghost ghost) {
+    private void applyPinkGhostAI() {
+        Ghost ghost = ghosts.get("pink");
         PhysicEntity playerPhysic = pacman.getPhysicEntity();
         PhysicEntity ghostPhysic = ghost.getPhysicEntity();
+        Set<MoveDirection> forbiddenDirections = ghost.getForbiddenDirection();
 
+        //Calcul de la distance horizontale et verticale entre pacman et le fantome
         int playerXmiddle = (playerPhysic.getX() + playerPhysic.getWidth()) / 2;
         int playerYmiddle = (playerPhysic.getY() + playerPhysic.getHeight()) / 2;
         int ghostXmiddle = (ghostPhysic.getX() + ghostPhysic.getWidth()) / 2;
@@ -324,65 +321,111 @@ public class Gameplay {
         int xDistance = playerXmiddle - ghostXmiddle;
         int yDistance = playerYmiddle - ghostYmiddle;
 
-        MoveDirection xDirection = xDistance == 0 ? null : xDistance < 0 ? MoveDirection.LEFT : MoveDirection.RIGHT;
-        MoveDirection yDirection = yDistance == 0 ? null : yDistance < 0 ? MoveDirection.UP : MoveDirection.DOWN;
+        //Définition des directions horizontales et verticales
+        MoveDirection xDirection = xDistance == 0 ? null
+                : xDistance < 0 ? MoveDirection.LEFT : MoveDirection.RIGHT;
+        MoveDirection yDirection = yDistance == 0 ? null
+                : yDistance < 0 ? MoveDirection.UP : MoveDirection.DOWN;
 
+        //Définition de la prochaine direction
         MoveDirection nextDirection = Math.abs(xDistance) > Math.abs(yDistance) ? xDirection : yDirection;
 
-        boolean somethingUP     = physicsEngine().isSomethingUp(ghost.getPhysicEntity()) != null;
-        boolean somethingRIGHT  = physicsEngine().isSomethingRight(ghost.getPhysicEntity()) != null;
-        boolean somethingDOWN   = physicsEngine().isSomethingDown(ghost.getPhysicEntity()) != null;
-        boolean somethingLEFT   = physicsEngine().isSomethingLeft(ghost.getPhysicEntity()) != null;
+        //Vérification des collisions
+        boolean somethingUP     = physicsEngine().isSomethingUp(ghost) != null;
+        boolean somethingRIGHT  = physicsEngine().isSomethingRight(ghost) != null;
+        boolean somethingDOWN   = physicsEngine().isSomethingDown(ghost) != null;
+        boolean somethingLEFT   = physicsEngine().isSomethingLeft(ghost) != null;
 
-        if (yDirection == MoveDirection.UP && ghost.getLastDirection() != MoveDirection.UP && !somethingUP) {
+        //Détermination de la prochaine direction
+        if (Math.abs(xDistance) <= 1 && Math.abs(yDistance) <= 1) {
+            ghost.setCurrentDirection(null);
+        } else if (nextDirection == MoveDirection.UP && !forbiddenDirections.contains(MoveDirection.UP) && !somethingUP) {
             ghost.setCurrentDirection(MoveDirection.UP);
-            ghost.setForbiddenDirection(null);
-        }
-        else if (yDirection == MoveDirection.DOWN && ghost.getLastDirection() != MoveDirection.DOWN && !somethingDOWN) {
+            forbiddenDirections.clear();
+        } else if (nextDirection == MoveDirection.DOWN && !forbiddenDirections.contains(MoveDirection.DOWN) && !somethingDOWN) {
             ghost.setCurrentDirection(MoveDirection.DOWN);
-            ghost.setForbiddenDirection(null);
-        }
-        else if (xDirection == MoveDirection.LEFT && ghost.getLastDirection() != MoveDirection.LEFT && !somethingLEFT) {
+            forbiddenDirections.clear();
+        } else if (nextDirection == MoveDirection.LEFT && !forbiddenDirections.contains(MoveDirection.LEFT) && !somethingLEFT) {
             ghost.setCurrentDirection(MoveDirection.LEFT);
-            ghost.setForbiddenDirection(null);
-        }
-        else if (xDirection == MoveDirection.RIGHT && ghost.getLastDirection() != MoveDirection.RIGHT && !somethingRIGHT) {
+            forbiddenDirections.clear();
+        } else if (nextDirection == MoveDirection.RIGHT && !forbiddenDirections.contains(MoveDirection.RIGHT) && !somethingRIGHT) {
             ghost.setCurrentDirection(MoveDirection.RIGHT);
-            ghost.setForbiddenDirection(null);
-        }
-        else {
-            if (nextDirection == MoveDirection.UP && somethingUP || nextDirection == MoveDirection.DOWN && somethingDOWN) {
-                if (!somethingLEFT) {
-                    ghost.setForbiddenDirection(MoveDirection.RIGHT);
+            forbiddenDirections.clear();
+        } else {
+            if (nextDirection == MoveDirection.UP || nextDirection == MoveDirection.DOWN) {
+                if (forbiddenDirections.size() == 1 && forbiddenDirections.contains(nextDirection))
+                    if (!somethingUP && nextDirection == MoveDirection.UP
+                            || !somethingDOWN && nextDirection == MoveDirection.DOWN)
+                        forbiddenDirections.clear();
+
+                if (somethingRIGHT) forbiddenDirections.add(MoveDirection.RIGHT);
+                if (somethingLEFT) forbiddenDirections.add(MoveDirection.LEFT);
+
+                if (xDirection != null && !forbiddenDirections.contains(xDirection)) {
+                    ghost.setCurrentDirection(xDirection);
+                    forbiddenDirections.add(xDirection == MoveDirection.LEFT ? MoveDirection.RIGHT : MoveDirection.LEFT);
+                } else if (!forbiddenDirections.contains(MoveDirection.LEFT)) {
                     ghost.setCurrentDirection(MoveDirection.LEFT);
-                } else if (!somethingRIGHT) {
-                    ghost.setForbiddenDirection(MoveDirection.LEFT);
+                    forbiddenDirections.add(MoveDirection.RIGHT);
+                } else if (!forbiddenDirections.contains(MoveDirection.RIGHT)) {
                     ghost.setCurrentDirection(MoveDirection.RIGHT);
+                    forbiddenDirections.add(MoveDirection.LEFT);
                 } else {
-                    if (nextDirection == MoveDirection.UP) ghost.setCurrentDirection(MoveDirection.DOWN);
-                    else ghost.setCurrentDirection(MoveDirection.UP);
-                    ghost.setForbiddenDirection(nextDirection);
+                    boolean removeXDirections = false;
+                    if (xDirection != null)
+                        ghost.setCurrentDirection(xDirection);
+                    else if (nextDirection == MoveDirection.UP) {
+                        forbiddenDirections.add(MoveDirection.UP);
+                        if (!somethingDOWN) ghost.setCurrentDirection(MoveDirection.DOWN);
+                        else removeXDirections = true;
+                    } else {
+                        forbiddenDirections.add(MoveDirection.DOWN);
+                        if (!somethingUP) ghost.setCurrentDirection(MoveDirection.UP);
+                        else removeXDirections = true;
+                    }
+                    if (removeXDirections)
+                        forbiddenDirections.removeAll(Arrays.asList(MoveDirection.LEFT,MoveDirection.RIGHT));
                 }
-            } else if (nextDirection == MoveDirection.LEFT && somethingLEFT || nextDirection == MoveDirection.RIGHT && somethingRIGHT) {
-                if (!somethingUP) {
-                    ghost.setForbiddenDirection(MoveDirection.DOWN);
+            }
+            else if (nextDirection == MoveDirection.LEFT || nextDirection == MoveDirection.RIGHT) {
+                if (forbiddenDirections.size() == 1 && forbiddenDirections.contains(nextDirection)) {
+                    if (!somethingLEFT && nextDirection == MoveDirection.LEFT)
+                        forbiddenDirections.clear();
+                    else if (!somethingRIGHT && nextDirection == MoveDirection.RIGHT)
+                        forbiddenDirections.clear();
+                }
+
+                if (somethingUP) forbiddenDirections.add(MoveDirection.UP);
+                if (somethingDOWN) forbiddenDirections.add(MoveDirection.DOWN);
+
+                if (yDirection != null && !forbiddenDirections.contains(yDirection)) {
+                    ghost.setCurrentDirection(yDirection);
+                    forbiddenDirections.add(yDirection == MoveDirection.UP ? MoveDirection.DOWN : MoveDirection.UP);
+                }
+                else if (!forbiddenDirections.contains(MoveDirection.UP)) {
                     ghost.setCurrentDirection(MoveDirection.UP);
-                } else if (!somethingDOWN) {
-                    ghost.setForbiddenDirection(MoveDirection.UP);
+                    forbiddenDirections.add(MoveDirection.DOWN);
+                } else if (!forbiddenDirections.contains(MoveDirection.DOWN)) {
                     ghost.setCurrentDirection(MoveDirection.DOWN);
+                    forbiddenDirections.add(MoveDirection.UP);
                 } else {
-                    if (nextDirection == MoveDirection.LEFT) ghost.setCurrentDirection(MoveDirection.RIGHT);
-                    else ghost.setCurrentDirection(MoveDirection.LEFT);
-                    ghost.setForbiddenDirection(nextDirection);
+                    boolean removeYDirections = false;
+                    if (yDirection != null) ghost.setCurrentDirection(yDirection);
+                    else if (nextDirection == MoveDirection.LEFT) {
+                        forbiddenDirections.add(MoveDirection.LEFT);
+                        if (!somethingRIGHT) ghost.setCurrentDirection(MoveDirection.RIGHT);
+                        else removeYDirections = true;
+                    } else {
+                        forbiddenDirections.add(MoveDirection.RIGHT);
+                        if (!somethingLEFT) ghost.setCurrentDirection(MoveDirection.LEFT);
+                        else removeYDirections = true;
+                    }
+                    if (removeYDirections)
+                        forbiddenDirections.removeAll(Arrays.asList(MoveDirection.UP, MoveDirection.DOWN));
                 }
             }
         }
-
-        if (Math.abs(xDistance) <= 1 && Math.abs(yDistance) <= 1) {
-            ghost.setForbiddenDirection(null);
-            ghost.setCurrentDirection(null);
-        }
-
+        if (forbiddenDirections.size() == 4) forbiddenDirections.clear();
         if (ghost.getCurrentDirection() != null) {
             callEventFromDirection(ghost, ghost.getCurrentDirection());
             graphicsEngine().bindAnimation(ghost, ghost.getAnimations().get(ghost.getCurrentDirection().name()));
@@ -405,10 +448,10 @@ public class Gameplay {
      */
     private void checkPacmanCollisions() {
         ArrayList<PhysicEntity> collidingEntities = new ArrayList<>();
-        collidingEntities.add(physicsEngine().isSomethingUp(pacman.getPhysicEntity()));
-        collidingEntities.add(physicsEngine().isSomethingRight(pacman.getPhysicEntity()));
-        collidingEntities.add(physicsEngine().isSomethingDown(pacman.getPhysicEntity()));
-        collidingEntities.add(physicsEngine().isSomethingLeft(pacman.getPhysicEntity()));
+        collidingEntities.add(physicsEngine().isSomethingUp(pacman));
+        collidingEntities.add(physicsEngine().isSomethingRight(pacman));
+        collidingEntities.add(physicsEngine().isSomethingDown(pacman));
+        collidingEntities.add(physicsEngine().isSomethingLeft(pacman));
 
         if (pacman.getCurrentAnimationID() != 0)
             if (graphicsEngine().getAnimation(pacman.getCurrentAnimationID()).isPlaying())
@@ -452,22 +495,22 @@ public class Gameplay {
         PhysicEntity entityNearby;
         switch (direction) {
             case UP:
-                entityNearby = physicsEngine().isSomethingUp(entity.getPhysicEntity());
+                entityNearby = physicsEngine().isSomethingUp(entity);
                 if (entityNearby == null)
                     entity.setCurrentDirection(MoveDirection.UP);
                 break;
             case RIGHT:
-                entityNearby = physicsEngine().isSomethingRight(entity.getPhysicEntity());
+                entityNearby = physicsEngine().isSomethingRight(entity);
                 if (entityNearby == null)
                     entity.setCurrentDirection(MoveDirection.RIGHT);
                 break;
             case DOWN:
-                entityNearby = physicsEngine().isSomethingDown(entity.getPhysicEntity());
+                entityNearby = physicsEngine().isSomethingDown(entity);
                 if (entityNearby == null)
                     entity.setCurrentDirection(MoveDirection.DOWN);
                 break;
             case LEFT:
-                entityNearby = physicsEngine().isSomethingLeft(entity.getPhysicEntity());
+                entityNearby = physicsEngine().isSomethingLeft(entity);
                 if (entityNearby == null)
                     entity.setCurrentDirection(MoveDirection.LEFT);
                 break;
@@ -487,16 +530,16 @@ public class Gameplay {
         if (direction != null) {
             switch (direction) {
                 case UP:
-                    physicsEngine().goUp(entity.getPhysicEntity());
+                    physicsEngine().goUp(entity);
                     break;
                 case RIGHT:
-                    physicsEngine().goRight(entity.getPhysicEntity());
+                    physicsEngine().goRight(entity);
                     break;
                 case DOWN:
-                    physicsEngine().goDown(entity.getPhysicEntity());
+                    physicsEngine().goDown(entity);
                     break;
                 case LEFT:
-                    physicsEngine().goLeft(entity.getPhysicEntity());
+                    physicsEngine().goLeft(entity);
                     break;
                 default:
                     break;
