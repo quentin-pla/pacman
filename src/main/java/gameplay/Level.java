@@ -235,7 +235,9 @@ public class Level {
      * Mettre à jour les vies restantes de pacman
      */
     public void updateLives() {
-        gameplay.kernelEngine().removeEntity(livesEntity[livesCount - 1]);
+
+        if (livesCount > 0)
+            gameplay.kernelEngine().removeEntity(livesEntity[livesCount-1]);
         livesCount--;
     }
 

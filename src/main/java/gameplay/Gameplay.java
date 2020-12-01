@@ -12,6 +12,7 @@ import engines.physics.PhysicEntity;
 import engines.physics.PhysicsEngine;
 import engines.sound.SoundEngine;
 
+import javax.sound.sampled.LineEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -134,7 +135,10 @@ public class Gameplay {
         //Baisser le volume
         kernelEngine.addEvent("downVolume", this::decrementGlobalVolume);
         //Lorsqu'il y a une collision
+
         kernelEngine.addEvent("pacmanOnCollision", this::checkPacmanCollisions);
+
+
 
         //Liaison des évènements du niveau
         ioEngine().bindEventOnLastKey(KeyEvent.VK_UP, "pacmanGoUp");
@@ -154,6 +158,9 @@ public class Gameplay {
         soundEngine().loadSound("munch_2.wav","munch2");
         soundEngine().loadSound("game_start.wav","gameStart");
         soundEngine().loadSound("death_1.wav","death_1");
+        soundEngine().loadSound("death_2.wav","death_2");
+
+        soundEngine().setGlobalVolume(0);
     }
 
     /**
@@ -417,10 +424,28 @@ public class Gameplay {
         for (Ghost ghost : ghosts.values()) {
             if (collidingEntities.contains(ghost.getPhysicEntity())) {
                 currentLevel.updateLives();
-                soundEngine().playSound(pacman.getDeathSound());
-                if (currentLevel.getLivesCount() > 0)
-                    playLevel(currentLevel);
-                else showEndGameView();
+                soundEngine().playSound(pacman.getDeath1Sound());
+                soundEngine().getSounds().get(pacman.getDeath1Sound()).addLineListener(e -> {
+                    if (e.getType() == LineEvent.Type.STOP) {
+                        soundEngine().playSound(pacman.getDeath2Sound());
+                    }
+                });
+                kernelEngine.pauseEvents();
+                graphicsEngine().bindAnimation(pacman, pacman.getAnimations().get("DEATH"));
+                new Thread(() -> {
+                    try {
+                        sleep(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    kernelEngine.resumeEvents();
+                    if (currentLevel.getLivesCount() > 0) {
+                        playLevel(currentLevel);
+                    }
+                    else {
+                        showEndGameView();
+                    }
+                }).start();
             }
         }
     }
@@ -520,7 +545,7 @@ public class Gameplay {
      */
     protected void spawnPlayersOnLevel() {
         currentLevel.spawnPlayer(15,9);
-        currentLevel.spawnGhost(ghosts.get("red"),7,9);
+        currentLevel.spawnGhost(ghosts.get("red"),11,9);
         currentLevel.spawnGhost(ghosts.get("blue"),9,8);
         currentLevel.spawnGhost(ghosts.get("pink"),9,9);
         currentLevel.spawnGhost(ghosts.get("orange"),9,10);
@@ -538,7 +563,7 @@ public class Gameplay {
             kernelEngine.pauseEvents();
             new Thread(() -> {
                 try {
-                    sleep(4000);
+                    sleep(1);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
