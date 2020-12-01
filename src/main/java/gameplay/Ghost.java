@@ -20,7 +20,7 @@ public class Ghost extends Player {
         super(gameplay.kernelEngine());
         this.gameplay = gameplay;
         gameplay.physicsEngine().resize(this, 30, 30);
-        gameplay.physicsEngine().setSpeed(this, 3);
+        gameplay.physicsEngine().setSpeed(this, 2);
         switch (color) {
             case "red" :
                 this.defaultTextureCoords = new int[]{3, 1};
