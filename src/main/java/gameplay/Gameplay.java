@@ -171,6 +171,7 @@ public class Gameplay {
         soundEngine().loadSound("death_2.wav","death2");
         soundEngine().loadSound("siren_1.wav", "siren1");
         soundEngine().loadSound("power_pellet.wav", "powerup");
+        soundEngine().loadSound("eat_ghost.wav", "eatGhost");
         soundEngine().setGlobalVolume(0.5F);
     }
 
@@ -558,16 +559,8 @@ public class Gameplay {
                 int targetX = (targetBottomRight.getX());
                 int targetY = (targetBottomRight.getY());
 
-                /*System.out.println(targetX+4);
-                System.out.println(targetX-4);
-                System.out.println(ghostX);
-                System.out.println(targetY+4);
-                System.out.println(targetY-4);
-                System.out.println(ghostY);*/
                 if ((ghostX <= (targetX+4)) && (ghostX >= (targetX-4)) && (ghostY <= (targetY+4)) && (ghostY >= (targetY-4))){
-                    System.out.println("pass");
                     ghost.setPatroleZoneReached(true);
-                    System.out.println(ghost.isPatroleZoneReached());
                 }
                 return;
             }
@@ -717,7 +710,6 @@ public class Gameplay {
 
     }
 
-
     /**
      * Changer la direction de pacman
      * @param direction direction
@@ -782,6 +774,7 @@ public class Gameplay {
      */
     private void eatGhost(Ghost ghost) {
         if (!ghost.getEaten()) {
+            soundEngine().playSound("eatGhost");
             this.currentLevel.updateActualScore(this.currentLevel.getActualScore() + 250);
             ghost.setEaten(true);
             new Thread(() -> {
@@ -948,9 +941,11 @@ public class Gameplay {
      * Afficher la vue de fin de jeu
      */
     protected void showEndGameView() {
+        ioEngine().resetLastPressedKey();
         GraphicEntity score = endGameView.getEntities().get(1);
         graphicsEngine().bindText(score.getParent(), "Score : " + currentLevel.getActualScore(),
                 new Color(255,255,255), 20, true);
+        kernelEngine().switchScene(endGameView);
         kernelEngine.resumeEvents();
     }
 
