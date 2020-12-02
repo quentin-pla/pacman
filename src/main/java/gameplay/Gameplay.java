@@ -332,12 +332,11 @@ public class Gameplay {
         defaultLevel.addGomme(1,17);
         defaultLevel.addGomme(19,17);
 
-        //ajout target pour scatter
+        //ajout target pour scatter (patrouille)
         targets.put("TopLeft", defaultLevel.addTarget(1,1));
         targets.put("TopRight",defaultLevel.addTarget(1,17));
         targets.put("BottomLeft",defaultLevel.addTarget(19,1));
         targets.put("BottomRight",defaultLevel.addTarget(19,17));
-
     }
 
     private void reachTarget(Ghost ghost,PhysicEntity target){

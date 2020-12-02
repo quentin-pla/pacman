@@ -24,9 +24,24 @@ public class Ghost extends Player {
      */
     private boolean eaten;
 
+    /**
+     * hashmap de patrouille des zones
+     */
     private HashMap<String,Boolean> scatterPatrolZones = new HashMap<String, Boolean>();
+
+    /**
+     * Si la zone de patrouille est atteinte
+     */
     private boolean patroleZoneReached = false;
+
+    /**
+     * Direction de déplacement précédente
+     */
     private Gameplay.MoveDirection previousDirection;
+
+    /**
+     * Garder la direction actuelle
+     */
     private HashMap<String,Boolean> keepDirection = new HashMap<>();
 
 
