@@ -58,6 +58,8 @@ public class Scene extends SwingScene {
     protected void paintComponent(java.awt.Graphics g) {
         super.paintComponent(g);
         graphics = (Graphics2D) g.create();
+        graphics.setColor(backgroundColor);
+        graphics.fillRect(0, 0, width, height);
         for (GraphicEntity entity : entities)
             graphicsEngine.draw(entity.getParent());
         graphics.dispose();

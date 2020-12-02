@@ -31,19 +31,9 @@ public class SwingRenderer {
     }
 
     /**
-     * Environnement graphique
-     */
-    private GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-
-    /**
-     * Configuration graphique
-     */
-    private GraphicsConfiguration gc = ge.getDefaultScreenDevice().getDefaultConfiguration();
-
-    /**
      * Textures chargées
      */
-    private Map<String,BufferedImage> loaded_textures = new HashMap<>();
+    private final Map<String,BufferedImage> loadedTextures = new HashMap<>();
 
     /**
      * Générer un rectangle
@@ -54,10 +44,8 @@ public class SwingRenderer {
      * @param color couleur
      */
     public void renderRect(int height, int width, int x, int y, Color color) {
-        Graphics2D graphics2D = (Graphics2D) getCurrentGraphics().create();
-        graphics2D.setColor(color);
-        graphics2D.fillRect(x,y,width,height);
-        graphics2D.dispose();
+        getCurrentGraphics().setColor(color);
+        getCurrentGraphics().fillRect(x,y,width,height);
     }
 
     /**
@@ -69,9 +57,7 @@ public class SwingRenderer {
      * @param link lien vers la texture
      */
     public void renderTexturedRect(int height, int width, int x, int y, String link) {
-        Graphics2D graphics2D = (Graphics2D) getCurrentGraphics().create();
-        graphics2D.drawImage(loaded_textures.get(link), x, y, width, height, null);
-        graphics2D.dispose();
+        getCurrentGraphics().drawImage(loadedTextures.get(link), x, y, width, height, null);
     }
 
     /**
@@ -103,26 +89,25 @@ public class SwingRenderer {
      */
     public void loadTexture(String link) {
         BufferedImage texture = getBufferedImage(link);
-        loaded_textures.put(link, texture);
+        loadedTextures.put(link, texture);
         texture.flush();
     }
 
     /**
      * Charger un fichier de textures
      * @param link lien du fichier
-     * @param sheet_height nombre de textures sur la hauteur
-     * @param sheet_width nombre de textures sur la largeur
+     * @param sheetHeight nombre de textures sur la hauteur
+     * @param sheetWidth nombre de textures sur la largeur
      */
-    public void loadSpriteSheet(String link, int sheet_height, int sheet_width) {
+    public void loadSpriteSheet(String link, int sheetHeight, int sheetWidth) {
         BufferedImage texture = getBufferedImage(link);
-        loaded_textures.put(link, texture);
-        int part_width = texture.getWidth() / sheet_width;
-        int part_height = texture.getHeight() / sheet_height;
-        for (int row = 0; row < sheet_height; row++) {
-            for (int col = 0; col < sheet_width; col++) {
-                int crop_x = col * part_width;
-                int crop_y = row * part_height;
-                loaded_textures.put(link + row + col, texture.getSubimage(crop_x, crop_y, part_width, part_height));
+        int partWidth = texture.getWidth() / sheetWidth;
+        int partHeight = texture.getHeight() / sheetHeight;
+        for (int row = 0; row < sheetHeight; row++) {
+            for (int col = 0; col < sheetWidth; col++) {
+                int cropX = col * partWidth;
+                int cropY = row * partHeight;
+                loadedTextures.put(link + row + "-" + col, texture.getSubimage(cropX, cropY, partWidth, partHeight));
             }
         }
         texture.flush();
@@ -150,7 +135,7 @@ public class SwingRenderer {
      * @return booléen
      */
     public boolean isTextureLoaded(String link) {
-        return loaded_textures.containsKey(link);
+        return loadedTextures.containsKey(link);
     }
 
     /**

@@ -24,7 +24,7 @@ public class Sprite extends Cover {
      */
     protected Sprite(SpriteSheet spriteSheet, int row, int col) {
         this.spriteSheet = spriteSheet;
-        this.link = spriteSheet.getLink() + row + col;
+        this.link = spriteSheet.getLink() + row + "-" + col;
     }
 
     @Override

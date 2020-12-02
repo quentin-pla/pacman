@@ -52,8 +52,9 @@ public class SwingWindow {
      * Rafraichir la fenêtre
      */
     public void refreshWindow() {
-        getCurrentScene().repaint();
-        getCurrentScene().revalidate();
+        SwingScene currentScene = getCurrentScene();
+        if (currentScene != null)
+            currentScene.repaint();
     }
 
     /**
@@ -61,15 +62,14 @@ public class SwingWindow {
      * @param scene scène
      */
     public void showScene(SwingScene scene) {
-        //Supprimer la scène courante
-        if (window.getContentPane().getComponents().length > 0)
-            window.getContentPane().remove(0);
+        //Suppression des éléments de la scène
+        window.getContentPane().removeAll();
         //Ajout de la nouvelle scène
-        window.getContentPane().add(scene);
+        window.getContentPane().add(scene, 0);
         //Dimensionnement de la fenêtre à la scène
         window.pack();
         //Centrer la fenêtre
-        window.setLocationRelativeTo(null);
+        //window.setLocationRelativeTo(null);
     }
 
     /**

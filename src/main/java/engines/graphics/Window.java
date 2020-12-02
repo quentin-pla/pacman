@@ -30,14 +30,14 @@ public class Window extends SwingAPI {
     /**
      * Scène affichée
      */
-    private static Scene actual_scene;
+    private static Scene actualScene;
 
     /**
      * Afficher la fenêtre
      */
     protected static void show() {
         try {
-            if (actual_scene == null)
+            if (actualScene == null)
                 throw new Exception("Aucune scène spécifiée");
         } catch (Exception e) {
             e.printStackTrace();
@@ -70,10 +70,10 @@ public class Window extends SwingAPI {
      * @param scene scène
      */
     protected static void bindScene(Scene scene) {
-        Window.actual_scene = scene;
+        Window.actualScene = scene;
         Window.height = scene.getHeight();
         Window.width = scene.getWidth();
-        SwingWindow.getInstance().showScene(actual_scene);
+        SwingWindow.getInstance().showScene(actualScene);
     }
 
     // GETTERS & SETTERS //
@@ -98,5 +98,5 @@ public class Window extends SwingAPI {
 
     public static int getWidth() { return width; }
 
-    public static Scene getActualScene() { return actual_scene; }
+    public static Scene getActualScene() { return actualScene; }
 }

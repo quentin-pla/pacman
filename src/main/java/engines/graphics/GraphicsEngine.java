@@ -164,6 +164,8 @@ public class GraphicsEngine implements GraphicEvent {
      * @param animationID identifiant de l'animation
      */
     public void bindAnimation(Entity entity, int animationID) {
+        SpriteAnimation animation = animations.get(animationID);
+        if (!animation.isLooping()) animation.reset();
         entity.getGraphicEntity().setTexture(animations.get(animationID));
     }
 
@@ -371,7 +373,6 @@ public class GraphicsEngine implements GraphicEvent {
      */
     public void bindScene(Scene scene) {
         Window.bindScene(scene);
-        notifyEvent("updateFocusedEntities");
     }
 
     //-----------------------------------------------//

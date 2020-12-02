@@ -56,10 +56,6 @@ public class SwingScene extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        graphics = (Graphics2D) g.create();
-        graphics.setColor(backgroundColor);
-        graphics.fillRect(0, 0, width, height);
-        graphics.dispose();
     }
 
     public Graphics2D get2DGraphics() { return graphics; }

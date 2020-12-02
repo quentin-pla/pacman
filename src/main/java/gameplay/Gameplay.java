@@ -12,9 +12,10 @@ import engines.physics.PhysicEntity;
 import engines.physics.PhysicsEngine;
 import engines.sound.SoundEngine;
 
-import javax.sound.sampled.LineEvent;
 import java.awt.event.KeyEvent;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.lang.Thread.sleep;
 
@@ -63,6 +64,7 @@ public class Gameplay {
      * Affichage du volume
      */
     private Entity currentVolume;
+
     /**
      * Joueur
      */
@@ -76,7 +78,12 @@ public class Gameplay {
     /**
      * Booléen pour savoir si les fantômes sont appeurés
      */
-    private volatile boolean ghostFear;
+    private final AtomicBoolean ghostFear;
+
+    /**
+     * Temps restant pour la crainte des fantomes
+     */
+    private final AtomicInteger ghostFearTimeout;
 
     /**
      * Constructeur
@@ -85,7 +92,8 @@ public class Gameplay {
         this.kernelEngine = new KernelEngine();
         this.textures = kernelEngine.getGraphicsEngine().loadSpriteSheet("assets/sprite_sheet.png", 12, 11);
         this.levels = new ArrayList<>();
-        this.ghostFear = false;
+        this.ghostFear = new AtomicBoolean(false);
+        this.ghostFearTimeout = new AtomicInteger(5);
         initGameplay();
     }
 
@@ -116,12 +124,8 @@ public class Gameplay {
     private void initEvents() {
         //Jouer un niveau
         kernelEngine.addEvent("playLevel", () -> playLevel(levels.get(0)));
-        //Jouer une nouvelle partie
-        kernelEngine.addEvent("newGame", () -> {
-            levels.remove(currentLevel);
-            initDefaultLevel();
-            playLevel(levels.get(0));
-        });
+        //Rejouer un niveau
+        kernelEngine.addEvent("restartLevel", this::restartLevel);
         //Déplacer le fantome rose
         kernelEngine.addEvent("movePinkGhost", this::applyPinkGhostAI);
         //Se déplacer vers le haut
@@ -133,14 +137,11 @@ public class Gameplay {
         //Se déplacer vers la gauche
         kernelEngine.addEvent("pacmanGoLeft", () -> switchPacmanDirection(MoveDirection.LEFT));
         //Augmenter le volume
-        kernelEngine.addEvent("augmentVolume", this::incrementGlobalVolume);
+        kernelEngine.addEvent("upVolume", this::incrementGlobalVolume);
         //Baisser le volume
         kernelEngine.addEvent("downVolume", this::decrementGlobalVolume);
         //Lorsqu'il y a une collision
-
         kernelEngine.addEvent("pacmanOnCollision", this::checkPacmanCollisions);
-
-
 
         //Liaison des évènements du niveau
         ioEngine().bindEventOnLastKey(KeyEvent.VK_UP, "pacmanGoUp");
@@ -158,10 +159,11 @@ public class Gameplay {
         soundEngine().loadSound("munch_1.wav","munch1");
         soundEngine().loadSound("munch_2.wav","munch2");
         soundEngine().loadSound("game_start.wav","gameStart");
-        soundEngine().loadSound("death_1.wav","death_1");
-        soundEngine().loadSound("death_2.wav","death_2");
-
-        soundEngine().setGlobalVolume(0);
+        soundEngine().loadSound("death_1.wav","death1");
+        soundEngine().loadSound("death_2.wav","death2");
+        soundEngine().loadSound("siren_1.wav", "siren1");
+        soundEngine().loadSound("power_pellet.wav", "powerup");
+        soundEngine().setGlobalVolume(0.5F);
     }
 
     /**
@@ -186,7 +188,7 @@ public class Gameplay {
         graphicsEngine().bindColor(volumeMinus,50,50,50);
         graphicsEngine().bindText(volumeMinus, "+", new Color(255,255,255), 20, true);
         graphicsEngine().addToScene(menuView, volumeMinus);
-        ioEngine().bindEventOnClick(volumeMinus,"augmentVolume");
+        ioEngine().bindEventOnClick(volumeMinus,"upVolume");
 
         physicsEngine().resize(currentVolume,200,50);
         physicsEngine().move(currentVolume, 100,337);
@@ -207,7 +209,6 @@ public class Gameplay {
         physicsEngine().move(menuLogo, 50,120);
         graphicsEngine().bindTexture(menuLogo,logoTexture);
         graphicsEngine().addToScene(menuView, menuLogo);
-
     }
 
     /**
@@ -233,7 +234,7 @@ public class Gameplay {
         graphicsEngine().bindColor(newGame,50,50,50);
         graphicsEngine().bindText(newGame, "NEW GAME", new Color(255,255,255), 20, true);
         graphicsEngine().addToScene(endGameView, newGame);
-        ioEngine().bindEventOnClick(newGame,"newGame");
+        ioEngine().bindEventOnClick(newGame,"restartLevel");
     }
 
     /**
@@ -318,10 +319,9 @@ public class Gameplay {
         //Ajout de la barrière
         defaultLevel.addFence(8, 9);
 
+        // Ajout des super gommes
         defaultLevel.addGomme(1,1);
         defaultLevel.addGomme(19,1);
-
-        // Ajout des super gommes
         defaultLevel.addGomme(1,17);
         defaultLevel.addGomme(19,17);
     }
@@ -450,8 +450,19 @@ public class Gameplay {
         if (forbiddenDirections.size() == 4) forbiddenDirections.clear();
         if (ghost.getCurrentDirection() != null) {
             callEventFromDirection(ghost, ghost.getCurrentDirection());
-            graphicsEngine().bindAnimation(ghost, ghost.getAnimations().get(ghost.getCurrentDirection().name()));
+            updateGhostAnimation(ghost);
         }
+    }
+
+    /**
+     * Mettre à jour l'animation d'un fantome
+     * @param ghost fantome
+     */
+    private void updateGhostAnimation(Ghost ghost) {
+        String animationName = ghost.getCurrentDirection().name();
+        if (ghost.getEaten()) animationName = "eaten" + animationName;
+        else if (ghostFear.get()) animationName = ghostFearTimeout.get() > 2 ? "fear" : "fearEnd";
+        graphicsEngine().bindAnimation(ghost, ghost.getAnimations().get(animationName));
     }
 
     /**
@@ -469,62 +480,65 @@ public class Gameplay {
      * Vérifier les collisions de Pacman
      */
     private void checkPacmanCollisions() {
-
-        ArrayList<PhysicEntity> collidingEntities = new ArrayList<>();
-        collidingEntities.add(physicsEngine().isSomethingUp(pacman));
-        collidingEntities.add(physicsEngine().isSomethingRight(pacman));
-        collidingEntities.add(physicsEngine().isSomethingDown(pacman));
-        collidingEntities.add(physicsEngine().isSomethingLeft(pacman));
-
         if (pacman.getCurrentAnimationID() != 0)
             if (graphicsEngine().getAnimation(pacman.getCurrentAnimationID()).isPlaying())
                 graphicsEngine().playPauseAnimation(pacman.getCurrentAnimationID());
+    }
 
-        for (Ghost ghost : ghosts.values()) {
-            if (collidingEntities.contains(ghost.getPhysicEntity())) {
+    /**
+     * Collision entre pacman et un fantome
+     * @param ghost fantome
+     */
+    public void pacmanGhostCollision(Ghost ghost) {
+        // Si les fantômes sont appeurés
+        if (ghostFear.get()) eatGhost(ghost);
+        else decreasePacmanLife();
+    }
 
-                // Si les fantômes sont appeurés
-                if (ghostFear) {
-                    this.currentLevel.updateActualScore(this.currentLevel.getActualScore() + 250);
-                    physicsEngine().removeCollisions(pacman.getPhysicEntity(), ghost.getPhysicEntity());
-                    ghost.setEaten(true);
-                    updateEatenGhostSkin();
+    /**
+     * Décrémenter la vie de pacman lorsqu'il se fait toucher par un fantome
+     */
+    private void decreasePacmanLife() {
+        moveGhostsOut();
+        kernelEngine.pauseEvents();
+        currentLevel.updateLives();
+        graphicsEngine().bindAnimation(pacman, pacman.getAnimations().get("death"));
+        new Thread(() -> {
+            soundEngine().pauseSound("siren1");
+            soundEngine().playSound("death1");
+            try { sleep(700); } catch (InterruptedException e) { e.printStackTrace(); }
+            soundEngine().stopSound("death1");
+            soundEngine().playSound("death2");
+            try { sleep(2000); } catch (InterruptedException e) { e.printStackTrace(); }
+            if (currentLevel.getLivesCount().get() > 0) playLevel(currentLevel);
+            else showEndGameView();
+        }).start();
+    }
 
-                    new Thread( () -> {
-                        long startTime = System.currentTimeMillis();
-                        while(((System.currentTimeMillis() - startTime)/1000) < 7) {;}
-                        physicsEngine().addCollisions(pacman, ghost);
-                        ghost.setEaten(false);
-                        updateEatenGhostSkin();
-                    }).start();
+    /**
+     * Placer les fanomes hors du niveau
+     */
+    private void moveGhostsOut() {
+        for (Ghost ghost1 : ghosts.values())
+            physicsEngine().move(ghost1, -100, -100);
+    }
+
+    /**
+     * Manger un fantome
+     * @param ghost fantome
+     */
+    private void eatGhost(Ghost ghost) {
+        if (!ghost.getEaten()) {
+            this.currentLevel.updateActualScore(this.currentLevel.getActualScore() + 250);
+            ghost.setEaten(true);
+            new Thread(() -> {
+                try {
+                    sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-
-                else {
-                    currentLevel.updateLives();
-                    soundEngine().playSound(pacman.getDeath1Sound());
-                    soundEngine().getSounds().get(pacman.getDeath1Sound()).addLineListener(e -> {
-                        if (e.getType() == LineEvent.Type.STOP) {
-                            soundEngine().playSound(pacman.getDeath2Sound());
-                        }
-                    });
-
-                    kernelEngine.pauseEvents();
-                    graphicsEngine().bindAnimation(pacman, pacman.getAnimations().get("DEATH"));
-                    new Thread(() -> {
-                        try {
-                            sleep(2000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        kernelEngine.resumeEvents();
-                        if (currentLevel.getLivesCount() > 0) {
-                            playLevel(currentLevel);
-                        } else {
-                            showEndGameView();
-                        }
-                    }).start();
-                }
-            }
+                ghost.setEaten(false);
+            }).start();
         }
     }
 
@@ -623,10 +637,19 @@ public class Gameplay {
      */
     protected void spawnPlayersOnLevel() {
         currentLevel.spawnPlayer(15,9);
-        currentLevel.spawnGhost(ghosts.get("red"),11,9);
-        currentLevel.spawnGhost(ghosts.get("blue"),9,8);
+//        currentLevel.spawnGhost(ghosts.get("red"),11,9);
+//        currentLevel.spawnGhost(ghosts.get("blue"),9,8);
         currentLevel.spawnGhost(ghosts.get("pink"),9,9);
-        currentLevel.spawnGhost(ghosts.get("orange"),9,10);
+//        currentLevel.spawnGhost(ghosts.get("orange"),9,10);
+    }
+
+    /**
+     * Rejouer un niveau
+     */
+    protected void restartLevel() {
+        levels.remove(currentLevel);
+        initDefaultLevel();
+        playLevel(levels.get(0));
     }
 
     /**
@@ -634,132 +657,56 @@ public class Gameplay {
      * @param level level
      */
     protected void playLevel(Level level) {
-        ioEngine().resetLastPressedKey();
         currentLevel = level;
-        if (currentLevel.getLivesCount() == 3) {
-            soundEngine().playSound("gameStart");
-            kernelEngine.pauseEvents();
-            new Thread(() -> {
-                try {
-                    sleep(4000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                kernelEngine.resumeEvents();
-            }).start();
-        }
+        ioEngine().resetLastPressedKey();
         spawnPlayersOnLevel();
-        graphicsEngine().bindScene(currentLevel.getScene());
+        kernelEngine().switchScene(currentLevel.getScene());
+        if (currentLevel.getLivesCount().get() == 3)
+            soundEngine().playSound("gameStart");
+        new Thread(() -> {
+            kernelEngine.pauseEvents();
+            try { sleep(currentLevel.getLivesCount().get() == 3 ? 4000 : 1000); }
+            catch (InterruptedException e) { e.printStackTrace(); }
+            kernelEngine.resumeEvents();
+            soundEngine().loopSound("siren1");
+        }).start();
     }
 
     /**
-     * Mettre à jour les textures des fantômes selon s'ils
-     * sont appeurés ou non
+     * Activer le super pouvoir pour 5 secondes
      */
-    public void updateFearGhostSkin() {
-        if (ghostFear) {
-            for (Ghost ghost : ghosts.values()) {
-                if (!ghost.getEaten()) {
-                    graphicsEngine().bindTexture(ghost, textures, 8, 1);
-
-                    int moveUP = ghost.getAnimations().get(MoveDirection.UP.name());
-                    graphicsEngine().clearFrameOfAnimation(moveUP);
-                    graphicsEngine().addFrameToAnimation(moveUP, 8, 1);
-                    graphicsEngine().addFrameToAnimation(moveUP, 8, 2);
-
-                    int moveDOWN = ghost.getAnimations().get(MoveDirection.DOWN.name());
-                    graphicsEngine().clearFrameOfAnimation(moveDOWN);
-                    graphicsEngine().addFrameToAnimation(moveDOWN, 8, 1);
-                    graphicsEngine().addFrameToAnimation(moveDOWN, 8, 2);
-
-                    int moveLEFT = ghost.getAnimations().get(MoveDirection.LEFT.name());
-                    graphicsEngine().clearFrameOfAnimation(moveLEFT);
-                    graphicsEngine().addFrameToAnimation(moveLEFT, 8, 1);
-                    graphicsEngine().addFrameToAnimation(moveLEFT, 8, 2);
-
-                    int moveRIGHT = ghost.getAnimations().get(MoveDirection.RIGHT.name());
-                    graphicsEngine().clearFrameOfAnimation(moveRIGHT);
-                    graphicsEngine().addFrameToAnimation(moveRIGHT, 8, 1);
-                    graphicsEngine().addFrameToAnimation(moveRIGHT, 8, 2);
-                }
+    public void enablePowerUP() {
+        ghostFear.getAndSet(true);
+        ghostFearTimeout.getAndSet(5);
+        new Thread(() -> {
+            soundEngine().pauseSound("siren1");
+            soundEngine().loopSound("powerup");
+            for (int i = 0; i < 5; i++) {
+                try { sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
+                ghostFearTimeout.getAndDecrement();
             }
-        }
-        else {
-            for (Ghost ghost : ghosts.values()) {
-                if (!ghost.getEaten()) {
-                    graphicsEngine().bindTexture(ghost, textures, ghost.defaultTextureCoords[0], ghost.defaultTextureCoords[1]);
-                    int moveUP = ghost.getAnimations().get(MoveDirection.UP.name());
-                    graphicsEngine().clearFrameOfAnimation(moveUP);
-                    int moveDOWN = ghost.getAnimations().get(MoveDirection.DOWN.name());
-                    graphicsEngine().clearFrameOfAnimation(moveDOWN);
-                    int moveLEFT = ghost.getAnimations().get(MoveDirection.LEFT.name());
-                    graphicsEngine().clearFrameOfAnimation(moveLEFT);
-                    int moveRIGHT = ghost.getAnimations().get(MoveDirection.RIGHT.name());
-                    graphicsEngine().clearFrameOfAnimation(moveRIGHT);
-                    ghost.initAnimations(textures);
-                }
-            }
-        }
-    }
-
-    /**
-     * Mettre à jour le skin d'un fantome mangé
-     */
-    public void updateEatenGhostSkin() {
-        for (Ghost ghost: ghosts.values()) {
-            if (ghost.getEaten()) {
-                graphicsEngine().bindTexture(ghost, textures, 7, 1);
-
-                int moveUP = ghost.getAnimations().get(MoveDirection.UP.name());
-                graphicsEngine().clearFrameOfAnimation(moveUP);
-                graphicsEngine().addFrameToAnimation(moveUP, 7, 1);
-                graphicsEngine().addFrameToAnimation(moveUP, 7, 2);
-
-                int moveDOWN = ghost.getAnimations().get(MoveDirection.DOWN.name());
-                graphicsEngine().clearFrameOfAnimation(moveDOWN);
-                graphicsEngine().addFrameToAnimation(moveDOWN, 7, 1);
-                graphicsEngine().addFrameToAnimation(moveDOWN, 7, 2);
-
-                int moveLEFT = ghost.getAnimations().get(MoveDirection.LEFT.name());
-                graphicsEngine().clearFrameOfAnimation(moveLEFT);
-                graphicsEngine().addFrameToAnimation(moveLEFT, 7, 1);
-                graphicsEngine().addFrameToAnimation(moveLEFT, 7, 2);
-
-                int moveRIGHT = ghost.getAnimations().get(MoveDirection.RIGHT.name());
-                graphicsEngine().clearFrameOfAnimation(moveRIGHT);
-                graphicsEngine().addFrameToAnimation(moveRIGHT, 7, 1);
-                graphicsEngine().addFrameToAnimation(moveRIGHT, 7, 2);
-            }
-            else {
-                graphicsEngine().bindTexture(ghost, textures, ghost.defaultTextureCoords[0], ghost.defaultTextureCoords[1]);
-                int moveUP = ghost.getAnimations().get(MoveDirection.UP.name());
-                graphicsEngine().clearFrameOfAnimation(moveUP);
-                int moveDOWN = ghost.getAnimations().get(MoveDirection.DOWN.name());
-                graphicsEngine().clearFrameOfAnimation(moveDOWN);
-                int moveLEFT = ghost.getAnimations().get(MoveDirection.LEFT.name());
-                graphicsEngine().clearFrameOfAnimation(moveLEFT);
-                int moveRIGHT = ghost.getAnimations().get(MoveDirection.RIGHT.name());
-                graphicsEngine().clearFrameOfAnimation(moveRIGHT);
-                ghost.initAnimations(textures);
-            }
-        }
+            ghostFear.getAndSet(false);
+            soundEngine().pauseSound("powerup");
+            soundEngine().loopSound("siren1");
+        }).start();
     }
 
     /**
      * Afficher la vue de fin de jeu
      */
     protected void showEndGameView() {
+        kernelEngine().switchScene(endGameView);
         GraphicEntity score = endGameView.getEntities().get(1);
         graphicsEngine().bindText(score.getParent(), "Score : " + currentLevel.getActualScore(),
                 new Color(255,255,255), 20, true);
-        graphicsEngine().bindScene(endGameView);
+        kernelEngine.resumeEvents();
     }
 
     /**
      * Lancer le jeu
      */
     public void start() {
-        graphicsEngine().bindScene(menuView);
+        kernelEngine().switchScene(menuView);
         kernelEngine.start();
     }
 
@@ -784,26 +731,4 @@ public class Gameplay {
     public Map<String,Ghost> getGhosts() { return ghosts; }
 
     public ArrayList<Level> getLevels() { return levels; }
-
-    // SETTERS //
-
-    /**
-     * Mettre à jour la peur des fantômes
-     * et appel au changement de textures
-     *
-     * Mise en place d'un timer, à la fin de celui-ci les fantômes redeviennent normaux
-     * @param fear
-     */
-    public void setGhostFear(boolean fear) {
-        this.ghostFear = fear;
-        updateFearGhostSkin();
-
-        new Thread( () -> {
-            long startTime = System.currentTimeMillis();
-            while(((System.currentTimeMillis() - startTime)/1000) < 5) {;}
-
-            this.ghostFear = false;
-            updateFearGhostSkin();
-        }).start();
-    }
 }

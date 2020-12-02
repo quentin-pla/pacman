@@ -5,6 +5,7 @@ import engines.graphics.Scene;
 import engines.kernel.Entity;
 
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Niveau de jeu
@@ -56,7 +57,7 @@ public class Level {
     /**
      * Nombre de vies
      */
-    private int livesCount = 3;
+    private AtomicInteger livesCount = new AtomicInteger(3);
 
     /**
      * Barrière blanche
@@ -108,13 +109,14 @@ public class Level {
      */
     public void spawnPlayer(int row, int col) {
         Pacman pacman = gameplay.getPlayer();
-        gameplay.physicsEngine().addBoundLimits(pacman,0,0,scene.getWidth(),scene.getHeight());
+        if (!scene.getEntities().contains(pacman.getGraphicEntity())) {
+            gameplay.physicsEngine().addBoundLimits(pacman, 0, 0, scene.getWidth(), scene.getHeight());
+            gameplay.graphicsEngine().addToScene(scene, pacman);
+        }
         pacman.bindDefaultTexture();
         Entity entity = matrix[row][col];
         gameplay.physicsEngine().move(pacman,
                 entity.getPhysicEntity().getX(), entity.getPhysicEntity().getY());
-        if (!scene.getEntities().contains(pacman.getGraphicEntity()))
-            gameplay.graphicsEngine().addToScene(scene, pacman);
     }
 
     /**
@@ -124,13 +126,17 @@ public class Level {
      * @param col colonne
      */
     public void spawnGhost(Ghost ghost, int row, int col) {
-        gameplay.physicsEngine().addBoundLimits(ghost,0,0,scene.getWidth(),scene.getHeight());
-        gameplay.physicsEngine().addCollisions(gameplay.getPlayer(), ghost);
+        if (!scene.getEntities().contains(ghost.getGraphicEntity())) {
+            gameplay.physicsEngine().addBoundLimits(ghost, 0, 0, scene.getWidth(), scene.getHeight());
+            gameplay.kernelEngine().addEvent("pacman" + ghost.getColor() + "ghostCollision",
+                    () -> gameplay.pacmanGhostCollision(ghost));
+            gameplay.physicsEngine().bindEventOnCollision(gameplay.getPlayer(), ghost,
+                    "pacman" + ghost.getColor() + "ghostCollision");
+            gameplay.graphicsEngine().addToScene(scene, ghost);
+        }
         Entity entity = matrix[row][col];
         gameplay.physicsEngine().move(ghost,
                 entity.getPhysicEntity().getX(), entity.getPhysicEntity().getY());
-        if (!scene.getEntities().contains(ghost.getGraphicEntity()))
-            gameplay.graphicsEngine().addToScene(scene, ghost);
     }
 
     /**
@@ -184,9 +190,8 @@ public class Level {
         gameplay.graphicsEngine().bindTexture(gomme, gameplay.getTexturesFile(), 10, 1);
         gameplay.kernelEngine().addEvent("eraseGomme" + gommes, () -> {
             gameplay.kernelEngine().removeEntity(gomme);
-            gameplay.soundEngine().playSound(gameplay.getPlayer().getMunchSound());
             updateActualScore(actualScore + 50);
-            updateFear(true);
+            gameplay.enablePowerUP();
         });
         gameplay.physicsEngine().bindEventOnSameLocation(gameplay.getPlayer(), gomme, "eraseGomme" + gommes);
         ++gommes;
@@ -256,17 +261,9 @@ public class Level {
      * Mettre à jour les vies restantes de pacman
      */
     public void updateLives() {
-        if (livesCount > 0)
-            gameplay.kernelEngine().removeEntity(livesEntity[livesCount-1]);
-        livesCount--;
-    }
-
-    /**
-     * Mettre à jour la peur des fantômes
-     * @param fear les fantômes sont appeurés
-     */
-    public void updateFear(boolean fear) {
-        this.gameplay.setGhostFear(fear);
+        livesCount.getAndDecrement();
+        if (livesCount.get() > 0)
+            gameplay.kernelEngine().removeEntity(livesEntity[livesCount.get()]);
     }
 
     /**
@@ -313,7 +310,7 @@ public class Level {
 
     public Scene getScene() { return scene; }
 
-    public int getLivesCount() { return this.livesCount; }
+    public AtomicInteger getLivesCount() { return this.livesCount; }
 
     public int getActualScore() { return actualScore; }
 

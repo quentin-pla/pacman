@@ -3,7 +3,7 @@ package engines.kernel;
 import engines.AI.AIEngine;
 import engines.graphics.GraphicEntity;
 import engines.graphics.GraphicsEngine;
-import engines.graphics.Window;
+import engines.graphics.Scene;
 import engines.input_output.IOEngine;
 import engines.physics.PhysicEntity;
 import engines.physics.PhysicsEngine;
@@ -56,6 +56,11 @@ public class KernelEngine implements EventListener {
     private boolean pauseEvents = false;
 
     /**
+     * Mettre le rafraichissement des graphismes en pause
+     */
+    private boolean pauseGraphics = false;
+
+    /**
      * Liste des évènements du jeu
      */
     private final Map<String, Runnable> events = new HashMap<>();
@@ -80,7 +85,6 @@ public class KernelEngine implements EventListener {
         this.soundEngine = new SoundEngine();
         this.aiEngine = new AIEngine();
         initListeners();
-        initKernelEvents();
     }
 
     @Override
@@ -103,13 +107,6 @@ public class KernelEngine implements EventListener {
         ioEngine.subscribeEvents(this);
         physicsEngine.subscribeEvents(this);
         aiEngine.subscribeEvents(this);
-    }
-
-    /**
-     * Initialiser les évènements noyaux
-     */
-    private void initKernelEvents() {
-        addEvent("updateFocusedEntities", this::updateFocusedEntities);
     }
 
     /**
@@ -150,7 +147,7 @@ public class KernelEngine implements EventListener {
             aiEngine.updateEntities();
             physicsEngine.updateEntites();
         }
-        graphicsEngine.refreshWindow();
+        if (!pauseGraphics) graphicsEngine.refreshWindow();
     };
 
     /**
@@ -168,6 +165,31 @@ public class KernelEngine implements EventListener {
     }
 
     /**
+     * Mettre en pause le rafraichissement des grahismes
+     */
+    public void pauseGraphics() {
+        pauseGraphics = true;
+    }
+
+    /**
+     * Reprendre le rafraichissement des graphismes
+     */
+    public void resumeGraphics() {
+        pauseGraphics = false;
+    }
+
+    /**
+     * Changer de scène
+     * @param scene scène
+     */
+    public void switchScene(Scene scene) {
+        pauseGraphics();
+        updateFocusedEntities(scene);
+        graphicsEngine.bindScene(scene);
+        resumeGraphics();
+    }
+
+    /**
      * Exécuter le moteur noyau
      */
     public void start() {
@@ -179,11 +201,11 @@ public class KernelEngine implements EventListener {
     /**
      * Mettre à jour les entités sur lesquelles on a le focus
      */
-    public void updateFocusedEntities() {
+    public void updateFocusedEntities(Scene scene) {
         graphicsEngine.getEntities().clear();
         physicsEngine.getEntities().clear();
         aiEngine.getEntities().clear();
-        for (GraphicEntity entity : Window.getActualScene().getEntities()) {
+        for (GraphicEntity entity : scene.getEntities()) {
             graphicsEngine.getEntities().put(entity.parent.getId(),entity.parent.getGraphicEntity());
             physicsEngine.getEntities().put(entity.parent.getId(),entity.parent.getPhysicEntity());
             aiEngine.getEntities().put(entity.parent.getId(),entity.parent.getAiEntity());
@@ -249,4 +271,8 @@ public class KernelEngine implements EventListener {
     public SoundEngine getSoundEngine() { return soundEngine; }
 
     public AIEngine getAiEngine() { return aiEngine; }
+
+    public boolean isEventsPaused() { return pauseEvents; }
+
+    public boolean isGraphicsPaused() { return pauseGraphics; }
 }

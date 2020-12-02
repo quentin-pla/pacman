@@ -10,7 +10,7 @@ public class Ghost extends Player {
     /**
      * Gameplay
      */
-    private Gameplay gameplay;
+    private final Gameplay gameplay;
 
     /**
      * Directions interdites
@@ -23,6 +23,11 @@ public class Ghost extends Player {
     private boolean eaten;
 
     /**
+     * Couleur
+     */
+    private final String color;
+
+    /**
      * Constructeur
      * @param gameplay gameplay
      * @param color couleur
@@ -32,25 +37,17 @@ public class Ghost extends Player {
         this.gameplay = gameplay;
         this.forbiddenDirection = new HashSet<>();
         this.eaten = false;
+        this.color = color;
         gameplay.physicsEngine().resize(this, 30, 30);
         gameplay.physicsEngine().setSpeed(this, 2);
         switch (color) {
-            case "red" :
-                this.defaultTextureCoords = new int[]{3, 1};
-                break;
-            case "pink" :
-                this.defaultTextureCoords = new int[]{4, 1};
-                break;
-            case "blue" :
-                this.defaultTextureCoords = new int[]{5, 1};
-                break;
-            case "orange" :
-                this.defaultTextureCoords = new int[]{6, 1};
-                break;
+            case "red"    : defaultTextureCoords = new int[]{3, 1}; break;
+            case "pink"   : defaultTextureCoords = new int[]{4, 1}; break;
+            case "blue"   : defaultTextureCoords = new int[]{5, 1}; break;
+            case "orange" : defaultTextureCoords = new int[]{6, 1};break;
         }
-        gameplay.graphicsEngine().bindTexture(this, gameplay.getTexturesFile(),
-                defaultTextureCoords[0], defaultTextureCoords[1]);
         initAnimations(gameplay.getTexturesFile());
+        gameplay.graphicsEngine().bindAnimation(this, animations.get("RIGHT"));
     }
 
     /**
@@ -79,6 +76,38 @@ public class Ghost extends Player {
         gameplay.graphicsEngine().addFrameToAnimation(moveLEFT,defaultTextureCoords[0],5);
         gameplay.graphicsEngine().addFrameToAnimation(moveLEFT,defaultTextureCoords[0],6);
         animations.put(Gameplay.MoveDirection.LEFT.name(), moveLEFT);
+
+        int eatenUP = gameplay.graphicsEngine().generateAnimation(spriteSheetID, animationsDuration, true);
+        gameplay.graphicsEngine().addFrameToAnimation(eatenUP,7,7);
+        gameplay.graphicsEngine().addFrameToAnimation(eatenUP,7,8);
+        animations.put("eaten" + Gameplay.MoveDirection.UP.name(), eatenUP);
+
+        int eatenRIGHT = gameplay.graphicsEngine().generateAnimation(spriteSheetID, animationsDuration, true);
+        gameplay.graphicsEngine().addFrameToAnimation(eatenRIGHT,7,1);
+        gameplay.graphicsEngine().addFrameToAnimation(eatenRIGHT,7,2);
+        animations.put("eaten" + Gameplay.MoveDirection.RIGHT.name(), eatenRIGHT);
+
+        int eatenDOWN = gameplay.graphicsEngine().generateAnimation(spriteSheetID, animationsDuration, true);
+        gameplay.graphicsEngine().addFrameToAnimation(eatenDOWN,7,3);
+        gameplay.graphicsEngine().addFrameToAnimation(eatenDOWN,7,4);
+        animations.put("eaten" + Gameplay.MoveDirection.DOWN.name(), eatenDOWN);
+
+        int eatenLEFT = gameplay.graphicsEngine().generateAnimation(spriteSheetID, animationsDuration, true);
+        gameplay.graphicsEngine().addFrameToAnimation(eatenLEFT,7,5);
+        gameplay.graphicsEngine().addFrameToAnimation(eatenLEFT,7,6);
+        animations.put("eaten" + Gameplay.MoveDirection.LEFT.name(), eatenLEFT);
+
+        int fear = gameplay.graphicsEngine().generateAnimation(spriteSheetID, animationsDuration, true);
+        gameplay.graphicsEngine().addFrameToAnimation(fear,8,1);
+        gameplay.graphicsEngine().addFrameToAnimation(fear,8,2);
+        animations.put("fear", fear);
+
+        int fearEnd = gameplay.graphicsEngine().generateAnimation(spriteSheetID, animationsDuration, true);
+        gameplay.graphicsEngine().addFrameToAnimation(fearEnd,8,1);
+        gameplay.graphicsEngine().addFrameToAnimation(fearEnd,8,2);
+        gameplay.graphicsEngine().addFrameToAnimation(fearEnd,8,3);
+        gameplay.graphicsEngine().addFrameToAnimation(fearEnd,8,4);
+        animations.put("fearEnd", fearEnd);
     }
 
     public Set<Gameplay.MoveDirection> getForbiddenDirection() { return forbiddenDirection; }
@@ -86,4 +115,6 @@ public class Ghost extends Player {
     public boolean getEaten() { return this.eaten; }
 
     public void setEaten(boolean eaten) { this.eaten = eaten; }
+
+    public String getColor() { return color; }
 }

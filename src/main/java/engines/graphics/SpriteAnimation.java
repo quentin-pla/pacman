@@ -11,7 +11,7 @@ public class SpriteAnimation extends Cover {
     /**
      * Image de départ
      */
-    private int actual_frame = 0;
+    private int actualFrame = 0;
 
     /**
      * Images de l'animation
@@ -31,7 +31,7 @@ public class SpriteAnimation extends Cover {
     /**
      * Additionner ou soustraire
      */
-    private boolean add_substract = true;
+    private boolean addSubstract = true;
 
     /**
      * En cours
@@ -46,7 +46,7 @@ public class SpriteAnimation extends Cover {
     /**
      * Fichier de texture
      */
-    private SpriteSheet spriteSheet;
+    private final SpriteSheet spriteSheet;
 
     /**
      * Constructeur
@@ -66,9 +66,9 @@ public class SpriteAnimation extends Cover {
      */
     private SpriteAnimation(SpriteAnimation clone) {
         this(clone.spriteSheet, clone.speed, clone.looping);
-        this.actual_frame = clone.actual_frame;
+        this.actualFrame = clone.actualFrame;
         this.frames = new ArrayList<>(clone.frames);
-        this.add_substract = clone.add_substract;
+        this.addSubstract = clone.addSubstract;
         this.playing = clone.playing;
         this.time = clone.time;
     }
@@ -82,6 +82,9 @@ public class SpriteAnimation extends Cover {
         frames.add(spriteSheet.getSprite(row, col));
     }
 
+    /**
+     * Supprimer les images de l'animation
+     */
     protected void clearFrame() {
         frames = new ArrayList<>();
     }
@@ -96,6 +99,9 @@ public class SpriteAnimation extends Cover {
      */
     protected void reset() {
         time = 0;
+        playing = true;
+        actualFrame = 0;
+        addSubstract = true;
     }
 
     @Override
@@ -109,14 +115,14 @@ public class SpriteAnimation extends Cover {
         if (playing) {
             ++time;
             if (time > speed) {
-                if (add_substract) ++actual_frame;
-                else --actual_frame;
-                if (actual_frame <= 0) {
-                    if (!looping) reset();
-                    add_substract = !add_substract;
+                if (actualFrame < frames.size() - 1 && addSubstract)
+                    ++actualFrame;
+                else if (actualFrame > 0 && !addSubstract)--actualFrame;
+                if (actualFrame == 0) addSubstract = true;
+                else if (actualFrame == frames.size() - 1) {
+                    if (!looping) playPause();
+                    addSubstract = false;
                 }
-                else if (actual_frame >= frames.size() - 1)
-                    add_substract = !add_substract;
                 time = 0;
             }
         }
@@ -129,7 +135,7 @@ public class SpriteAnimation extends Cover {
 
     // GETTERS & SETTERS //
 
-    public Sprite getFrame() { return frames.get(actual_frame); }
+    public Sprite getFrame() { return frames.get(actualFrame); }
 
     public SpriteSheet getSpriteSheet() { return spriteSheet; }
 
@@ -138,6 +144,8 @@ public class SpriteAnimation extends Cover {
     public boolean isPlaying() { return playing; }
 
     public void setSpeed(int speed) { this.speed = speed; }
+
+    public boolean isLooping() { return looping; }
 
     public void setLooping(boolean looping) { this.looping = looping; }
 }

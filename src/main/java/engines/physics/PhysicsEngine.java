@@ -78,7 +78,6 @@ public class PhysicsEngine implements CollisionEvent {
             PhysicEntity e1 = event.getKey()[0];
             PhysicEntity e2 = event.getKey()[1];
             if ((e2 == null && e1.isColliding())
-                    || (e2 != null && e1.isColliding() && e2.isColliding())
                     || (e2 != null && isInCollision(e1.getParent(), e2.getParent())))
                 notifyCollision(event.getValue());
         }
@@ -107,7 +106,6 @@ public class PhysicsEngine implements CollisionEvent {
         entity1.getCollisions().remove(entity2);
         entity2.getCollisions().remove(entity1);
     }
-
 
     /**
      * Ajouter des limites de déplacement
