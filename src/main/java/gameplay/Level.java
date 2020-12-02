@@ -14,17 +14,17 @@ public class Level {
     /**
      * Gameplay
      */
-    private Gameplay gameplay;
+    private final Gameplay gameplay;
 
     /**
      * Scène liée
      */
-    private Scene scene;
+    private final Scene scene;
 
     /**
      * Matrice d'entités graphiques
      */
-    private Entity[][] matrix;
+    private final Entity[][] matrix;
 
     /**
      * Liste des murs du niveau
@@ -40,11 +40,6 @@ public class Level {
      * Nombre de gommes
      */
     private int gommes;
-
-    /**
-     * Chronomètre
-     */
-    private float timer;
 
     /**
      * Score actuel
@@ -80,7 +75,7 @@ public class Level {
         this.matrix = new Entity[rows][cols];
         this.walls = new boolean[rows][cols];
         this.actualScore = 0;
-        this.scene = gameplay.graphicsEngine().generateScene(rows * 30 + 30,cols * 30);
+        this.scene = gameplay.graphicsEngine().generateScene(rows * 30 + 30,(cols * 30));
         fillMatrix();
         initScore();
         initLives();
@@ -111,10 +106,8 @@ public class Level {
      */
     public void spawnPlayer(int row, int col) {
         Pacman pacman = gameplay.getPlayer();
-        if (!scene.getEntities().contains(pacman.getGraphicEntity())) {
-            gameplay.physicsEngine().addBoundLimits(pacman, 0, 0, scene.getWidth(), scene.getHeight());
+        if (!scene.getEntities().contains(pacman.getGraphicEntity()))
             gameplay.graphicsEngine().addToScene(scene, pacman);
-        }
         pacman.bindDefaultTexture();
         Entity entity = matrix[row][col];
         gameplay.physicsEngine().move(pacman,
@@ -129,7 +122,6 @@ public class Level {
      */
     public void spawnGhost(Ghost ghost, int row, int col) {
         if (!scene.getEntities().contains(ghost.getGraphicEntity())) {
-            gameplay.physicsEngine().addBoundLimits(ghost, 0, 0, scene.getWidth(), scene.getHeight());
             gameplay.kernelEngine().addEvent("pacman" + ghost.getColor() + "ghostCollision",
                     () -> gameplay.pacmanGhostCollision(ghost));
             gameplay.physicsEngine().bindEventOnCollision(gameplay.getPlayer(), ghost,
@@ -152,6 +144,29 @@ public class Level {
         for (Ghost ghost : gameplay.getGhosts().values())
             gameplay.physicsEngine().addCollisions(ghost, wall);
         walls[row][col] = true;
+    }
+
+    /**
+     * Ajouter un portail de téléportation
+     * @param row ligne
+     * @param col colonne
+     */
+    public void addTeleportationPortal(int row, int col, int teleportRow, int teleportCol, Gameplay.MoveDirection direction) {
+        Entity portal = matrix[row][col];
+        Entity teleportLocation = matrix[teleportRow][teleportCol];
+
+        int teleportX = teleportLocation.getPhysicEntity().getX();
+        int teleportY = teleportLocation.getPhysicEntity().getY();
+
+        gameplay.kernelEngine().addEvent("teleport" + portal + gameplay.getPlayer(),
+                () -> gameplay.teleportPlayer(gameplay.getPlayer(), teleportX, teleportY, direction));
+        gameplay.physicsEngine().bindEventOnSameLocation(gameplay.getPlayer(), portal,
+                "teleport" + portal + gameplay.getPlayer());
+        for (Ghost ghost : gameplay.getGhosts().values()) {
+            gameplay.kernelEngine().addEvent("teleport" + portal + ghost,
+                    () -> gameplay.teleportPlayer(ghost, teleportX, teleportY, direction));
+            gameplay.physicsEngine().bindEventOnSameLocation(ghost, portal, "teleport" + portal + ghost);
+        }
     }
 
     /**
@@ -210,8 +225,7 @@ public class Level {
      * @param col colonne
      */
     public Entity addTarget(int row, int col){
-        Entity target = matrix[row] [col];
-        return target;
+        return matrix[row][col];
     }
 
     /**
@@ -323,6 +337,16 @@ public class Level {
         livesEntity = new Entity[] {life, life2, life3};
     }
 
+    public void setVisiblePart(int x, int y, int height, int width) {
+        int xDifference = x > scene.getX() ? -x : x;
+        int yDifference = y > scene.getY() ? -y : y;
+        gameplay.graphicsEngine().setSceneSize(scene, height + yDifference, width + xDifference);
+        gameplay.graphicsEngine().setSceneLocation(scene, xDifference, yDifference);
+        gameplay.physicsEngine().translate(scoreLabel, xDifference * -1, yDifference * -1);
+        for (Entity liveEntity : livesEntity)
+            gameplay.physicsEngine().translate(liveEntity, xDifference, yDifference);
+    }
+
     // GETTERS //
 
     public Scene getScene() { return scene; }
@@ -332,4 +356,8 @@ public class Level {
     public int getActualScore() { return actualScore; }
 
     public Entity getFence() { return fence; }
+
+    public boolean[][] getWalls() {
+        return walls;
+    }
 }

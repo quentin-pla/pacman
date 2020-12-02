@@ -183,10 +183,17 @@ public class KernelEngine implements EventListener {
      * @param scene scène
      */
     public void switchScene(Scene scene) {
+        boolean resumeEvents = false;
+        if (!isEventsPaused()) {
+            pauseEvents();
+            resumeEvents = true;
+        }
         pauseGraphics();
         updateFocusedEntities(scene);
         graphicsEngine.bindScene(scene);
         resumeGraphics();
+        if (resumeEvents)
+            resumeEvents();
     }
 
     /**

@@ -3,6 +3,8 @@ package engines.graphics;
 import api.SwingAPI;
 import api.SwingWindow;
 
+import java.awt.Color;
+
 /**
  * Fenêtre
  */
@@ -74,6 +76,14 @@ public class Window extends SwingAPI {
         Window.height = scene.getHeight();
         Window.width = scene.getWidth();
         SwingWindow.getInstance().showScene(actualScene);
+    }
+
+    /**
+     * Définir la couleur de fond de la fenêtre
+     * @param color couleur
+     */
+    protected void setBackgroundColor(Color color) {
+        SwingWindow.getInstance().setBackgroundColor(color);
     }
 
     // GETTERS & SETTERS //

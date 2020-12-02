@@ -1,6 +1,7 @@
 package api;
 
 import javax.swing.*;
+import java.awt.*;
 
 /**
  * Fenêtre JFrame (bibliothèque Swing)
@@ -70,6 +71,17 @@ public class SwingWindow {
         window.pack();
         //Centrer la fenêtre
         window.setLocationRelativeTo(null);
+        //Définition du fond de la fenêtre
+        setBackgroundColor(scene.backgroundColor);
+
+    }
+
+    /**
+     * Définir la couleur de fond
+     * @param color couleur
+     */
+    public void setBackgroundColor(Color color) {
+        window.getContentPane().setBackground(color);
     }
 
     /**

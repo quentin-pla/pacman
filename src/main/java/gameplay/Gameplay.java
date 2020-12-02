@@ -149,6 +149,14 @@ public class Gameplay {
         kernelEngine.addEvent("downVolume", this::decrementGlobalVolume);
         //Lorsqu'il y a une collision
         kernelEngine.addEvent("pacmanOnCollision", this::checkPacmanCollisions);
+        //Téléporter à droite
+        kernelEngine().addEvent("teleportToRight", () -> {
+
+        });
+        //Téléporter à gauche
+        kernelEngine().addEvent("teleportToLeft", () -> {
+
+        });
 
         //Liaison des évènements du niveau
         ioEngine().bindEventOnLastKey(KeyEvent.VK_UP, "pacmanGoUp");
@@ -263,7 +271,7 @@ public class Gameplay {
      */
     private void initDefaultLevel() {
         //Level par défaut
-        Level defaultLevel = generateLevel(21,19);
+        Level defaultLevel = generateLevel(21,21);
 
         //Génération des murs
         Map<Integer,int[]> wallRows = new HashMap<>();
@@ -276,9 +284,9 @@ public class Gameplay {
         wallRows.put(5, new int[]{0, 5, 9, 13, 18});
         wallRows.put(6, new int[]{0, 1, 2, 3, 5, 6, 7, 9, 11, 12, 13, 15, 16, 17, 18});
         wallRows.put(7, new int[]{3, 5, 13, 15});
-        wallRows.put(8, new int[]{0, 1, 2, 3, 5, 7, 8, 10, 11, 13, 15, 16, 17, 18});
+        wallRows.put(8, new int[]{-1, 0, 1, 2, 3, 5, 7, 8, 10, 11, 13, 15, 16, 17, 18, 19});
         wallRows.put(9, new int[]{7, 11});
-        wallRows.put(10, new int[]{0, 1, 2, 3, 5, 7, 8, 9, 10, 11, 13, 15, 16, 17, 18});
+        wallRows.put(10, new int[]{-1, 0, 1, 2, 3, 5, 7, 8, 9, 10, 11, 13, 15, 16, 17, 18, 19});
         wallRows.put(11, new int[]{3, 5, 13, 15});
         wallRows.put(12, new int[]{0, 1, 2, 3, 5, 7, 8, 9, 10, 11, 13, 15, 16, 17, 18});
         wallRows.put(13, new int[]{0, 9, 18});
@@ -292,7 +300,7 @@ public class Gameplay {
 
         for (Map.Entry<Integer,int[]> row : wallRows.entrySet())
             for (int col : row.getValue())
-                defaultLevel.addWall(row.getKey(),col);
+                defaultLevel.addWall(row.getKey(),col + 1);
 
         defaultLevel.applyWallTextures();
 
@@ -321,22 +329,40 @@ public class Gameplay {
 
         for (Map.Entry<Integer,int[]> row : ballRows.entrySet())
             for (int col : row.getValue())
-                defaultLevel.addBall(row.getKey(),col);
+                defaultLevel.addBall(row.getKey(),col + 1);
 
         //Ajout de la barrière
-        defaultLevel.addFence(8, 9);
+        defaultLevel.addFence(8, 10);
+
+        //Ajout des portails de téléportation
+        defaultLevel.addTeleportationPortal(9, 0, 9, 20, MoveDirection.LEFT);
+        defaultLevel.addTeleportationPortal(9, 20, 9, 0, MoveDirection.RIGHT);
 
         // Ajout des super gommes
-        defaultLevel.addGomme(1,1);
-        defaultLevel.addGomme(19,1);
-        defaultLevel.addGomme(1,17);
-        defaultLevel.addGomme(19,17);
+        defaultLevel.addGomme(1,2);
+        defaultLevel.addGomme(19,2);
+        defaultLevel.addGomme(1,18);
+        defaultLevel.addGomme(19,18);
 
         //ajout target pour scatter (patrouille)
-        targets.put("TopLeft", defaultLevel.addTarget(1,1));
-        targets.put("TopRight",defaultLevel.addTarget(1,17));
-        targets.put("BottomLeft",defaultLevel.addTarget(19,1));
-        targets.put("BottomRight",defaultLevel.addTarget(19,17));
+        targets.put("TopLeft", defaultLevel.addTarget(1,2));
+        targets.put("TopRight",defaultLevel.addTarget(1,18));
+        targets.put("BottomLeft",defaultLevel.addTarget(19,2));
+        targets.put("BottomRight",defaultLevel.addTarget(19,18));
+
+        //Réduction de la taille pour ne pas voir les extrémités
+        defaultLevel.setVisiblePart(30,0,
+                defaultLevel.getScene().getHeight(),defaultLevel.getScene().getWidth() - 30);
+    }
+
+    /**
+     * Téléporter une entité
+     */
+    public void teleportPlayer(Player player, int x, int y, MoveDirection direction) {
+        if (player.getCurrentDirection() == direction) {
+            physicsEngine().move(player, x, y);
+            setEntityNextDirection(player, direction);
+        }
     }
 
     /**
@@ -801,7 +827,8 @@ public class Gameplay {
      */
     private void incrementGlobalVolume(){
         soundEngine().incrementGlobalVolume();
-        graphicsEngine().bindText(currentVolume, "Volume is : " + soundEngine().getGlobalVolume(), new Color(255,255,255), 20, true);
+        graphicsEngine().bindText(currentVolume, "Volume is : " + soundEngine().getGlobalVolume(),
+                new Color(255,255,255), 20, true);
     }
 
     /**
@@ -811,7 +838,8 @@ public class Gameplay {
      */
     private void decrementGlobalVolume(){
         soundEngine().decrementGlobalVolume();
-        graphicsEngine().bindText(currentVolume, "Volume is : " + soundEngine().getGlobalVolume(), new Color(255,255,255), 20, true);
+        graphicsEngine().bindText(currentVolume, "Volume is : " + soundEngine().getGlobalVolume(),
+                new Color(255,255,255), 20, true);
     }
 
     /**
@@ -820,7 +848,7 @@ public class Gameplay {
      * @param direction direction
      */
     private void setEntityNextDirection(Player entity, MoveDirection direction) {
-        PhysicEntity entityNearby;
+        PhysicEntity entityNearby = null;
         switch (direction) {
             case UP:
                 entityNearby = physicsEngine().isSomethingUp(entity);
@@ -890,11 +918,11 @@ public class Gameplay {
      * Faire apparaitre les joueurs sur le niveau actuel
      */
     protected void spawnPlayersOnLevel() {
-        currentLevel.spawnPlayer(15,9);
-        currentLevel.spawnGhost(ghosts.get("red"),11,9);
-        currentLevel.spawnGhost(ghosts.get("blue"),11,8);
-        currentLevel.spawnGhost(ghosts.get("pink"),9,9);
-        currentLevel.spawnGhost(ghosts.get("orange"),9,10);
+        currentLevel.spawnPlayer(15,10);
+        currentLevel.spawnGhost(ghosts.get("red"),11,10);
+        currentLevel.spawnGhost(ghosts.get("blue"),11,9);
+        currentLevel.spawnGhost(ghosts.get("pink"),9,10);
+        currentLevel.spawnGhost(ghosts.get("orange"),9,11);
     }
 
     /**

@@ -368,6 +368,25 @@ public class GraphicsEngine implements GraphicEvent {
     }
 
     /**
+     * Définir la position de la scène dans la fenêtre
+     * @param scene scène
+     * @param x position horizontale
+     * @param y position verticale
+     */
+    public void setSceneLocation(Scene scene, int x, int y) {
+        scene.setLocation(x, y);
+    }
+
+    /**
+     * Définir la taille d'une scène
+     * @param height hauteur
+     * @param width largeur
+     */
+    public void setSceneSize(Scene scene, int height, int width) {
+        scene.setSize(height, width);
+    }
+
+    /**
      * Attacher une scène à la fenêtre
      * @param scene scène
      */

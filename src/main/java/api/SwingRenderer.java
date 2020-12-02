@@ -47,6 +47,8 @@ public class SwingRenderer {
         Graphics2D graphics2D = getCurrentGraphics();
         if (graphics2D != null) {
             graphics2D.setColor(color);
+            x += getCurrentScene().xLocation;
+            y += getCurrentScene().yLocation;
             graphics2D.fillRect(x, y, width, height);
         }
     }
@@ -61,8 +63,11 @@ public class SwingRenderer {
      */
     public void renderTexturedRect(int height, int width, int x, int y, String link) {
         Graphics2D graphics2D = getCurrentGraphics();
-        if (graphics2D != null)
+        if (graphics2D != null) {
+            x += getCurrentScene().xLocation;
+            y += getCurrentScene().yLocation;
             graphics2D.drawImage(loadedTextures.get(link), x, y, width, height, null);
+        }
     }
 
     /**
@@ -84,6 +89,8 @@ public class SwingRenderer {
                 x = x + (width - metrics.stringWidth(text)) / 2;
                 y = y + ((height - metrics.getHeight()) / 2) + metrics.getAscent();
             }
+            x += getCurrentScene().xLocation;
+            y += getCurrentScene().yLocation;
             graphics2D.setColor(color);
             graphics2D.drawString(text, x, y);
         }
@@ -155,11 +162,13 @@ public class SwingRenderer {
         return new Color(red, green, blue);
     }
 
-    /**
-     * Obtenir l'objet graphique courant
-     * @return objet graphique
-     */
+    // GETTERS //
+
     private Graphics2D getCurrentGraphics() {
         return SwingWindow.getInstance().getCurrentScene().get2DGraphics();
+    }
+
+    private SwingScene getCurrentScene() {
+        return SwingWindow.getInstance().getCurrentScene();
     }
 }
