@@ -36,7 +36,9 @@ public class Level {
      */
     private int balls;
 
-
+    /**
+     * Nombre de gommes
+     */
     private int gommes;
 
     /**
@@ -57,7 +59,7 @@ public class Level {
     /**
      * Nombre de vies
      */
-    private AtomicInteger livesCount = new AtomicInteger(3);
+    private final AtomicInteger livesCount = new AtomicInteger(3);
 
     /**
      * Barrière blanche
@@ -175,6 +177,11 @@ public class Level {
             gameplay.kernelEngine().removeEntity(ball);
             gameplay.soundEngine().playSound(gameplay.getPlayer().getMunchSound());
             updateActualScore(actualScore + 10);
+            --balls;
+            if (balls == 0) {
+                gameplay.showEndGameView("YOU WIN !", new Color(0,255,0));
+                gameplay.soundEngine().playSound("win");
+            }
         });
         gameplay.physicsEngine().bindEventOnSameLocation(gameplay.getPlayer(), ball, "eraseBall" + balls);
         ++balls;

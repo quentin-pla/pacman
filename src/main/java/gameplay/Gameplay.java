@@ -118,7 +118,7 @@ public class Gameplay {
         //Initialiser le menu
         initMenu();
         //Initialiser la vue de fin de jeu
-        initEndGameView("YOU LOST !", new Color(255,50,0));
+        initEndGameView();
         //Initialiser le niveau par défaut
         initDefaultLevel();
     }
@@ -172,7 +172,8 @@ public class Gameplay {
         soundEngine().loadSound("siren_1.wav", "siren1");
         soundEngine().loadSound("power_pellet.wav", "powerup");
         soundEngine().loadSound("eat_ghost.wav", "eatGhost");
-        soundEngine().setGlobalVolume(0.5F);
+        soundEngine().loadSound("eat_fruit.wav", "eatGomme");
+        soundEngine().loadSound("intermission.wav", "win");
     }
 
     /**
@@ -202,7 +203,7 @@ public class Gameplay {
         physicsEngine().resize(currentVolume,200,50);
         physicsEngine().move(currentVolume, 100,337);
         graphicsEngine().bindColor(currentVolume,50,50,50);
-        graphicsEngine().bindText(currentVolume, "Volume is : " + (int) soundEngine().getGlobalvolume()*100, new Color(255,255,255), 20, true);
+        graphicsEngine().bindText(currentVolume, "Volume is : " + (int) soundEngine().getGlobalVolume()*100, new Color(255,255,255), 20, true);
         graphicsEngine().addToScene(menuView, currentVolume);
 
         physicsEngine().resize(button,100,50);
@@ -222,16 +223,13 @@ public class Gameplay {
 
     /**
      * Initialiser la page en fin de jeu
-     * @param title titre
-     * @param titleColor couleur du titre
      */
-    private void initEndGameView(String title, Color titleColor) {
+    private void initEndGameView() {
         endGameView = graphicsEngine().generateScene(400,400);
 
         Entity youLost = kernelEngine.generateEntity();
         physicsEngine().resize(youLost,100,50);
         physicsEngine().move(youLost, 150,50);
-        graphicsEngine().bindText(youLost, title, titleColor, 25, true);
         graphicsEngine().addToScene(endGameView, youLost);
 
         Entity score = kernelEngine.generateEntity();
@@ -339,6 +337,17 @@ public class Gameplay {
         targets.put("TopRight",defaultLevel.addTarget(1,17));
         targets.put("BottomLeft",defaultLevel.addTarget(19,1));
         targets.put("BottomRight",defaultLevel.addTarget(19,17));
+    }
+
+    /**
+     * Définir le volume global
+     * @param volume volume
+     */
+    public void setGlobalVolume(int volume) {
+        float floatVolume = (float)volume/100;
+        soundEngine().setGlobalVolume(floatVolume);
+        graphicsEngine().bindText(currentVolume, "Volume is : " + Math.round(soundEngine().getGlobalVolume()*100),
+                new Color(255,255,255), 20, true);
     }
 
     /**
@@ -756,7 +765,7 @@ public class Gameplay {
             soundEngine().playSound("death2");
             try { sleep(2000); } catch (InterruptedException e) { e.printStackTrace(); }
             if (currentLevel.getLivesCount().get() > 0) playLevel(currentLevel);
-            else showEndGameView();
+            else showEndGameView("YOU LOST !", new Color(255,0,0));
         }).start();
     }
 
@@ -793,7 +802,7 @@ public class Gameplay {
      */
     private void incrementGlobalVolume(){
         soundEngine().incrementGlobalVolume();
-        graphicsEngine().bindText(currentVolume, "Volume is : " + (int)(soundEngine().getGlobalvolume()*100), new Color(255,255,255), 20, true);
+        graphicsEngine().bindText(currentVolume, "Volume is : " + (int)(soundEngine().getGlobalVolume()*100), new Color(255,255,255), 20, true);
     }
 
     /**
@@ -803,7 +812,7 @@ public class Gameplay {
      */
     private void decrementGlobalVolume(){
         soundEngine().decrementGlobalVolume();
-        graphicsEngine().bindText(currentVolume, "Volume is : " + (int)(soundEngine().getGlobalvolume()*100), new Color(255,255,255), 20, true);
+        graphicsEngine().bindText(currentVolume, "Volume is : " + (int)(soundEngine().getGlobalVolume()*100), new Color(255,255,255), 20, true);
     }
 
     /**
@@ -922,6 +931,7 @@ public class Gameplay {
      * Activer le super pouvoir pour 5 secondes
      */
     public void enablePowerUP() {
+        soundEngine().playSound("eatGomme");
         ghostFear.getAndSet(true);
         ghostFearTimeout.getAndSet(5);
         new Thread(() -> {
@@ -939,11 +949,16 @@ public class Gameplay {
 
     /**
      * Afficher la vue de fin de jeu
+     * @param title titre
+     * @param color couleur du titre
      */
-    protected void showEndGameView() {
+    protected void showEndGameView(String title, Color color) {
+        soundEngine().stopSounds();
         ioEngine().resetLastPressedKey();
-        GraphicEntity score = endGameView.getEntities().get(1);
-        graphicsEngine().bindText(score.getParent(), "Score : " + currentLevel.getActualScore(),
+        GraphicEntity titleEntity = endGameView.getEntities().get(0);
+        graphicsEngine().bindText(titleEntity.getParent(), title, color, 20, true);
+        GraphicEntity scoreEntity = endGameView.getEntities().get(1);
+        graphicsEngine().bindText(scoreEntity.getParent(), "Score : " + currentLevel.getActualScore(),
                 new Color(255,255,255), 20, true);
         kernelEngine().switchScene(endGameView);
         kernelEngine.resumeEvents();
@@ -955,6 +970,7 @@ public class Gameplay {
     public void start() {
         kernelEngine().switchScene(menuView);
         kernelEngine.start();
+        setGlobalVolume(50);
     }
 
     // GETTERS //
