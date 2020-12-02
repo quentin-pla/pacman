@@ -70,7 +70,10 @@ public class Gameplay {
      */
     private Pacman pacman;
 
-    private HashMap<String,Entity> targets = new HashMap<String,Entity>();
+    /**
+     * Liste des entités à suivre
+     */
+    private final Map<String,Entity> targets = new HashMap<>();
 
     /**
      * Fantomes
@@ -115,7 +118,7 @@ public class Gameplay {
         //Initialiser le menu
         initMenu();
         //Initialiser la vue de fin de jeu
-        initEndGameView();
+        initEndGameView("YOU LOST !", new Color(255,50,0));
         //Initialiser le niveau par défaut
         initDefaultLevel();
     }
@@ -128,10 +131,8 @@ public class Gameplay {
         kernelEngine.addEvent("playLevel", () -> playLevel(levels.get(0)));
         //Rejouer un niveau
         kernelEngine.addEvent("restartLevel", this::restartLevel);
-        //Déplacer le fantome rose
-        kernelEngine.addEvent("movePinkGhost", this::applyPinkGhostAI);
         //Déplacer le fantome rouge
-        kernelEngine.addEvent("moveRedGhost", this::applyPinkGhostAI);
+        kernelEngine.addEvent("moveRedGhost", this::applyRedGhostAI);
         //Déplacer le fantome Bleu
         kernelEngine.addEvent("moveBlueGhost", this::applyBlueGhostAI);
         //Se déplacer vers le haut
@@ -155,7 +156,7 @@ public class Gameplay {
         ioEngine().bindEventOnLastKey(KeyEvent.VK_DOWN, "pacmanGoDown");
         ioEngine().bindEventOnLastKey(KeyEvent.VK_LEFT, "pacmanGoLeft");
         physicsEngine().bindEventOnCollision(pacman, "pacmanOnCollision");
-        aiEngine().bindEvent(ghosts.get("pink"), "movePinkGhost");
+        aiEngine().bindEvent(ghosts.get("red"), "moveRedGhost");
         aiEngine().bindEvent(ghosts.get("blue"), "moveBlueGhost");
     }
 
@@ -220,14 +221,16 @@ public class Gameplay {
 
     /**
      * Initialiser la page en fin de jeu
+     * @param title titre
+     * @param titleColor couleur du titre
      */
-    private void initEndGameView() {
+    private void initEndGameView(String title, Color titleColor) {
         endGameView = graphicsEngine().generateScene(400,400);
 
         Entity youLost = kernelEngine.generateEntity();
         physicsEngine().resize(youLost,100,50);
         physicsEngine().move(youLost, 150,50);
-        graphicsEngine().bindText(youLost, "YOU LOST !", new Color(255,50,0), 25, true);
+        graphicsEngine().bindText(youLost, title, titleColor, 25, true);
         graphicsEngine().addToScene(endGameView, youLost);
 
         Entity score = kernelEngine.generateEntity();
@@ -317,8 +320,6 @@ public class Gameplay {
         ballRows.put(18, new int[]{1, 8, 10, 17});
         ballRows.put(19, new int[]{2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16});
 
-
-
         for (Map.Entry<Integer,int[]> row : ballRows.entrySet())
             for (int col : row.getValue())
                 defaultLevel.addBall(row.getKey(),col);
@@ -339,8 +340,12 @@ public class Gameplay {
         targets.put("BottomRight",defaultLevel.addTarget(19,17));
     }
 
+    /**
+     * Atteindre une entité
+     * @param ghost fantome
+     * @param target entité
+     */
     private void reachTarget(Ghost ghost,PhysicEntity target){
-
         PhysicEntity ghostPhysic = ghost.getPhysicEntity();
         Set<MoveDirection> forbiddenDirections = ghost.getForbiddenDirection();
 
@@ -475,9 +480,9 @@ public class Gameplay {
     }
 
     /**
-     * Appliquer l'intelligence artificielle au fantome rose
+     * Appliquer l'intelligence artificielle au fantome rouge
      */
-    private void applyPinkGhostAI() {
+    private void applyRedGhostAI() {
         Ghost ghost = ghosts.get("red");
         PhysicEntity playerPhysic = pacman.getPhysicEntity();
         reachTarget(ghost,playerPhysic);
@@ -487,9 +492,7 @@ public class Gameplay {
      * Appliquer l'intelligence artificielle au fantome bleu
      */
     protected void applyBlueGhostAI() {
-
         Ghost ghost = ghosts.get("blue");
-
         //setting new patrol zone depending on score
         if(currentLevel.getActualScore() == 0){
             ghost.getScatterPatrolZones().put("TopRight",false);
@@ -519,7 +522,6 @@ public class Gameplay {
 
         //vérifie si on a atteint la zone de patrouille
         if (!ghost.isPatroleZoneReached()){
-
             //on enregistre la position du fantome
             PhysicEntity ghostPhysic = ghost.getPhysicEntity();
             int ghostXmiddle = (ghostPhysic.getX() + ghostPhysic.getWidth()) / 2;
@@ -572,10 +574,15 @@ public class Gameplay {
         }
         if (ghost.getCurrentDirection() != null) {
             callEventFromDirection(ghost, ghost.getCurrentDirection());
-            graphicsEngine().bindAnimation(ghost, ghost.getAnimations().get(ghost.getCurrentDirection().name()));
+            updateGhostAnimation(ghost);
         }
     }
 
+    /**
+     * Mettre à jour la direction du fantome aléatoirement
+     * @param ghost fantome
+     * @return direction
+     */
     protected MoveDirection updateGhostDirectionWithRandomness(Ghost ghost) {
         boolean somethingUP     = physicsEngine().isSomethingUp(ghost) != null;
         boolean somethingRIGHT  = physicsEngine().isSomethingRight(ghost) != null;
@@ -584,7 +591,6 @@ public class Gameplay {
 
         int nombreAleatoire = 1 + (int)(Math.random() * ((4 - 1) + 1));
         HashMap<String,Boolean> keepDirection = ghost.getKeepDirection() ;
-        System.out.println(nombreAleatoire);
 
         if (keepDirection.get("KeepUp") && somethingLEFT && somethingRIGHT && !somethingUP){
             ghost.setPreviousDirection(MoveDirection.UP);
