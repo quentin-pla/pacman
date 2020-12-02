@@ -70,6 +70,8 @@ public class Gameplay {
      */
     private Pacman pacman;
 
+    private HashMap<String,Entity> targets = new HashMap<String,Entity>();
+
     /**
      * Fantomes
      */
@@ -128,6 +130,10 @@ public class Gameplay {
         kernelEngine.addEvent("restartLevel", this::restartLevel);
         //Déplacer le fantome rose
         kernelEngine.addEvent("movePinkGhost", this::applyPinkGhostAI);
+        //Déplacer le fantome rouge
+        kernelEngine.addEvent("moveRedGhost", this::applyPinkGhostAI);
+        //Déplacer le fantome Bleu
+        kernelEngine.addEvent("moveBlueGhost", this::applyBlueGhostAI);
         //Se déplacer vers le haut
         kernelEngine.addEvent("pacmanGoUp", () -> switchPacmanDirection(MoveDirection.UP));
         //Se déplacer vers la droite
@@ -150,6 +156,7 @@ public class Gameplay {
         ioEngine().bindEventOnLastKey(KeyEvent.VK_LEFT, "pacmanGoLeft");
         physicsEngine().bindEventOnCollision(pacman, "pacmanOnCollision");
         aiEngine().bindEvent(ghosts.get("pink"), "movePinkGhost");
+        aiEngine().bindEvent(ghosts.get("blue"), "moveBlueGhost");
     }
 
     /**
@@ -324,20 +331,22 @@ public class Gameplay {
         defaultLevel.addGomme(19,1);
         defaultLevel.addGomme(1,17);
         defaultLevel.addGomme(19,17);
+
+        //ajout target pour scatter (patrouille)
+        targets.put("TopLeft", defaultLevel.addTarget(1,1));
+        targets.put("TopRight",defaultLevel.addTarget(1,17));
+        targets.put("BottomLeft",defaultLevel.addTarget(19,1));
+        targets.put("BottomRight",defaultLevel.addTarget(19,17));
     }
 
-    /**
-     * Appliquer l'intelligence artificielle au fantome rose
-     */
-    private void applyPinkGhostAI() {
-        Ghost ghost = ghosts.get("pink");
-        PhysicEntity playerPhysic = pacman.getPhysicEntity();
+    private void reachTarget(Ghost ghost,PhysicEntity target){
+
         PhysicEntity ghostPhysic = ghost.getPhysicEntity();
         Set<MoveDirection> forbiddenDirections = ghost.getForbiddenDirection();
 
         //Calcul de la distance horizontale et verticale entre pacman et le fantome
-        int playerXmiddle = (playerPhysic.getX() + playerPhysic.getWidth()) / 2;
-        int playerYmiddle = (playerPhysic.getY() + playerPhysic.getHeight()) / 2;
+        int playerXmiddle = (target.getX() + target.getWidth()) / 2;
+        int playerYmiddle = (target.getY() + target.getHeight()) / 2;
         int ghostXmiddle = (ghostPhysic.getX() + ghostPhysic.getWidth()) / 2;
         int ghostYmiddle = (ghostPhysic.getY() + ghostPhysic.getHeight()) / 2;
         int xDistance = playerXmiddle - ghostXmiddle;
@@ -464,6 +473,230 @@ public class Gameplay {
         else if (ghostFear.get()) animationName = ghostFearTimeout.get() > 2 ? "fear" : "fearEnd";
         graphicsEngine().bindAnimation(ghost, ghost.getAnimations().get(animationName));
     }
+
+    /**
+     * Appliquer l'intelligence artificielle au fantome rose
+     */
+    private void applyPinkGhostAI() {
+        Ghost ghost = ghosts.get("red");
+        PhysicEntity playerPhysic = pacman.getPhysicEntity();
+        reachTarget(ghost,playerPhysic);
+    }
+
+    /**
+     * Appliquer l'intelligence artificielle au fantome bleu
+     */
+    protected void applyBlueGhostAI() {
+
+        Ghost ghost = ghosts.get("blue");
+
+        //setting new patrol zone depending on score
+        if(currentLevel.getActualScore() == 0){
+            ghost.getScatterPatrolZones().put("TopRight",false);
+            ghost.getScatterPatrolZones().put("TopLeft",false);
+            ghost.getScatterPatrolZones().put("BottomRight",true);
+            ghost.getScatterPatrolZones().put("BottomLeft",false);
+            ghost.setPatroleZoneReached(false);
+        }else if(currentLevel.getActualScore() == 350){
+            ghost.getScatterPatrolZones().put("TopRight",false);
+            ghost.getScatterPatrolZones().put("TopLeft",false);
+            ghost.getScatterPatrolZones().put("BottomRight",false);
+            ghost.getScatterPatrolZones().put("BottomLeft",true);
+            ghost.setPatroleZoneReached(false);
+        }else if(currentLevel.getActualScore() == 700){
+            ghost.getScatterPatrolZones().put("TopRight",true);
+            ghost.getScatterPatrolZones().put("TopLeft",false);
+            ghost.getScatterPatrolZones().put("BottomRight",false);
+            ghost.getScatterPatrolZones().put("BottomLeft",false);
+            ghost.setPatroleZoneReached(false);
+        }else if (currentLevel.getActualScore() == 1200){
+            ghost.getScatterPatrolZones().put("TopRight",false);
+            ghost.getScatterPatrolZones().put("TopLeft",true);
+            ghost.getScatterPatrolZones().put("BottomRight",false);
+            ghost.getScatterPatrolZones().put("BottomLeft",false);
+            ghost.setPatroleZoneReached(false);
+        }
+
+        //vérifie si on a atteint la zone de patrouille
+        if (!ghost.isPatroleZoneReached()){
+
+            //on enregistre la position du fantome
+            PhysicEntity ghostPhysic = ghost.getPhysicEntity();
+            int ghostXmiddle = (ghostPhysic.getX() + ghostPhysic.getWidth()) / 2;
+            int ghostYmiddle = (ghostPhysic.getY() + ghostPhysic.getHeight()) / 2;
+
+            //on décide de l'endroit ou aller en fonction de la zone visée
+            if (ghost.getScatterPatrolZones().get("TopRight")){
+                //on récupère l'entité cible qui est en l'occurence dans le coin haut droit
+                PhysicEntity targetTopRight = targets.get("TopRight").getPhysicEntity();
+                //pn cherche a rejoindre cette cible
+                reachTarget(ghost,targetTopRight);
+                //si on atteint la cible, donc que les coordonnées sont les memes, on passe a la suite
+                int targetX = (targetTopRight.getX() + targetTopRight.getWidth()) / 2;
+                int targetY = (targetTopRight.getY() + targetTopRight.getHeight()) / 2;
+                if (ghostXmiddle == targetX && ghostYmiddle == targetY){
+                    ghost.setPatroleZoneReached(true);
+                }
+            }
+            else if (ghost.getScatterPatrolZones().get("TopLeft")){
+                PhysicEntity targetTopLeft = targets.get("TopLeft").getPhysicEntity();
+                reachTarget(ghost,targetTopLeft);
+                int targetX = (targetTopLeft.getX() + targetTopLeft.getWidth()) / 2;
+                int targetY = (targetTopLeft.getY() + targetTopLeft.getHeight()) / 2;
+                if (ghostXmiddle == targetX && ghostYmiddle == targetY){
+                    ghost.setPatroleZoneReached(true);
+                }
+            }
+            else if (ghost.getScatterPatrolZones().get("BottomRight")){
+
+                PhysicEntity targetBottomRight = targets.get("BottomRight").getPhysicEntity();
+                reachTarget(ghost,targetBottomRight);
+                int targetX = (targetBottomRight.getX() + targetBottomRight.getWidth()) / 2;
+                int targetY = (targetBottomRight.getY() + targetBottomRight.getHeight()) / 2;
+                if (ghostXmiddle == targetX && ghostYmiddle == targetY){
+                    ghost.setPatroleZoneReached(true);
+                }
+            }
+            else if (ghost.getScatterPatrolZones().get("BottomLeft")){
+                PhysicEntity targetBottomLeft = targets.get("BottomLeft").getPhysicEntity();
+                reachTarget(ghost,targetBottomLeft);
+                int targetX = (targetBottomLeft.getX() + targetBottomLeft.getWidth()) / 2;
+                int targetY = (targetBottomLeft.getY() + targetBottomLeft.getHeight()) / 2;
+                if (ghostXmiddle == targetX && ghostYmiddle == targetY){
+                    ghost.setPatroleZoneReached(true);
+                }
+            }
+        } else {
+            //une fois dans la zone on patrouille au hasard
+            ghost.setCurrentDirection(updateGhostDirectionWithRandomness(ghost));
+        }
+        if (ghost.getCurrentDirection() != null) {
+            callEventFromDirection(ghost, ghost.getCurrentDirection());
+            graphicsEngine().bindAnimation(ghost, ghost.getAnimations().get(ghost.getCurrentDirection().name()));
+        }
+    }
+
+    protected MoveDirection updateGhostDirectionWithRandomness(Ghost ghost) {
+        boolean somethingUP     = physicsEngine().isSomethingUp(ghost) != null;
+        boolean somethingRIGHT  = physicsEngine().isSomethingRight(ghost) != null;
+        boolean somethingDOWN   = physicsEngine().isSomethingDown(ghost) != null;
+        boolean somethingLEFT   = physicsEngine().isSomethingLeft(ghost) != null;
+
+        int nombreAleatoire = 1 + (int)(Math.random() * ((4 - 1) + 1));
+        HashMap<String,Boolean> keepDirection = ghost.getKeepDirection() ;
+        System.out.println(nombreAleatoire);
+
+        if (keepDirection.get("KeepUp") && somethingLEFT && somethingRIGHT && !somethingUP){
+            ghost.setPreviousDirection(MoveDirection.UP);
+            return MoveDirection.UP;
+        }
+        else if (keepDirection.get("KeepDown") && somethingLEFT && somethingRIGHT && !somethingDOWN){
+            ghost.setPreviousDirection(MoveDirection.DOWN);
+            return MoveDirection.DOWN;
+        }
+        else if (keepDirection.get("KeepRight") && somethingUP && somethingDOWN && !somethingRIGHT){
+            ghost.setPreviousDirection(MoveDirection.RIGHT);
+            return MoveDirection.RIGHT;
+        }
+        else if (keepDirection.get("KeepLeft") && somethingUP && somethingDOWN && !somethingLEFT){
+            ghost.setPreviousDirection(MoveDirection.LEFT);
+            return MoveDirection.LEFT;
+        }
+        ghost.getKeepDirection().put("KeepUp",false);
+        ghost.getKeepDirection().put("KeepRight",false);
+        ghost.getKeepDirection().put("KeepDown",false);
+        ghost.getKeepDirection().put("KeepLeft",false);
+
+        if (nombreAleatoire == 1 && !somethingUP && ghost.getPreviousDirection() != MoveDirection.DOWN){
+            ghost.getKeepDirection().put("KeepUp",true);
+            ghost.setPreviousDirection(MoveDirection.UP);
+            return MoveDirection.UP;
+        }
+        else if (nombreAleatoire == 1 && !somethingRIGHT && ghost.getPreviousDirection() != MoveDirection.LEFT){
+            ghost.getKeepDirection().put("KeepRight",true);
+            ghost.setPreviousDirection(MoveDirection.RIGHT);
+            return MoveDirection.RIGHT;
+        }
+        else if (nombreAleatoire == 1 && !somethingLEFT && ghost.getPreviousDirection() != MoveDirection.RIGHT){
+            ghost.getKeepDirection().put("KeepLeft",true);
+            ghost.setPreviousDirection(MoveDirection.LEFT);
+            return MoveDirection.LEFT;
+        }
+        else if (nombreAleatoire == 1){
+            ghost.getKeepDirection().put("KeepDown",true);
+            ghost.setPreviousDirection(MoveDirection.DOWN);
+            return MoveDirection.DOWN;
+        }
+
+        if (nombreAleatoire == 2 && !somethingRIGHT  && ghost.getPreviousDirection() != MoveDirection.LEFT){
+            ghost.getKeepDirection().put("KeepRight",true);
+            ghost.setPreviousDirection(MoveDirection.RIGHT);
+            return MoveDirection.RIGHT;
+        }
+        else if (nombreAleatoire == 2 && !somethingDOWN && ghost.getPreviousDirection() != MoveDirection.UP){
+            ghost.getKeepDirection().put("KeepDown",true);
+            ghost.setPreviousDirection(MoveDirection.UP);
+            return MoveDirection.DOWN;
+        }
+        else if (nombreAleatoire == 2 && !somethingUP && ghost.getPreviousDirection() != MoveDirection.DOWN){
+            ghost.getKeepDirection().put("KeepUp",true);
+            ghost.setPreviousDirection(MoveDirection.UP);
+            return MoveDirection.UP;
+        }
+        else if (nombreAleatoire == 2) {
+            ghost.getKeepDirection().put("KeepLeft",true);
+            ghost.setPreviousDirection(MoveDirection.LEFT);
+            return MoveDirection.LEFT;
+        }
+
+        if (nombreAleatoire == 3 && !somethingDOWN && ghost.getPreviousDirection() != MoveDirection.UP){
+            ghost.getKeepDirection().put("KeepDown",true);
+            ghost.setPreviousDirection(MoveDirection.UP);
+            return MoveDirection.DOWN;
+        }
+        else if (nombreAleatoire == 3 && !somethingLEFT && ghost.getPreviousDirection() != MoveDirection.RIGHT){
+            ghost.getKeepDirection().put("KeepLeft",true);
+            ghost.setPreviousDirection(MoveDirection.LEFT);
+            return MoveDirection.LEFT;
+        }
+        else if (nombreAleatoire == 3 && !somethingRIGHT  && ghost.getPreviousDirection() != MoveDirection.LEFT){
+            ghost.getKeepDirection().put("KeepRight",true);
+            ghost.setPreviousDirection(MoveDirection.RIGHT);
+            return MoveDirection.RIGHT;
+        }
+        else if (nombreAleatoire == 3){
+            ghost.getKeepDirection().put("KeepUp",true);
+            ghost.setPreviousDirection(MoveDirection.UP);
+            return MoveDirection.UP;
+        }
+
+        if (nombreAleatoire == 4 && !somethingLEFT && ghost.getPreviousDirection() != MoveDirection.RIGHT){
+            ghost.getKeepDirection().put("KeepLeft",true);
+            ghost.setPreviousDirection(MoveDirection.LEFT);
+            return MoveDirection.LEFT;
+        }
+        else if (nombreAleatoire == 4 && !somethingDOWN && ghost.getPreviousDirection() != MoveDirection.UP){
+            ghost.getKeepDirection().put("KeepDown",true);
+            ghost.setPreviousDirection(MoveDirection.UP);
+            return MoveDirection.DOWN;
+        }
+        else if (nombreAleatoire == 4 && !somethingUP  && ghost.getPreviousDirection() != MoveDirection.DOWN){
+            ghost.getKeepDirection().put("KeepUp",true);
+            ghost.setPreviousDirection(MoveDirection.UP);
+            return MoveDirection.UP;
+        }
+        else if (nombreAleatoire == 4){
+            ghost.getKeepDirection().put("KeepRight",true);
+            ghost.setPreviousDirection(MoveDirection.RIGHT);
+            return MoveDirection.RIGHT;
+        }
+
+        ghost.setPreviousDirection(MoveDirection.RIGHT);
+        return MoveDirection.RIGHT; //default move
+        //random direction
+
+    }
+
 
     /**
      * Changer la direction de pacman
@@ -637,10 +870,10 @@ public class Gameplay {
      */
     protected void spawnPlayersOnLevel() {
         currentLevel.spawnPlayer(15,9);
-//        currentLevel.spawnGhost(ghosts.get("red"),11,9);
-//        currentLevel.spawnGhost(ghosts.get("blue"),9,8);
+        currentLevel.spawnGhost(ghosts.get("red"),11,9);
+        currentLevel.spawnGhost(ghosts.get("blue"),11,8);
         currentLevel.spawnGhost(ghosts.get("pink"),9,9);
-//        currentLevel.spawnGhost(ghosts.get("orange"),9,10);
+        currentLevel.spawnGhost(ghosts.get("orange"),9,10);
     }
 
     /**
@@ -695,7 +928,6 @@ public class Gameplay {
      * Afficher la vue de fin de jeu
      */
     protected void showEndGameView() {
-        kernelEngine().switchScene(endGameView);
         GraphicEntity score = endGameView.getEntities().get(1);
         graphicsEngine().bindText(score.getParent(), "Score : " + currentLevel.getActualScore(),
                 new Color(255,255,255), 20, true);

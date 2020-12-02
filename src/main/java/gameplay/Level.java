@@ -198,6 +198,16 @@ public class Level {
     }
 
     /**
+     * creating invisible target for scattering
+     * @param row ligne
+     * @param col colonne
+     */
+    public Entity addTarget(int row, int col){
+        Entity target = matrix[row] [col];
+        return target;
+    }
+
+        /**
      * Appliquer la texture de chaque mur
      */
     public void applyWallTextures() {
