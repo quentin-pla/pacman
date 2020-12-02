@@ -202,7 +202,7 @@ public class Level {
         return target;
     }
 
-        /**
+    /**
      * Appliquer la texture de chaque mur
      */
     public void applyWallTextures() {
@@ -298,19 +298,19 @@ public class Level {
         gameplay.physicsEngine().resize(life,20,20);
         gameplay.physicsEngine().move(life, scene.getWidth()-110,scene.getHeight()-28);
         gameplay.graphicsEngine().bindTexture(life,
-        gameplay.getTexturesFile(),1 , 1);
+                gameplay.getTexturesFile(),1 , 1);
 
         Entity life2 = gameplay.kernelEngine().generateEntity();
         gameplay.physicsEngine().resize(life2,20,20);
         gameplay.physicsEngine().move(life2,scene.getWidth()-70,scene.getHeight()-28);
         gameplay.graphicsEngine().bindTexture(life2,
-        gameplay.getTexturesFile(),1 , 1);
+                gameplay.getTexturesFile(),1 , 1);
 
         Entity life3 = gameplay.kernelEngine().generateEntity();
         gameplay.physicsEngine().resize(life3,20,20);
         gameplay.physicsEngine().move(life3,scene.getWidth()-30,scene.getHeight()-28);
         gameplay.graphicsEngine().bindTexture(life3,
-        gameplay.getTexturesFile(),1 , 1);
+                gameplay.getTexturesFile(),1 , 1);
 
         gameplay.graphicsEngine().addToScene(scene, life);
         gameplay.graphicsEngine().addToScene(scene, life2);
