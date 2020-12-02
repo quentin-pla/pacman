@@ -344,9 +344,8 @@ public class Gameplay {
      * @param volume volume
      */
     public void setGlobalVolume(int volume) {
-        float floatVolume = (float)volume/100;
-        soundEngine().setGlobalVolume(floatVolume);
-        graphicsEngine().bindText(currentVolume, "Volume is : " + Math.round(soundEngine().getGlobalVolume()*100),
+        soundEngine().setGlobalVolume(volume);
+        graphicsEngine().bindText(currentVolume, "Volume is : " + soundEngine().getGlobalVolume(),
                 new Color(255,255,255), 20, true);
     }
 
@@ -802,7 +801,7 @@ public class Gameplay {
      */
     private void incrementGlobalVolume(){
         soundEngine().incrementGlobalVolume();
-        graphicsEngine().bindText(currentVolume, "Volume is : " + (int)(soundEngine().getGlobalVolume()*100), new Color(255,255,255), 20, true);
+        graphicsEngine().bindText(currentVolume, "Volume is : " + soundEngine().getGlobalVolume(), new Color(255,255,255), 20, true);
     }
 
     /**
@@ -812,7 +811,7 @@ public class Gameplay {
      */
     private void decrementGlobalVolume(){
         soundEngine().decrementGlobalVolume();
-        graphicsEngine().bindText(currentVolume, "Volume is : " + (int)(soundEngine().getGlobalVolume()*100), new Color(255,255,255), 20, true);
+        graphicsEngine().bindText(currentVolume, "Volume is : " + soundEngine().getGlobalVolume(), new Color(255,255,255), 20, true);
     }
 
     /**

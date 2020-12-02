@@ -22,8 +22,14 @@ public class SoundEngine {
      */
     private final Map<String, Clip> sounds = new HashMap<>();
 
-    private float globalVolume = 1;
+    /**
+     * Volume global
+     */
+    private int globalVolume = 50;
 
+    /**
+     * Sons en cours de lecture
+     */
     private final CopyOnWriteArrayList<Clip> playingSounds = new CopyOnWriteArrayList<>();
 
     /**
@@ -122,37 +128,34 @@ public class SoundEngine {
      * @param name nom du son
      * @return volume
      */
-    public float getVolume(String name) {
+    public int getVolume(String name) {
         Clip sound = sounds.get(name);
         FloatControl gainControl = (FloatControl) sound.getControl(FloatControl.Type.MASTER_GAIN);
-        return (float) Math.pow(10f, gainControl.getValue() / 20f);
+        return Math.round((float) Math.pow(10f, gainControl.getValue() / 20f))*100;
     }
 
     /**
      * Modifier le volume d'un son spécifique
      * @param name nom du son
-     * @param volume volume
+     * @param volume volume de 0 à 100
      */
-    public void setSoundVolume(String name,float volume) {
+    public void setSoundVolume(String name, int volume) {
         Clip sound = sounds.get(name);
-        if (volume < 0f || volume > 1f)
-            throw new IllegalArgumentException("Volume not valid: " + volume);
+        float floatVolume = getVolumeAsFloat(volume);
         FloatControl gainControl = (FloatControl) sound.getControl(FloatControl.Type.MASTER_GAIN);
-        gainControl.setValue(20f * (float) Math.log10(volume));
+        gainControl.setValue(20f * (float) Math.log10(floatVolume));
     }
 
     /**
      * Définir le volume global
-     * @param volume
+     * @param volume volume
      */
-    public void setGlobalVolume(float volume) {
+    public void setGlobalVolume(int volume) {
         for(Map.Entry<String, Clip> entry : sounds.entrySet()) {
             Clip clip = entry.getValue();
-            if (volume < 0f || volume > 1f)
-                throw new IllegalArgumentException("Volume not valid: " + volume);
             FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-            gainControl.setValue(20f * (float) Math.log10(volume));
-            globalVolume = (float) Math.pow(10f, gainControl.getValue() / 20f);
+            gainControl.setValue(20f * (float) Math.log10(getVolumeAsFloat(volume)));
+            globalVolume = volume;
         }
     }
 
@@ -160,25 +163,29 @@ public class SoundEngine {
      * Incrémenter le volume
      */
     public void incrementGlobalVolume(){
-        if (globalVolume < 0.95)
-            setGlobalVolume((getGlobalVolume()*100+5)/100);
-        else setGlobalVolume(1);
+        setGlobalVolume(Math.min(globalVolume + 5, 100));
     }
 
     /**
      * décrémenter le volume
      */
     public void decrementGlobalVolume(){
-        if (globalVolume > 0.05)
-            setGlobalVolume((getGlobalVolume()*100-5)/100);
-        else setGlobalVolume(0);
+        setGlobalVolume(Math.max(globalVolume - 5, 0));
+    }
+
+    /**
+     * Obtenir le volume en float
+     * @param volume volume
+     */
+    public float getVolumeAsFloat(int volume) {
+        if (volume >= 0 && volume <= 100)
+            return (float) volume / 100;
+        else throw new IllegalArgumentException("Volume invalide: " + volume);
     }
 
     // GETTERS //
 
-    public float getGlobalVolume(){
-        return globalVolume;
-    }
+    public int getGlobalVolume() { return globalVolume; }
 
     public Map<String, Clip> getSounds() { return sounds; }
 }
