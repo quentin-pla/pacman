@@ -524,8 +524,8 @@ public class Gameplay {
         if (!ghost.isPatroleZoneReached()){
             //on enregistre la position du fantome
             PhysicEntity ghostPhysic = ghost.getPhysicEntity();
-            int ghostXmiddle = (ghostPhysic.getX() + ghostPhysic.getWidth()) / 2;
-            int ghostYmiddle = (ghostPhysic.getY() + ghostPhysic.getHeight()) / 2;
+            int ghostX = ghostPhysic.getX();
+            int ghostY = ghostPhysic.getY();
 
             //on décide de l'endroit ou aller en fonction de la zone visée
             if (ghost.getScatterPatrolZones().get("TopRight")){
@@ -534,39 +534,53 @@ public class Gameplay {
                 //pn cherche a rejoindre cette cible
                 reachTarget(ghost,targetTopRight);
                 //si on atteint la cible, donc que les coordonnées sont les memes, on passe a la suite
-                int targetX = (targetTopRight.getX() + targetTopRight.getWidth()) / 2;
-                int targetY = (targetTopRight.getY() + targetTopRight.getHeight()) / 2;
-                if (ghostXmiddle == targetX && ghostYmiddle == targetY){
+                int targetX = (targetTopRight.getX());
+                int targetY = (targetTopRight.getY());
+                if ((ghostX <= (targetX+4)) && (ghostX >= (targetX-4)) && (ghostY <= (targetY+4)) && (ghostY >= (targetY-4))){
                     ghost.setPatroleZoneReached(true);
                 }
+                return;
             }
             else if (ghost.getScatterPatrolZones().get("TopLeft")){
                 PhysicEntity targetTopLeft = targets.get("TopLeft").getPhysicEntity();
                 reachTarget(ghost,targetTopLeft);
-                int targetX = (targetTopLeft.getX() + targetTopLeft.getWidth()) / 2;
-                int targetY = (targetTopLeft.getY() + targetTopLeft.getHeight()) / 2;
-                if (ghostXmiddle == targetX && ghostYmiddle == targetY){
+                int targetX = (targetTopLeft.getX());
+                int targetY = (targetTopLeft.getY());
+                if ((ghostX <= (targetX+4)) && (ghostX >= (targetX-4)) && (ghostY <= (targetY+4)) && (ghostY >= (targetY-4))){
                     ghost.setPatroleZoneReached(true);
                 }
+                return;
             }
             else if (ghost.getScatterPatrolZones().get("BottomRight")){
 
                 PhysicEntity targetBottomRight = targets.get("BottomRight").getPhysicEntity();
                 reachTarget(ghost,targetBottomRight);
-                int targetX = (targetBottomRight.getX() + targetBottomRight.getWidth()) / 2;
-                int targetY = (targetBottomRight.getY() + targetBottomRight.getHeight()) / 2;
-                if (ghostXmiddle == targetX && ghostYmiddle == targetY){
+                int targetX = (targetBottomRight.getX());
+                int targetY = (targetBottomRight.getY());
+
+                /*System.out.println(targetX+4);
+                System.out.println(targetX-4);
+                System.out.println(ghostX);
+                System.out.println(targetY+4);
+                System.out.println(targetY-4);
+                System.out.println(ghostY);*/
+                if ((ghostX <= (targetX+4)) && (ghostX >= (targetX-4)) && (ghostY <= (targetY+4)) && (ghostY >= (targetY-4))){
+                    System.out.println("pass");
                     ghost.setPatroleZoneReached(true);
+                    System.out.println(ghost.isPatroleZoneReached());
                 }
+                return;
             }
             else if (ghost.getScatterPatrolZones().get("BottomLeft")){
                 PhysicEntity targetBottomLeft = targets.get("BottomLeft").getPhysicEntity();
                 reachTarget(ghost,targetBottomLeft);
-                int targetX = (targetBottomLeft.getX() + targetBottomLeft.getWidth()) / 2;
-                int targetY = (targetBottomLeft.getY() + targetBottomLeft.getHeight()) / 2;
-                if (ghostXmiddle == targetX && ghostYmiddle == targetY){
+                int targetX = (targetBottomLeft.getX());
+                int targetY = (targetBottomLeft.getY());
+
+                if ((ghostX <= (targetX+4)) && (ghostX >= (targetX-4)) && (ghostY <= (targetY+4)) && (ghostY >= (targetY-4))){
                     ghost.setPatroleZoneReached(true);
                 }
+                return;
             }
         } else {
             //une fois dans la zone on patrouille au hasard
