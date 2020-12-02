@@ -479,7 +479,7 @@ public class Gameplay {
         Ghost ghost = ghosts.get("blue");
 
         //setting new patrol zone depending on score
-        if(currentLevel.getActualScore() <= 3500){
+        if(currentLevel.getActualScore() <= 350){
             ghost.getScatterPatrolZones().put("TopRight",false);
             ghost.getScatterPatrolZones().put("TopLeft",false);
             ghost.getScatterPatrolZones().put("BottomRight",true);
@@ -551,47 +551,7 @@ public class Gameplay {
                 }
             }
         } else {
-
-
-            //faire le tour du bloc
-           /* HashMap<String,Boolean> scatterPatrolZones = ghost.getScatterPatrolZones();
-
-            boolean somethingUP     = physicsEngine().isSomethingUp(ghost) != null;
-            boolean somethingRIGHT  = physicsEngine().isSomethingRight(ghost) != null;
-            boolean somethingDOWN   = physicsEngine().isSomethingDown(ghost) != null;
-            boolean somethingLEFT   = physicsEngine().isSomethingLeft(ghost) != null;
-
-            System.out.println("passe par la tho");
-            System.out.println("previous : " + ghost.getPreviousDirection());
-
-            if (scatterPatrolZones.get("BottomRight") && !somethingUP && ghost.getPreviousDirection() == MoveDirection.LEFT){
-                System.out.println("stuck up");
-                ghost.setCurrentDirection(MoveDirection.UP);
-                if (!somethingRIGHT){
-                    ghost.setPreviousDirection(MoveDirection.UP);
-                }
-            }
-            else if (scatterPatrolZones.get("BottomRight") && !somethingRIGHT && ghost.getPreviousDirection() == MoveDirection.UP){
-                System.out.println("stuck right");
-                ghost.setCurrentDirection(MoveDirection.RIGHT);
-                if (!somethingDOWN){
-                    ghost.setPreviousDirection(MoveDirection.RIGHT);
-                }
-            }
-            else if (scatterPatrolZones.get("BottomRight") && !somethingDOWN && ghost.getPreviousDirection() == MoveDirection.RIGHT){
-                System.out.println("stuck down");
-                ghost.setCurrentDirection(MoveDirection.DOWN);
-                if (!somethingLEFT){
-                    ghost.setPreviousDirection(MoveDirection.DOWN);
-                }
-                ghost.setPreviousDirection(MoveDirection.RIGHT);
-            } else if (scatterPatrolZones.get("BottomRight") && !somethingLEFT){
-                System.out.println("stuck left");
-                ghost.setCurrentDirection(MoveDirection.LEFT);
-                if (!somethingUP){
-                    ghost.setPreviousDirection(MoveDirection.LEFT);
-                }
-            }*/
+            //une fois dans la zone on patrouille au hasard
             ghost.setCurrentDirection(updateGhostDirectionWithRandomness(ghost));
         }
         if (ghost.getCurrentDirection() != null) {
