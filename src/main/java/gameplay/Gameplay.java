@@ -479,26 +479,30 @@ public class Gameplay {
         Ghost ghost = ghosts.get("blue");
 
         //setting new patrol zone depending on score
-        if(currentLevel.getActualScore() <= 350){
+        if(currentLevel.getActualScore() == 0){
             ghost.getScatterPatrolZones().put("TopRight",false);
             ghost.getScatterPatrolZones().put("TopLeft",false);
             ghost.getScatterPatrolZones().put("BottomRight",true);
             ghost.getScatterPatrolZones().put("BottomLeft",false);
-        }else if(currentLevel.getActualScore() <= 700){
+            ghost.setPatroleZoneReached(false);
+        }else if(currentLevel.getActualScore() == 350){
             ghost.getScatterPatrolZones().put("TopRight",false);
             ghost.getScatterPatrolZones().put("TopLeft",false);
             ghost.getScatterPatrolZones().put("BottomRight",false);
             ghost.getScatterPatrolZones().put("BottomLeft",true);
-        }else if(currentLevel.getActualScore() <= 1200){
+            ghost.setPatroleZoneReached(false);
+        }else if(currentLevel.getActualScore() == 700){
             ghost.getScatterPatrolZones().put("TopRight",true);
             ghost.getScatterPatrolZones().put("TopLeft",false);
             ghost.getScatterPatrolZones().put("BottomRight",false);
             ghost.getScatterPatrolZones().put("BottomLeft",false);
-        }else {
+            ghost.setPatroleZoneReached(false);
+        }else if (currentLevel.getActualScore() == 1200){
             ghost.getScatterPatrolZones().put("TopRight",false);
             ghost.getScatterPatrolZones().put("TopLeft",true);
             ghost.getScatterPatrolZones().put("BottomRight",false);
             ghost.getScatterPatrolZones().put("BottomLeft",false);
+            ghost.setPatroleZoneReached(false);
         }
 
         //vérifie si on a atteint la zone de patrouille
