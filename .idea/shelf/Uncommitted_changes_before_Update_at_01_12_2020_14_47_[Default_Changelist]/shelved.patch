@@ -1,0 +1,201 @@
+Index: src/main/java/gameplay/Ghost.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package gameplay;\r\n\r\n/**\r\n * Fantome\r\n */\r\npublic class Ghost extends Player {\r\n    /**\r\n     * Gameplay\r\n     */\r\n    private Gameplay gameplay;\r\n\r\n    private Gameplay.MoveDirection lastDirection;\r\n\r\n    /**\r\n     * Constructeur\r\n     * @param gameplay gameplay\r\n     */\r\n    public Ghost(Gameplay gameplay) {\r\n        super(gameplay.kernelEngine());\r\n        this.gameplay = gameplay;\r\n        this.defaultTextureCoords = new int[]{4, 1};\r\n        gameplay.physicsEngine().resize(this, 30, 30);\r\n        gameplay.physicsEngine().setSpeed(this, 3);\r\n        gameplay.graphicsEngine().bindTexture(this, gameplay.getTexturesFile(), 4, 1);\r\n        initAnimations(gameplay.getTexturesFile());\r\n    }\r\n\r\n    /**\r\n     * Constructeur surchargé\r\n     * @param gameplay gameplay\r\n     * @param color couleur\r\n     */\r\n    public Ghost(Gameplay gameplay, String color) {\r\n        super(gameplay.kernelEngine());\r\n        this.gameplay = gameplay;\r\n        gameplay.physicsEngine().resize(this, 30, 30);\r\n        gameplay.physicsEngine().setSpeed(this, 3);\r\n        switch (color) {\r\n            case \"red\" :\r\n                this.defaultTextureCoords = new int[]{3, 1};\r\n                break;\r\n            case \"pink\" :\r\n                this.defaultTextureCoords = new int[]{4, 1};\r\n                break;\r\n            case \"blue\" :\r\n                this.defaultTextureCoords = new int[]{5, 1};\r\n                break;\r\n            case \"orange\" :\r\n                this.defaultTextureCoords = new int[]{6, 1};\r\n                break;\r\n        }\r\n        gameplay.graphicsEngine().bindTexture(this, gameplay.getTexturesFile(),\r\n                defaultTextureCoords[0], defaultTextureCoords[1]);\r\n        initAnimations(gameplay.getTexturesFile());\r\n    }\r\n\r\n    /**\r\n     * Initialiser les animation\r\n     * @param spriteSheetID identifiant du fichier de textures\r\n     */\r\n    private void initAnimations(int spriteSheetID) {\r\n        int animationsSpeed = 4;\r\n\r\n        int moveUP = gameplay.graphicsEngine().generateAnimation(spriteSheetID, animationsSpeed, true);\r\n        gameplay.graphicsEngine().addFrameToAnimation(moveUP,defaultTextureCoords[0],7);\r\n        gameplay.graphicsEngine().addFrameToAnimation(moveUP,defaultTextureCoords[0],8);\r\n        animations.put(Gameplay.MoveDirection.UP.name(), moveUP);\r\n\r\n        int moveRIGHT = gameplay.graphicsEngine().generateAnimation(spriteSheetID, animationsSpeed, true);\r\n        gameplay.graphicsEngine().addFrameToAnimation(moveRIGHT,defaultTextureCoords[0],1);\r\n        gameplay.graphicsEngine().addFrameToAnimation(moveRIGHT,defaultTextureCoords[0],2);\r\n        animations.put(Gameplay.MoveDirection.RIGHT.name(), moveRIGHT);\r\n\r\n        int moveDOWN = gameplay.graphicsEngine().generateAnimation(spriteSheetID, animationsSpeed, true);\r\n        gameplay.graphicsEngine().addFrameToAnimation(moveDOWN,defaultTextureCoords[0],3);\r\n        gameplay.graphicsEngine().addFrameToAnimation(moveDOWN,defaultTextureCoords[0],4);\r\n        animations.put(Gameplay.MoveDirection.DOWN.name(), moveDOWN);\r\n\r\n        int moveLEFT = gameplay.graphicsEngine().generateAnimation(spriteSheetID, animationsSpeed, true);\r\n        gameplay.graphicsEngine().addFrameToAnimation(moveLEFT,defaultTextureCoords[0],5);\r\n        gameplay.graphicsEngine().addFrameToAnimation(moveLEFT,defaultTextureCoords[0],6);\r\n        animations.put(Gameplay.MoveDirection.LEFT.name(), moveLEFT);\r\n    }\r\n\r\n    public Gameplay.MoveDirection getLastDirection() {\r\n        return lastDirection;\r\n    }\r\n\r\n    public void setForbiddenDirection(Gameplay.MoveDirection lastDirection) {\r\n        this.lastDirection = lastDirection;\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/gameplay/Ghost.java	(revision f17e84996aa4ef1a97a61efa44563572ca42af6e)
++++ src/main/java/gameplay/Ghost.java	(date 1606830146878)
+@@ -1,5 +1,7 @@
+ package gameplay;
+ 
++import java.util.HashMap;
++
+ /**
+  * Fantome
+  */
+@@ -11,6 +13,10 @@
+ 
+     private Gameplay.MoveDirection lastDirection;
+ 
++    private HashMap<String,Boolean> scatterPatrolZones = new HashMap<String, Boolean>();
++
++
++
+     /**
+      * Constructeur
+      * @param gameplay gameplay
+@@ -49,6 +55,11 @@
+                 this.defaultTextureCoords = new int[]{6, 1};
+                 break;
+         }
++        scatterPatrolZones.put("TopRight",false);
++        scatterPatrolZones.put("TopLeft",false);
++        scatterPatrolZones.put("BottomRight",false);
++        scatterPatrolZones.put("BottomLeft",false);
++
+         gameplay.graphicsEngine().bindTexture(this, gameplay.getTexturesFile(),
+                 defaultTextureCoords[0], defaultTextureCoords[1]);
+         initAnimations(gameplay.getTexturesFile());
+@@ -89,4 +100,13 @@
+     public void setForbiddenDirection(Gameplay.MoveDirection lastDirection) {
+         this.lastDirection = lastDirection;
+     }
++
++
++    public HashMap<String, Boolean> getScatterPatrolZones() {
++        return scatterPatrolZones;
++    }
++
++    public void setScatterPatrolZones(HashMap<String, Boolean> scatterPatrolZones) {
++        this.scatterPatrolZones = scatterPatrolZones;
++    }
+ }
+Index: src/main/java/gameplay/Gameplay.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package gameplay;\r\n\r\nimport engines.AI.AIEngine;\r\nimport engines.graphics.Color;\r\nimport engines.graphics.GraphicsEngine;\r\nimport engines.graphics.Scene;\r\nimport engines.input_output.IOEngine;\r\nimport engines.kernel.Entity;\r\nimport engines.kernel.KernelEngine;\r\nimport engines.physics.PhysicEntity;\r\nimport engines.physics.PhysicsEngine;\r\nimport engines.sound.SoundEngine;\r\n\r\nimport java.awt.event.KeyEvent;\r\nimport java.util.ArrayList;\r\nimport java.util.HashMap;\r\nimport java.util.Map;\r\n\r\n/**\r\n * Gameplay\r\n */\r\npublic class Gameplay {\r\n    /**\r\n     * Directions de déplacement\r\n     */\r\n    public enum MoveDirection {\r\n        UP,RIGHT,DOWN,LEFT\r\n    }\r\n\r\n    /**\r\n     * Moteur noyau\r\n     */\r\n    private final KernelEngine kernelEngine;\r\n\r\n    /**\r\n     * Identifiant du fichier contenant les textures du jeu\r\n     */\r\n    private final int textures;\r\n\r\n    /**\r\n     * Identifiant scène\r\n     */\r\n    private Scene menuView;\r\n\r\n    /**\r\n     * Niveaux disponibles\r\n     */\r\n    private ArrayList<Level> levels;\r\n\r\n    /**\r\n     * Niveau courant\r\n     */\r\n    private Level currentLevel;\r\n\r\n    /**\r\n     * Affichage du volume\r\n     */\r\n    private Entity currentVolume;\r\n    /**\r\n     * Joueur\r\n     */\r\n    private Pacman pacman;\r\n\r\n    /**\r\n     * Fantomes\r\n     */\r\n    private Map<String,Ghost> ghosts;\r\n\r\n    /**\r\n     * Constructeur\r\n     */\r\n    public Gameplay() {\r\n        this.kernelEngine = new KernelEngine();\r\n        this.textures = kernelEngine.getGraphicsEngine().loadSpriteSheet(\"assets/sprite_sheet.png\", 12, 11);\r\n        this.levels = new ArrayList<>();\r\n        initGameplay();\r\n    }\r\n\r\n    /**\r\n     * Initialiser le gameplay\r\n     */\r\n    private void initGameplay() {\r\n        //Activation des entrées / sorties\r\n        ioEngine().enableKeyboardIO();\r\n        ioEngine().enableMouseIO();\r\n        //Initialiser les joueurs\r\n        initPlayers();\r\n        //Initialiser les évènements\r\n        initEvents();\r\n        //Initialiser les sons\r\n        initSounds();\r\n        //Initialiser le menu\r\n        initMenu();\r\n        //Initialiser le niveau par défaut\r\n        initDefaultLevel();\r\n    }\r\n\r\n    /**\r\n     * Initialiser les évènements du jeu\r\n     */\r\n    private void initEvents() {\r\n        //Jouer un niveau\r\n        kernelEngine.addEvent(\"playLevel\", () -> playLevel(levels.get(0)));\r\n        //Déplacer le fantome rouge\r\n        kernelEngine.addEvent(\"moveRedGhost\", () -> updateGhostDirection(ghosts.get(\"red\")));\r\n        //Déplacer le fantome rouge\r\n        kernelEngine.addEvent(\"moveBlueGhost\", () -> updateGhostDirection(ghosts.get(\"blue\")));\r\n        //Se déplacer vers le haut\r\n        kernelEngine.addEvent(\"pacmanGoUp\", () -> switchPacmanDirection(MoveDirection.UP));\r\n        //Se déplacer vers la droite\r\n        kernelEngine.addEvent(\"pacmanGoRight\", () -> switchPacmanDirection(MoveDirection.RIGHT));\r\n        //Se déplacer vers le bas\r\n        kernelEngine.addEvent(\"pacmanGoDown\", () -> switchPacmanDirection(MoveDirection.DOWN));\r\n        //Se déplacer vers la gauche\r\n        kernelEngine.addEvent(\"pacmanGoLeft\", () -> switchPacmanDirection(MoveDirection.LEFT));\r\n        //Augmenter le volume\r\n        kernelEngine.addEvent(\"augmentVolume\", this::incrementGlobalVolume);\r\n        //Baisser le volume\r\n        kernelEngine.addEvent(\"downVolume\", this::decrementGlobalVolume);\r\n\r\n        //Lorsqu'il y a une collision\r\n        kernelEngine.addEvent(\"pacmanOnCollision\", () -> {\r\n\r\n            PhysicEntity entity = null;\r\n            switch (pacman.getCurrentDirection()) {\r\n                case UP:\r\n                    entity = physicsEngine().isSomethingUp(pacman.getPhysicEntity());\r\n                    break;\r\n                case DOWN:\r\n                    entity = physicsEngine().isSomethingDown(pacman.getPhysicEntity());\r\n                    break;\r\n                case LEFT:\r\n                    entity = physicsEngine().isSomethingLeft(pacman.getPhysicEntity());\r\n                    break;\r\n                case RIGHT:\r\n                    entity = physicsEngine().isSomethingRight(pacman.getPhysicEntity());\r\n                    break;\r\n            }\r\n\r\n\r\n\r\n            if (pacman.getCurrentAnimationID() != 0) {\r\n                if (graphicsEngine().getAnimation(pacman.getCurrentAnimationID()).isPlaying()) {\r\n                    graphicsEngine().playPauseAnimation(pacman.getCurrentAnimationID());\r\n                    if (entity != null) {\r\n                        for (Ghost ghost : ghosts.values()) {\r\n                            if (entity.equals(ghost.getPhysicEntity())) {\r\n                                System.out.println(\"oui\");\r\n                                currentLevel.updateLives();\r\n                                soundEngine().playSound(pacman.getDeathSound());\r\n                                playLevel(currentLevel);\r\n                            }\r\n                        }\r\n                    }\r\n                }\r\n            }\r\n        });\r\n\r\n\r\n\r\n        //Rejouer l'animation courante\r\n        kernelEngine.addEvent(\"pacmanPlayCurrentAnimation\", () -> {\r\n            if (!graphicsEngine().getAnimation(pacman.getCurrentAnimationID()).isPlaying())\r\n                graphicsEngine().playPauseAnimation(pacman.getCurrentAnimationID());\r\n        });\r\n\r\n\r\n        ioEngine().bindEventOnLastKey(KeyEvent.VK_UP, \"pacmanGoUp\");\r\n        ioEngine().bindEventOnLastKey(KeyEvent.VK_RIGHT, \"pacmanGoRight\");\r\n        ioEngine().bindEventOnLastKey(KeyEvent.VK_DOWN, \"pacmanGoDown\");\r\n        ioEngine().bindEventOnLastKey(KeyEvent.VK_LEFT, \"pacmanGoLeft\");\r\n        physicsEngine().bindEventOnCollision(pacman.getPhysicEntity(), \"pacmanOnCollision\");\r\n        aiEngine().bindEvent(ghosts.get(\"red\"), \"moveRedGhost\");\r\n        aiEngine().bindEvent(ghosts.get(\"blue\"), \"moveBlueGhost\");\r\n    }\r\n\r\n    /**\r\n     * Initialiser les sons du jeu\r\n     */\r\n    private void initSounds() {\r\n        soundEngine().loadSound(\"munch_1.wav\",\"munch1\");\r\n        soundEngine().loadSound(\"munch_2.wav\",\"munch2\");\r\n        soundEngine().loadSound(\"game_start.wav\",\"gameStart\");\r\n        soundEngine().loadSound(\"death_1.wav\",\"death_1\");\r\n    }\r\n\r\n    /**\r\n     * Initialiser le menu\r\n     */\r\n    private void initMenu() {\r\n        menuView = graphicsEngine().generateScene(400,400);\r\n        Entity button = kernelEngine.generateEntity();\r\n        Entity volumePlus = kernelEngine.generateEntity();\r\n        Entity volumeMinus = kernelEngine.generateEntity();\r\n        currentVolume = kernelEngine.generateEntity();\r\n\r\n        physicsEngine().resize(volumePlus,50,25);\r\n        physicsEngine().move(volumePlus.getPhysicEntity(), 20,350);\r\n        graphicsEngine().bindColor(volumePlus,50,50,50);\r\n        graphicsEngine().bindText(volumePlus, \"-\", new Color(255,255,255), 20, true);\r\n        graphicsEngine().addToScene(menuView, volumePlus);\r\n        ioEngine().bindEventOnClick(volumePlus,\"downVolume\");\r\n\r\n        physicsEngine().resize(volumeMinus,50,25);\r\n        physicsEngine().move(volumeMinus.getPhysicEntity(), 330,350);\r\n        graphicsEngine().bindColor(volumeMinus,50,50,50);\r\n        graphicsEngine().bindText(volumeMinus, \"+\", new Color(255,255,255), 20, true);\r\n        graphicsEngine().addToScene(menuView, volumeMinus);\r\n        ioEngine().bindEventOnClick(volumeMinus,\"augmentVolume\");\r\n\r\n        physicsEngine().resize(currentVolume,200,50);\r\n        physicsEngine().move(currentVolume.getPhysicEntity(), 100,337);\r\n        graphicsEngine().bindColor(currentVolume,50,50,50);\r\n        graphicsEngine().bindText(currentVolume, \"Volume is : \" + (int) soundEngine().getGlobalvolume()*100, new Color(255,255,255), 20, true);\r\n        graphicsEngine().addToScene(menuView, currentVolume);\r\n\r\n        physicsEngine().resize(button,100,50);\r\n        physicsEngine().move(button.getPhysicEntity(), 150,240);\r\n        graphicsEngine().bindColor(button,50,50,50);\r\n        graphicsEngine().bindText(button, \"PLAY\", new Color(255,255,255), 20, true);\r\n        graphicsEngine().addToScene(menuView, button);\r\n        ioEngine().bindEventOnClick(button,\"playLevel\");\r\n\r\n        Entity menuLogo = kernelEngine.generateEntity();\r\n        int logoTexture = kernelEngine.getGraphicsEngine().loadTexture(\"assets/menu_logo.png\");\r\n        physicsEngine().resize(menuLogo,300,71);\r\n        physicsEngine().move(menuLogo.getPhysicEntity(), 50,120);\r\n        graphicsEngine().bindTexture(menuLogo,logoTexture);\r\n        graphicsEngine().addToScene(menuView, menuLogo);\r\n\r\n    }\r\n\r\n    /**\r\n     * Initialiser les joueurs\r\n     */\r\n    private void initPlayers() {\r\n        pacman = new Pacman(this);\r\n        ghosts = new HashMap<>();\r\n        ghosts.put(\"red\", new Ghost(this, \"red\"));\r\n        ghosts.put(\"blue\", new Ghost(this, \"blue\"));\r\n        ghosts.put(\"pink\", new Ghost(this, \"pink\"));\r\n        ghosts.put(\"orange\", new Ghost(this, \"orange\"));\r\n    }\r\n\r\n    /**\r\n     * Initialiser le niveau par défaut\r\n     */\r\n    private void initDefaultLevel() {\r\n        //Level par défaut\r\n        Level defaultLevel = generateLevel(21,19);\r\n\r\n        //Génération des murs\r\n        Map<Integer,int[]> wallRows = new HashMap<>();\r\n\r\n        wallRows.put(0, new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18});\r\n        wallRows.put(1, new int[]{0, 9, 18});\r\n        wallRows.put(2, new int[]{0, 2, 3, 5, 6, 7, 9, 11, 12, 13, 15, 16, 18});\r\n        wallRows.put(3, new int[]{0, 18});\r\n        wallRows.put(4, new int[]{0, 2, 3, 5, 7, 8, 9, 10, 11, 13, 15, 16, 18});\r\n        wallRows.put(5, new int[]{0, 5, 9, 13, 18});\r\n        wallRows.put(6, new int[]{0, 1, 2, 3, 5, 6, 7, 9, 11, 12, 13, 15, 16, 17, 18});\r\n        wallRows.put(7, new int[]{3, 5, 13, 15});\r\n        wallRows.put(8, new int[]{0, 1, 2, 3, 5, 7, 8, 10, 11, 13, 15, 16, 17, 18});\r\n        wallRows.put(9, new int[]{7, 11});\r\n        wallRows.put(10, new int[]{0, 1, 2, 3, 5, 7, 8, 9, 10, 11, 13, 15, 16, 17, 18});\r\n        wallRows.put(11, new int[]{3, 5, 13, 15});\r\n        wallRows.put(12, new int[]{0, 1, 2, 3, 5, 7, 8, 9, 10, 11, 13, 15, 16, 17, 18});\r\n        wallRows.put(13, new int[]{0, 9, 18});\r\n        wallRows.put(14, new int[]{0, 2, 3, 5, 6, 7, 9, 11, 12, 13, 15, 16, 18});\r\n        wallRows.put(15, new int[]{0, 3, 15, 18});\r\n        wallRows.put(16, new int[]{0, 1, 3, 5, 7, 8, 9, 10, 11, 13, 15, 17, 18});\r\n        wallRows.put(17, new int[]{0, 5, 9, 13, 18});\r\n        wallRows.put(18, new int[]{0, 2, 3, 4, 5, 6, 7, 9, 11, 12, 13, 14, 15, 16, 18});\r\n        wallRows.put(19, new int[]{0, 18});\r\n        wallRows.put(20, new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18});\r\n\r\n        for (Map.Entry<Integer,int[]> row : wallRows.entrySet())\r\n            for (int col : row.getValue())\r\n                defaultLevel.addWall(row.getKey(),col);\r\n\r\n        defaultLevel.applyWallTextures();\r\n\r\n        //Génération des balles\r\n        Map<Integer,int[]> ballRows = new HashMap<>();\r\n\r\n        ballRows.put(1, new int[]{1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17});\r\n        ballRows.put(2, new int[]{1, 4, 8, 10, 14, 17});\r\n        ballRows.put(3, new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17});\r\n        ballRows.put(4, new int[]{1, 4, 6, 12, 14, 17});\r\n        ballRows.put(5, new int[]{1, 2, 3, 4, 6, 7, 8, 10, 11, 12, 14, 15, 16, 17});\r\n        ballRows.put(6, new int[]{4, 8, 10, 14});\r\n        ballRows.put(7, new int[]{4, 6, 7, 8, 9, 10, 11, 12, 14});\r\n        ballRows.put(8, new int[]{4, 6, 12, 14});\r\n        ballRows.put(9, new int[]{4, 5, 6, 12, 13, 14});\r\n        ballRows.put(10, new int[]{4, 6, 12, 14});\r\n        ballRows.put(11, new int[]{4, 6, 7, 8, 9, 10, 11, 12, 14});\r\n        ballRows.put(12, new int[]{4, 6, 12, 14});\r\n        ballRows.put(13, new int[]{1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17});\r\n        ballRows.put(14, new int[]{1, 4, 8, 10, 14, 17});\r\n        ballRows.put(15, new int[]{1, 2, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 16, 17});\r\n        ballRows.put(16, new int[]{2, 4, 6, 12, 14, 16});\r\n        ballRows.put(17, new int[]{1, 2, 3, 4, 6, 7, 8, 10, 11, 12, 14, 15, 16, 17});\r\n        ballRows.put(18, new int[]{1, 8, 10, 17});\r\n        ballRows.put(19, new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17});\r\n\r\n        for (Map.Entry<Integer,int[]> row : ballRows.entrySet())\r\n            for (int col : row.getValue())\r\n                defaultLevel.addBall(row.getKey(),col);\r\n\r\n        //Ajout de la barrière\r\n        defaultLevel.addFence(8, 9);\r\n\r\n        this.currentLevel = defaultLevel;\r\n        levels.add(defaultLevel);\r\n    }\r\n\r\n    /**\r\n     * Mettre à jour la position d'un fanôme\r\n     * @param ghost fantôme\r\n     */\r\n    protected void updateGhostDirection(Ghost ghost) {\r\n        PhysicEntity playerPhysic = pacman.getPhysicEntity();\r\n        PhysicEntity ghostPhysic = ghost.getPhysicEntity();\r\n\r\n        int playerXmiddle = (playerPhysic.getX() + playerPhysic.getWidth()) / 2;\r\n        int playerYmiddle = (playerPhysic.getY() + playerPhysic.getHeight()) / 2;\r\n        int ghostXmiddle = (ghostPhysic.getX() + ghostPhysic.getWidth()) / 2;\r\n        int ghostYmiddle = (ghostPhysic.getY() + ghostPhysic.getHeight()) / 2;\r\n        int xDistance = playerXmiddle - ghostXmiddle;\r\n        int yDistance = playerYmiddle - ghostYmiddle;\r\n\r\n        MoveDirection xDirection = xDistance == 0 ? null : xDistance < 0 ? MoveDirection.LEFT : MoveDirection.RIGHT;\r\n        MoveDirection yDirection = yDistance == 0 ? null : yDistance < 0 ? MoveDirection.UP : MoveDirection.DOWN;\r\n\r\n        MoveDirection nextDirection = Math.abs(xDistance) > Math.abs(yDistance) ? xDirection : yDirection;\r\n\r\n        boolean somethingUP     = physicsEngine().isSomethingUp(ghost.getPhysicEntity()) != null;\r\n        boolean somethingRIGHT  = physicsEngine().isSomethingRight(ghost.getPhysicEntity()) != null;\r\n        boolean somethingDOWN   = physicsEngine().isSomethingDown(ghost.getPhysicEntity()) != null;\r\n        boolean somethingLEFT   = physicsEngine().isSomethingLeft(ghost.getPhysicEntity()) != null;\r\n\r\n        if (yDirection == MoveDirection.UP && ghost.getLastDirection() != MoveDirection.UP && !somethingUP) {\r\n            ghost.setCurrentDirection(MoveDirection.UP);\r\n            ghost.setForbiddenDirection(null);\r\n        }\r\n        else if (yDirection == MoveDirection.DOWN && ghost.getLastDirection() != MoveDirection.DOWN && !somethingDOWN) {\r\n            ghost.setCurrentDirection(MoveDirection.DOWN);\r\n            ghost.setForbiddenDirection(null);\r\n        }\r\n        else if (xDirection == MoveDirection.LEFT && ghost.getLastDirection() != MoveDirection.LEFT && !somethingLEFT) {\r\n            ghost.setCurrentDirection(MoveDirection.LEFT);\r\n            ghost.setForbiddenDirection(null);\r\n        }\r\n        else if (xDirection == MoveDirection.RIGHT && ghost.getLastDirection() != MoveDirection.RIGHT && !somethingRIGHT) {\r\n            ghost.setCurrentDirection(MoveDirection.RIGHT);\r\n            ghost.setForbiddenDirection(null);\r\n        }\r\n        else {\r\n            if (nextDirection == MoveDirection.UP && somethingUP || nextDirection == MoveDirection.DOWN && somethingDOWN) {\r\n                if (!somethingLEFT) {\r\n                    ghost.setForbiddenDirection(MoveDirection.RIGHT);\r\n                    ghost.setCurrentDirection(MoveDirection.LEFT);\r\n                } else if (!somethingRIGHT) {\r\n                    ghost.setForbiddenDirection(MoveDirection.LEFT);\r\n                    ghost.setCurrentDirection(MoveDirection.RIGHT);\r\n                } else {\r\n                    if (nextDirection == MoveDirection.UP) ghost.setCurrentDirection(MoveDirection.DOWN);\r\n                    else ghost.setCurrentDirection(MoveDirection.UP);\r\n                    ghost.setForbiddenDirection(nextDirection);\r\n                }\r\n            } else if (nextDirection == MoveDirection.LEFT && somethingLEFT || nextDirection == MoveDirection.RIGHT && somethingRIGHT) {\r\n                if (!somethingUP) {\r\n                    ghost.setForbiddenDirection(MoveDirection.DOWN);\r\n                    ghost.setCurrentDirection(MoveDirection.UP);\r\n                } else if (!somethingDOWN) {\r\n                    ghost.setForbiddenDirection(MoveDirection.UP);\r\n                    ghost.setCurrentDirection(MoveDirection.DOWN);\r\n                } else {\r\n                    if (nextDirection == MoveDirection.LEFT) ghost.setCurrentDirection(MoveDirection.RIGHT);\r\n                    else ghost.setCurrentDirection(MoveDirection.LEFT);\r\n                    ghost.setForbiddenDirection(nextDirection);\r\n                }\r\n            }\r\n        }\r\n\r\n        if (Math.abs(xDistance) <= 1 && Math.abs(yDistance) <= 1) {\r\n            ghost.setForbiddenDirection(null);\r\n            ghost.setCurrentDirection(null);\r\n        }\r\n\r\n        if (ghost.getCurrentDirection() != null) {\r\n            callEventFromDirection(ghost, ghost.getCurrentDirection());\r\n            graphicsEngine().bindAnimation(ghost, ghost.getAnimations().get(ghost.getCurrentDirection().name()));\r\n        }\r\n    }\r\n\r\n    /**\r\n     * Changer la direction de pacman\r\n     * @param direction direction\r\n     */\r\n    protected void switchPacmanDirection(MoveDirection direction) {\r\n        pacman.setCurrentAnimationID(pacman.getAnimations().get(direction.name()));\r\n        kernelEngine().notifyEvent(\"pacmanPlayCurrentAnimation\");\r\n        setEntityNextDirection(pacman,direction);\r\n    }\r\n\r\n    /**\r\n     * Incrémente le volume 5 par 5\r\n     */\r\n    protected void incrementGlobalVolume(){\r\n        soundEngine().incrementGlobalVolume();\r\n        graphicsEngine().bindText(currentVolume, \"Volume is : \" + (int)(soundEngine().getGlobalvolume()*100), new Color(255,255,255), 20, true);\r\n    }\r\n\r\n    /**\r\n     * Décrémente le son 5 par 5\r\n     * le son étant un logarithme la décrémentation ne se fait pas très bien et\r\n     * nous nous retrouvons avec des nombre du style 24 de volume  mais cela n'est pas important\r\n     */\r\n    protected void decrementGlobalVolume(){\r\n        soundEngine().decrementGlobalVolume();\r\n        graphicsEngine().bindText(currentVolume, \"Volume is : \" + (int)(soundEngine().getGlobalvolume()*100), new Color(255,255,255), 20, true);\r\n    }\r\n\r\n    /**\r\n     * Déterminer la prochaine direction de l'entité\r\n     * @param entity entité\r\n     * @param direction direction\r\n     */\r\n    private void setEntityNextDirection(Player entity, MoveDirection direction) {\r\n        PhysicEntity entityNearby;\r\n        switch (direction) {\r\n            case UP:\r\n                entityNearby = physicsEngine().isSomethingUp(entity.getPhysicEntity());\r\n                if (entityNearby == null)\r\n                    entity.setCurrentDirection(MoveDirection.UP);\r\n                break;\r\n            case RIGHT:\r\n                entityNearby = physicsEngine().isSomethingRight(entity.getPhysicEntity());\r\n                if (entityNearby == null)\r\n                    entity.setCurrentDirection(MoveDirection.RIGHT);\r\n                break;\r\n            case DOWN:\r\n                entityNearby = physicsEngine().isSomethingDown(entity.getPhysicEntity());\r\n                if (entityNearby == null)\r\n                    entity.setCurrentDirection(MoveDirection.DOWN);\r\n                break;\r\n            case LEFT:\r\n                entityNearby = physicsEngine().isSomethingLeft(entity.getPhysicEntity());\r\n                if (entityNearby == null)\r\n                    entity.setCurrentDirection(MoveDirection.LEFT);\r\n                break;\r\n            default:\r\n                break;\r\n        }\r\n        if (entity.getCurrentDirection() != null) {\r\n            callEventFromDirection(entity, entity.getCurrentDirection());\r\n            graphicsEngine().bindAnimation(entity, entity.getAnimations().get(entity.getCurrentDirection().name()));\r\n        }\r\n    }\r\n\r\n    /**\r\n     * Appeler la méthode de déplacement en fonction de la direction courante\r\n     */\r\n    private void callEventFromDirection(Entity entity, MoveDirection direction) {\r\n        if (direction != null) {\r\n            switch (direction) {\r\n                case UP:\r\n                    physicsEngine().goUp(entity.getPhysicEntity());\r\n                    break;\r\n                case RIGHT:\r\n                    physicsEngine().goRight(entity.getPhysicEntity());\r\n                    break;\r\n                case DOWN:\r\n                    physicsEngine().goDown(entity.getPhysicEntity());\r\n                    break;\r\n                case LEFT:\r\n                    physicsEngine().goLeft(entity.getPhysicEntity());\r\n                    break;\r\n                default:\r\n                    break;\r\n            }\r\n        }\r\n    }\r\n\r\n    /**\r\n     * Générer un niveau\r\n     * @param rows nombre de lignes\r\n     * @param cols nombre de colonnes\r\n     */\r\n    public Level generateLevel(int rows, int cols) {\r\n        Level level = new Level(this,rows,cols);\r\n        this.levels.add(level);\r\n        return level;\r\n    }\r\n\r\n    /**\r\n     * Jouer un niveau\r\n     * @param level level\r\n     */\r\n    public void playLevel(Level level) {\r\n        this.currentLevel = level;\r\n        if (this.currentLevel.getLivesCount() == 3)\r\n            soundEngine().playSound(\"gameStart\");\r\n        this.currentLevel.spawnPlayer(15,9);\r\n        this.currentLevel.spawnGhost(ghosts.get(\"red\"),11,9);\r\n        this.currentLevel.spawnGhost(ghosts.get(\"blue\"),9,8);\r\n        this.currentLevel.spawnGhost(ghosts.get(\"pink\"),9,9);\r\n        this.currentLevel.spawnGhost(ghosts.get(\"orange\"),9,10);\r\n        graphicsEngine().bindScene(this.currentLevel.getScene());\r\n    }\r\n\r\n    /**\r\n     * Lancer le jeu\r\n     */\r\n    public void start() {\r\n        graphicsEngine().bindScene(menuView);\r\n        kernelEngine.start();\r\n    }\r\n\r\n    // GETTERS //\r\n\r\n    public int getTexturesFile() { return textures; }\r\n\r\n    public KernelEngine kernelEngine() { return kernelEngine; }\r\n\r\n    public GraphicsEngine graphicsEngine() { return kernelEngine.getGraphicsEngine(); }\r\n\r\n    public IOEngine ioEngine() { return kernelEngine.getIoEngine(); }\r\n\r\n    public PhysicsEngine physicsEngine() { return kernelEngine.getPhysicsEngine(); }\r\n\r\n    public SoundEngine soundEngine() { return kernelEngine.getSoundEngine(); }\r\n\r\n    public AIEngine aiEngine() { return kernelEngine.getAiEngine(); }\r\n\r\n    public Pacman getPlayer() { return pacman; }\r\n\r\n    public Map<String,Ghost> getGhosts() { return ghosts; }\r\n\r\n    public ArrayList<Level> getLevels() { return levels; }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/gameplay/Gameplay.java	(revision f17e84996aa4ef1a97a61efa44563572ca42af6e)
++++ src/main/java/gameplay/Gameplay.java	(date 1606830466067)
+@@ -102,9 +102,9 @@
+         //Jouer un niveau
+         kernelEngine.addEvent("playLevel", () -> playLevel(levels.get(0)));
+         //Déplacer le fantome rouge
+-        kernelEngine.addEvent("moveRedGhost", () -> updateGhostDirection(ghosts.get("red")));
++        kernelEngine.addEvent("moveRedGhost", () -> updateGhostDirectionCyanInky(ghosts.get("red")));
+         //Déplacer le fantome rouge
+-        kernelEngine.addEvent("moveBlueGhost", () -> updateGhostDirection(ghosts.get("blue")));
++        kernelEngine.addEvent("moveBlueGhost", () -> updateGhostDirectionRedBlinky(ghosts.get("blue")));
+         //Se déplacer vers le haut
+         kernelEngine.addEvent("pacmanGoUp", () -> switchPacmanDirection(MoveDirection.UP));
+         //Se déplacer vers la droite
+@@ -318,7 +318,7 @@
+      * Mettre à jour la position d'un fanôme
+      * @param ghost fantôme
+      */
+-    protected void updateGhostDirection(Ghost ghost) {
++    protected void updateGhostDirectionRedBlinky(Ghost ghost) {
+         PhysicEntity playerPhysic = pacman.getPhysicEntity();
+         PhysicEntity ghostPhysic = ghost.getPhysicEntity();
+ 
+@@ -394,6 +394,101 @@
+         }
+     }
+ 
++    protected void updateGhostDirectionCyanInky(Ghost ghost) {
++
++        PhysicEntity ghostPhysic = ghost.getPhysicEntity();
++
++        int ghostXmiddle = (ghostPhysic.getX() + ghostPhysic.getWidth()) / 2;
++        int ghostYmiddle = (ghostPhysic.getY() + ghostPhysic.getHeight()) / 2;
++
++        int xLimit = currentLevel.getScene().getWidth()/2;
++        int yLimit = currentLevel.getScene().getHeight()/2;
++
++        HashMap<String,Boolean> scatterPatrolZones = ghost.getScatterPatrolZones();
++        System.out.println(scatterPatrolZones);
++
++        if(currentLevel.get){
++
++        }
++
++        boolean somethingUP     = physicsEngine().isSomethingUp(ghost.getPhysicEntity()) != null;
++        boolean somethingRIGHT  = physicsEngine().isSomethingRight(ghost.getPhysicEntity()) != null;
++        boolean somethingDOWN   = physicsEngine().isSomethingDown(ghost.getPhysicEntity()) != null;
++        boolean somethingLEFT   = physicsEngine().isSomethingLeft(ghost.getPhysicEntity()) != null;
++
++        if (scatterPatrolZones.get("TopRight")){
++            if (ghostXmiddle < xLimit && !somethingRIGHT){
++                ghost.setCurrentDirection(MoveDirection.RIGHT);
++            }else if (ghostYmiddle > yLimit && !somethingUP){
++                ghost.setCurrentDirection(MoveDirection.UP);
++            }
++
++            //si on doit patrol top right
++        }
++        else if (scatterPatrolZones.get("TopLeft")){
++            if (ghostXmiddle > xLimit && !somethingLEFT){
++                ghost.setCurrentDirection(MoveDirection.LEFT);
++            }else if (ghostYmiddle > yLimit && !somethingUP){
++                ghost.setCurrentDirection(MoveDirection.UP);
++            }
++            //si on doit patrol top right
++        }
++        else if (scatterPatrolZones.get("BottomRight")){
++            if (ghostXmiddle < xLimit && !somethingRIGHT){
++                ghost.setCurrentDirection(MoveDirection.RIGHT);
++            }else if (ghostYmiddle < yLimit && !somethingDOWN){
++                ghost.setCurrentDirection(MoveDirection.DOWN);
++            }
++
++            //si on doit patrol top right
++
++        }
++        else if (scatterPatrolZones.get("BottomLeft")){
++            if (ghostXmiddle > xLimit && !somethingLEFT){
++                ghost.setCurrentDirection(MoveDirection.LEFT);
++            }else if (ghostYmiddle < yLimit && !somethingDOWN){
++                ghost.setCurrentDirection(MoveDirection.DOWN);
++            }
++            //si on doit patrol top right
++        }
++        else {
++            ghost.setForbiddenDirection(null);
++            int nombreAleatoire = 1 + (int)(Math.random() * ((4 - 1) + 1));
++            if (nombreAleatoire == 1 && !somethingUP){
++                ghost.setCurrentDirection(MoveDirection.UP);
++            }
++            else if (nombreAleatoire == 2 && !somethingRIGHT){
++                ghost.setCurrentDirection(MoveDirection.RIGHT);
++            }
++            else if (nombreAleatoire == 3 && !somethingDOWN){
++                ghost.setCurrentDirection(MoveDirection.DOWN);
++            }
++            else if (nombreAleatoire == 4 && !somethingLEFT){
++                ghost.setCurrentDirection(MoveDirection.LEFT);
++            }
++            else if (!somethingUP){
++                ghost.setCurrentDirection(MoveDirection.UP);
++            }
++            else if (!somethingRIGHT){
++                ghost.setCurrentDirection(MoveDirection.RIGHT);
++            }
++            else if (!somethingDOWN){
++                ghost.setCurrentDirection(MoveDirection.DOWN);
++            }
++            else if (!somethingLEFT){
++                ghost.setCurrentDirection(MoveDirection.LEFT);
++            }
++            //random direction
++
++        }
++
++        if (ghost.getCurrentDirection() != null) {
++            callEventFromDirection(ghost, ghost.getCurrentDirection());
++            graphicsEngine().bindAnimation(ghost, ghost.getAnimations().get(ghost.getCurrentDirection().name()));
++        }
++    }
++
++
+     /**
+      * Changer la direction de pacman
+      * @param direction direction
+Index: .idea/discord.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/discord.xml	(date 1606827140625)
++++ .idea/discord.xml	(date 1606827140625)
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="DiscordProjectSettings">
++    <option name="show" value="PROJECT_FILES" />
++  </component>
++</project>
+\ No newline at end of file

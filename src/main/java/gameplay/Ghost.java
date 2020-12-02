@@ -3,6 +3,8 @@ package gameplay;
 import java.util.HashSet;
 import java.util.Set;
 
+import java.util.HashMap;
+
 /**
  * Fantome
  */
@@ -21,6 +23,12 @@ public class Ghost extends Player {
      * Mangé
      */
     private boolean eaten;
+
+    private HashMap<String,Boolean> scatterPatrolZones = new HashMap<String, Boolean>();
+    private boolean patroleZoneReached = false;
+    private Gameplay.MoveDirection previousDirection;
+    private HashMap<String,Boolean> keepDirection = new HashMap<>();
+
 
     /**
      * Constructeur
@@ -48,6 +56,15 @@ public class Ghost extends Player {
                 this.defaultTextureCoords = new int[]{6, 1};
                 break;
         }
+        scatterPatrolZones.put("TopRight",false);
+        scatterPatrolZones.put("TopLeft",false);
+        scatterPatrolZones.put("BottomRight",false);
+        scatterPatrolZones.put("BottomLeft",false);
+        keepDirection.put("KeepUp",false);
+        keepDirection.put("KeepDown",false);
+        keepDirection.put("KeepLeft",false);
+        keepDirection.put("KeepRight",false);
+
         gameplay.graphicsEngine().bindTexture(this, gameplay.getTexturesFile(),
                 defaultTextureCoords[0], defaultTextureCoords[1]);
         initAnimations(gameplay.getTexturesFile());
@@ -83,7 +100,39 @@ public class Ghost extends Player {
 
     public Set<Gameplay.MoveDirection> getForbiddenDirection() { return forbiddenDirection; }
 
+
+    public HashMap<String, Boolean> getScatterPatrolZones() {
+        return scatterPatrolZones;
+    }
+
+    public void setScatterPatrolZones(HashMap<String, Boolean> scatterPatrolZones) {
+        this.scatterPatrolZones = scatterPatrolZones;
+    }
     public boolean getEaten() { return this.eaten; }
 
     public void setEaten(boolean eaten) { this.eaten = eaten; }
+
+    public boolean isPatroleZoneReached() {
+        return patroleZoneReached;
+    }
+
+    public void setPatroleZoneReached(boolean patroleZoneReached) {
+        this.patroleZoneReached = patroleZoneReached;
+    }
+
+    public Gameplay.MoveDirection getPreviousDirection() {
+        return previousDirection;
+    }
+
+    public void setPreviousDirection(Gameplay.MoveDirection previousDirection) {
+        this.previousDirection = previousDirection;
+    }
+
+    public HashMap<String, Boolean> getKeepDirection() {
+        return keepDirection;
+    }
+
+    public void setKeepDirection(HashMap<String, Boolean> keepDirection) {
+        this.keepDirection = keepDirection;
+    }
 }
