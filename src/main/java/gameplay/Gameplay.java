@@ -159,6 +159,8 @@ public class Gameplay {
         kernelEngine.addEvent("moveRedGhost", this::applyRedGhostAI);
         //Déplacer le fantome Bleu
         kernelEngine.addEvent("moveBlueGhost", this::applyBlueGhostAI);
+        //Déplacer le fantome orange
+        kernelEngine.addEvent("moveOrangeGhost", this::applyOrangeGhostAI);
         //Se déplacer vers le haut
         kernelEngine.addEvent("pacmanGoUp", () -> switchPacmanDirection(MoveDirection.UP));
         //Se déplacer vers la droite
@@ -190,6 +192,7 @@ public class Gameplay {
         //physicsEngine().bindEventOnCollision(pacman, "pacmanOnCollision");
         aiEngine().bindEvent(ghosts.get("red"), "moveRedGhost");
         aiEngine().bindEvent(ghosts.get("blue"), "moveBlueGhost");
+        aiEngine().bindEvent(ghosts.get("orange"),"moveOrangeGhost");
     }
 
     /**
@@ -548,6 +551,51 @@ public class Gameplay {
         Ghost ghost = ghosts.get("red");
         PhysicEntity playerPhysic = pacman.getPhysicEntity();
         reachTarget(ghost,playerPhysic);
+    }
+
+    private void applyOrangeGhostAI(){
+        Ghost ghost = ghosts.get("orange");
+        PhysicEntity playerPhysic = pacman.getPhysicEntity();
+        PhysicEntity ghostPhysic = ghost.getPhysicEntity();
+
+        //Calcul de la distance horizontale et verticale entre pacman et le fantome
+        int playerXmiddle = (playerPhysic.getX() + playerPhysic.getWidth()) / 2;
+        int playerYmiddle = (playerPhysic.getY() + playerPhysic.getHeight()) / 2;
+        int ghostXmiddle = (ghostPhysic.getX() + ghostPhysic.getWidth()) / 2;
+        int ghostYmiddle = (ghostPhysic.getY() + ghostPhysic.getHeight()) / 2;
+        int xDistance = playerXmiddle - ghostXmiddle;
+        int yDistance = playerYmiddle - ghostYmiddle;
+
+        //distance entre joueur et fantome
+        int distanceJoueurFantome = (int) Math.sqrt(((ghostXmiddle - playerXmiddle)*(ghostXmiddle - playerXmiddle)) + ((ghostYmiddle - playerYmiddle)*(ghostYmiddle - playerYmiddle)));
+        if (distanceJoueurFantome <= 100){
+           //target un des coins
+            //quand le fantome est en bas a droite de pacman
+            if (playerXmiddle <= ghostXmiddle && playerYmiddle <= ghostYmiddle){
+                PhysicEntity targetBottomRight = targets.get("BottomRight").getPhysicEntity();
+                reachTarget(ghost,targetBottomRight);
+            }
+            //quand le fantome est en bas a gauche de pacman
+            else if (playerXmiddle > ghostXmiddle && playerYmiddle >= ghostYmiddle){
+                PhysicEntity targetBottomLeft = targets.get("BottomLeft").getPhysicEntity();
+                reachTarget(ghost,targetBottomLeft);
+            }
+            else if (playerXmiddle < ghostXmiddle && playerYmiddle >= ghostYmiddle){
+                PhysicEntity targetTopRight = targets.get("TopRight").getPhysicEntity();
+                reachTarget(ghost,targetTopRight);
+            }
+            else {
+                PhysicEntity targetTopLeft = targets.get("TopLeft").getPhysicEntity();
+                reachTarget(ghost,targetTopLeft);
+            }
+        }
+        else{
+            ghost.setCurrentDirection(updateGhostDirectionWithRandomness(ghost));
+            if (ghost.getCurrentDirection() != null) {
+                callEventFromDirection(ghost, ghost.getCurrentDirection());
+                updateGhostAnimation(ghost);
+            }
+        }
     }
 
     /**
