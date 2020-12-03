@@ -964,17 +964,11 @@ public class Gameplay {
      */
     public void enablePowerUP() {
         soundEngine().playSound("eatGomme");
-
         int time = 8;
-
         if (ghostFear.get()) time = time + ghostFearTimeout.get();
         else ghostFear.getAndSet(true);
-
-        System.out.println("Duration : " + time + " s");
-
-        System.out.println("ICI " + ghostFearTimeout.getAndSet(time));
-
         int finalTime = time;
+
         Thread timerThread = new Thread(() -> {
             soundEngine().pauseSound("siren1");
             soundEngine().loopSound("powerup");
