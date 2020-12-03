@@ -14,6 +14,7 @@ import engines.sound.SoundEngine;
 
 import java.awt.event.KeyEvent;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -34,6 +35,11 @@ public class Gameplay {
      * Moteur noyau
      */
     private final KernelEngine kernelEngine;
+
+    /**
+     * Service d'exécution
+     */
+    private final ExecutorService executorService;
 
     /**
      * Identifiant du fichier contenant les textures du jeu
@@ -78,49 +84,55 @@ public class Gameplay {
     /**
      * Fantomes
      */
-    private Map<String,Ghost> ghosts;
+    private Map<GHOSTS,Ghost> ghosts;
 
     /**
-     * Booléen pour savoir si les fantômes sont appeurés
+     * Durée par défaut du pouvoir pour manger les fantomes
      */
-    private final AtomicBoolean ghostFear;
+    private final int eatPowerUpInitialTime = 8;
+
+    /**
+     * Durée par défaut du pouvoir pour casser les murs
+     */
+    private final int breakPowerUpInitialTime = 5;
+
+    /**
+     * Booléen pour savoir si le pouvoir pour manger les fantomes est actif
+     */
+    private final AtomicBoolean isEatPowerUpEnabled;
 
     /**
      * Booléen pour savoir si le pouvoir de briser les murs est actif
      */
-    private final AtomicBoolean pacmanBreak;
+    private final AtomicBoolean isBreakPowerUpEnabled;
 
     /**
-     * Temps restant pour la crainte des fantomes
+     * Temps restant pour le pouvoir de manger les fantomes
      */
-    private final AtomicInteger ghostFearTimeout;
+    private final AtomicInteger eatPowerUpTimeout;
 
     /**
-     * Temps restant pour le breaker
+     * Temps restant pour le pouvoir de casser les murs
      */
-    private final AtomicInteger pacmanBreakTimeout;
+    private final AtomicInteger breakPowerUpTimeout;
 
     /**
-     * Pool de thread gérant les timers pour les gommes
+     * Fantomes disponibles
      */
-    private final Vector<Thread> timerGommePool = new Vector<>();
-
-    /**
-     * Pool de thread gérant les timers pour les breakers
-     */
-    private final Vector<Thread> timerBreakerPool = new Vector<>();
+    public enum GHOSTS {RED, BLUE, ORANGE, PINK}
 
     /**
      * Constructeur
      */
     public Gameplay() {
         this.kernelEngine = new KernelEngine();
+        this.executorService = Executors.newFixedThreadPool(8);
         this.textures = kernelEngine.getGraphicsEngine().loadSpriteSheet("assets/sprite_sheet.png", 12, 11);
         this.levels = new ArrayList<>();
-        this.ghostFear = new AtomicBoolean(false);
-        this.ghostFearTimeout = new AtomicInteger(8);
-        this.pacmanBreak = new AtomicBoolean(false);
-        this.pacmanBreakTimeout = new AtomicInteger(5);
+        this.isEatPowerUpEnabled = new AtomicBoolean(false);
+        this.eatPowerUpTimeout = new AtomicInteger(eatPowerUpInitialTime);
+        this.isBreakPowerUpEnabled = new AtomicBoolean(false);
+        this.breakPowerUpTimeout = new AtomicInteger(breakPowerUpInitialTime);
         initGameplay();
     }
 
@@ -146,6 +158,18 @@ public class Gameplay {
     }
 
     /**
+     * Initialiser les joueurs
+     */
+    private void initPlayers() {
+        pacman = new Pacman(this);
+        ghosts = new HashMap<>();
+        ghosts.put(GHOSTS.RED,    new Ghost(this, GHOSTS.RED));
+        ghosts.put(GHOSTS.BLUE,   new Ghost(this, GHOSTS.BLUE));
+        ghosts.put(GHOSTS.PINK,   new Ghost(this, GHOSTS.PINK));
+        ghosts.put(GHOSTS.ORANGE, new Ghost(this, GHOSTS.ORANGE));
+    }
+
+    /**
      * Initialiser les évènements du jeu
      */
     private void initEvents() {
@@ -161,11 +185,14 @@ public class Gameplay {
         kernelEngine.addEvent("moveOrangeGhost", this::applyOrangeGhostAI);
         //Déplacer fantome rose
         kernelEngine.addEvent("movePinkGhost", this::applyPinkGhostAI);
-        //Ghost fear
-        kernelEngine.addEvent("moveFearGhostBlue", this::applyFearBlueGhost);
-        kernelEngine.addEvent("moveFearGhostRed", this::applyFearRedGhost);
-        kernelEngine.addEvent("moveFearGhostOrange", this::applyFearOrangeGhost);
-        kernelEngine.addEvent("moveFearGhostPink", this::applyFearPinkGhost);
+        //Déplacement fantome bleu craintif
+        kernelEngine.addEvent("moveFearGhostBlue", () -> applyGhostFearAI(ghosts.get(GHOSTS.BLUE)));
+        //Déplacement fantome rouge craintif
+        kernelEngine.addEvent("moveFearGhostRed", () -> applyGhostFearAI(ghosts.get(GHOSTS.RED)));
+        //Déplacement fantome orange craintif
+        kernelEngine.addEvent("moveFearGhostOrange", () -> applyGhostFearAI(ghosts.get(GHOSTS.ORANGE)));
+        //Déplacement fantome rose craintif
+        kernelEngine.addEvent("moveFearGhostPink", () -> applyGhostFearAI(ghosts.get(GHOSTS.PINK)));
         //Se déplacer vers le haut
         kernelEngine.addEvent("pacmanGoUp", () -> switchPacmanDirection(MoveDirection.UP));
         //Se déplacer vers la droite
@@ -178,16 +205,8 @@ public class Gameplay {
         kernelEngine.addEvent("upVolume", this::incrementGlobalVolume);
         //Baisser le volume
         kernelEngine.addEvent("downVolume", this::decrementGlobalVolume);
-        //Lorsqu'il y a une collision
+        //Lorsqu'il y a une collision avec pacman
         kernelEngine.addEvent("pacmanOnCollision", this::checkPacmanCollisions);
-        //Téléporter à droite
-        kernelEngine().addEvent("teleportToRight", () -> {
-
-        });
-        //Téléporter à gauche
-        kernelEngine().addEvent("teleportToLeft", () -> {
-
-        });
 
         //Liaison des évènements du niveau
         ioEngine().bindEventOnLastKey(KeyEvent.VK_UP, "pacmanGoUp");
@@ -195,10 +214,7 @@ public class Gameplay {
         ioEngine().bindEventOnLastKey(KeyEvent.VK_DOWN, "pacmanGoDown");
         ioEngine().bindEventOnLastKey(KeyEvent.VK_LEFT, "pacmanGoLeft");
         physicsEngine().bindEventOnCollision(pacman, "pacmanOnCollision");
-        aiEngine().bindEvent(ghosts.get("red"), "moveRedGhost");
-        aiEngine().bindEvent(ghosts.get("blue"), "moveBlueGhost");
-        aiEngine().bindEvent(ghosts.get("orange"),"moveOrangeGhost");
-        aiEngine().bindEvent(ghosts.get("pink"),"movePinkGhost");
+        bindGhostsInitialAI();
     }
 
     /**
@@ -289,18 +305,6 @@ public class Gameplay {
     }
 
     /**
-     * Initialiser les joueurs
-     */
-    private void initPlayers() {
-        pacman = new Pacman(this);
-        ghosts = new HashMap<>();
-        ghosts.put("red", new Ghost(this, "red"));
-        ghosts.put("blue", new Ghost(this, "blue"));
-        ghosts.put("pink", new Ghost(this, "pink"));
-        ghosts.put("orange", new Ghost(this, "orange"));
-    }
-
-    /**
      * Initialiser le niveau par défaut
      */
     private void initDefaultLevel() {
@@ -378,6 +382,7 @@ public class Gameplay {
         defaultLevel.addGomme(1,18);
         defaultLevel.addGomme(19,18);
 
+        //Ajout du super pouvoir pour casser les murs
         defaultLevel.addBreaker(15,9);
 
         //ajout target pour scatter (patrouille)
@@ -540,8 +545,10 @@ public class Gameplay {
      */
     private void updateGhostAnimation(Ghost ghost) {
         String animationName = ghost.getCurrentDirection().name();
-        if (ghost.getEaten()) animationName = "eaten" + animationName;
-        else if (ghostFear.get()) animationName = ghostFearTimeout.get() > 2 ? "fear" : "fearEnd";
+        if (ghost.getEaten())
+            animationName = "eaten" + animationName;
+        else if (isEatPowerUpEnabled.get())
+            animationName = eatPowerUpTimeout.get() > 2 ? "fear" : "fearEnd";
         graphicsEngine().bindAnimation(ghost, ghost.getAnimations().get(animationName));
     }
 
@@ -549,19 +556,25 @@ public class Gameplay {
      * Appliquer l'intelligence artificielle au fantome rouge
      */
     private void applyRedGhostAI() {
-        Ghost ghost = ghosts.get("red");
+        Ghost ghost = ghosts.get(GHOSTS.RED);
         PhysicEntity playerPhysic = pacman.getPhysicEntity();
         reachTarget(ghost,playerPhysic);
     }
 
-    private void applyPinkGhostAI(){
-        Ghost ghost = ghosts.get("pink");
+    /**
+     * Appliquer l'intelligence artificielle au fantome rose
+     */
+    private void applyPinkGhostAI() {
+        Ghost ghost = ghosts.get(GHOSTS.PINK);
         PhysicEntity playerPhysic = pacman.getPhysicEntity();
         reachTarget(ghost,playerPhysic);
     }
 
-    private void applyOrangeGhostAI(){
-        Ghost ghost = ghosts.get("orange");
+    /**
+     * Appliquer l'intelligence artificielle au fantome orange
+     */
+    private void applyOrangeGhostAI() {
+        Ghost ghost = ghosts.get(GHOSTS.ORANGE);
         PhysicEntity playerPhysic = pacman.getPhysicEntity();
         PhysicEntity ghostPhysic = ghost.getPhysicEntity();
 
@@ -605,8 +618,11 @@ public class Gameplay {
         }
     }
 
-    protected void GhostFearAI(Ghost ghost){
-
+    /**
+     * Intelligence artificielle du fantome craintif
+     * @param ghost fantome
+     */
+    protected void applyGhostFearAI(Ghost ghost) {
         PhysicEntity playerPhysic = pacman.getPhysicEntity();
         PhysicEntity ghostPhysic = ghost.getPhysicEntity();
 
@@ -615,11 +631,11 @@ public class Gameplay {
         int playerYmiddle = (playerPhysic.getY() + playerPhysic.getHeight()) / 2;
         int ghostXmiddle = (ghostPhysic.getX() + ghostPhysic.getWidth()) / 2;
         int ghostYmiddle = (ghostPhysic.getY() + ghostPhysic.getHeight()) / 2;
-        int xDistance = playerXmiddle - ghostXmiddle;
-        int yDistance = playerYmiddle - ghostYmiddle;
 
         //distance entre joueur et fantome
-        int distanceJoueurFantome = (int) Math.sqrt(((ghostXmiddle - playerXmiddle)*(ghostXmiddle - playerXmiddle)) + ((ghostYmiddle - playerYmiddle)*(ghostYmiddle - playerYmiddle)));
+        int distanceJoueurFantome = (int) Math.sqrt(((ghostXmiddle - playerXmiddle)*(ghostXmiddle - playerXmiddle))
+                + ((ghostYmiddle - playerYmiddle)*(ghostYmiddle - playerYmiddle)));
+
         if (distanceJoueurFantome <= 200){
             //target un des coins
             //quand le fantome est en bas a droite de pacman
@@ -648,27 +664,13 @@ public class Gameplay {
                 updateGhostAnimation(ghost);
             }
         }
-
-    }
-
-    private void applyFearBlueGhost(){
-        GhostFearAI(ghosts.get("blue"));
-    }
-    private void applyFearRedGhost(){
-        GhostFearAI(ghosts.get("red"));
-    }
-    private void applyFearOrangeGhost(){
-        GhostFearAI(ghosts.get("orange"));
-    }
-    private void applyFearPinkGhost(){
-        GhostFearAI(ghosts.get("pink"));
     }
 
     /**
      * Appliquer l'intelligence artificielle au fantome bleu
      */
     private void applyBlueGhostAI() {
-        Ghost ghost = ghosts.get("blue");
+        Ghost ghost = ghosts.get(GHOSTS.BLUE);
         //setting new patrol zone depending on score
         if(currentLevel.getActualScore() == 0){
             ghost.getScatterPatrolZones().put("TopRight",false);
@@ -771,8 +773,9 @@ public class Gameplay {
         boolean somethingDOWN   = physicsEngine().isSomethingDown(ghost) != null;
         boolean somethingLEFT   = physicsEngine().isSomethingLeft(ghost) != null;
 
-        int nombreAleatoire = 1 + (int)(Math.random() * ((4 - 1) + 1));
-        HashMap<String,Boolean> keepDirection = ghost.getKeepDirection() ;
+        int random = 1 + (int)(Math.random() * ((4 - 1) + 1));
+
+        HashMap<String,Boolean> keepDirection = ghost.getKeepDirection();
 
         if (keepDirection.get("KeepUp") && somethingLEFT && somethingRIGHT && !somethingUP){
             ghost.setPreviousDirection(MoveDirection.UP);
@@ -795,85 +798,85 @@ public class Gameplay {
         ghost.getKeepDirection().put("KeepDown",false);
         ghost.getKeepDirection().put("KeepLeft",false);
 
-        if (nombreAleatoire == 1 && !somethingUP && ghost.getPreviousDirection() != MoveDirection.DOWN){
+        if (random == 1 && !somethingUP && ghost.getPreviousDirection() != MoveDirection.DOWN){
             ghost.getKeepDirection().put("KeepUp",true);
             ghost.setPreviousDirection(MoveDirection.UP);
             return MoveDirection.UP;
         }
-        else if (nombreAleatoire == 1 && !somethingRIGHT && ghost.getPreviousDirection() != MoveDirection.LEFT){
+        else if (random == 1 && !somethingRIGHT && ghost.getPreviousDirection() != MoveDirection.LEFT){
             ghost.getKeepDirection().put("KeepRight",true);
             ghost.setPreviousDirection(MoveDirection.RIGHT);
             return MoveDirection.RIGHT;
         }
-        else if (nombreAleatoire == 1 && !somethingLEFT && ghost.getPreviousDirection() != MoveDirection.RIGHT){
+        else if (random == 1 && !somethingLEFT && ghost.getPreviousDirection() != MoveDirection.RIGHT){
             ghost.getKeepDirection().put("KeepLeft",true);
             ghost.setPreviousDirection(MoveDirection.LEFT);
             return MoveDirection.LEFT;
         }
-        else if (nombreAleatoire == 1){
+        else if (random == 1){
             ghost.getKeepDirection().put("KeepDown",true);
             ghost.setPreviousDirection(MoveDirection.DOWN);
             return MoveDirection.DOWN;
         }
 
-        if (nombreAleatoire == 2 && !somethingRIGHT  && ghost.getPreviousDirection() != MoveDirection.LEFT){
+        if (random == 2 && !somethingRIGHT  && ghost.getPreviousDirection() != MoveDirection.LEFT){
             ghost.getKeepDirection().put("KeepRight",true);
             ghost.setPreviousDirection(MoveDirection.RIGHT);
             return MoveDirection.RIGHT;
         }
-        else if (nombreAleatoire == 2 && !somethingDOWN && ghost.getPreviousDirection() != MoveDirection.UP){
+        else if (random == 2 && !somethingDOWN && ghost.getPreviousDirection() != MoveDirection.UP){
             ghost.getKeepDirection().put("KeepDown",true);
             ghost.setPreviousDirection(MoveDirection.UP);
             return MoveDirection.DOWN;
         }
-        else if (nombreAleatoire == 2 && !somethingUP && ghost.getPreviousDirection() != MoveDirection.DOWN){
+        else if (random == 2 && !somethingUP && ghost.getPreviousDirection() != MoveDirection.DOWN){
             ghost.getKeepDirection().put("KeepUp",true);
             ghost.setPreviousDirection(MoveDirection.UP);
             return MoveDirection.UP;
         }
-        else if (nombreAleatoire == 2) {
+        else if (random == 2) {
             ghost.getKeepDirection().put("KeepLeft",true);
             ghost.setPreviousDirection(MoveDirection.LEFT);
             return MoveDirection.LEFT;
         }
 
-        if (nombreAleatoire == 3 && !somethingDOWN && ghost.getPreviousDirection() != MoveDirection.UP){
+        if (random == 3 && !somethingDOWN && ghost.getPreviousDirection() != MoveDirection.UP){
             ghost.getKeepDirection().put("KeepDown",true);
             ghost.setPreviousDirection(MoveDirection.UP);
             return MoveDirection.DOWN;
         }
-        else if (nombreAleatoire == 3 && !somethingLEFT && ghost.getPreviousDirection() != MoveDirection.RIGHT){
+        else if (random == 3 && !somethingLEFT && ghost.getPreviousDirection() != MoveDirection.RIGHT){
             ghost.getKeepDirection().put("KeepLeft",true);
             ghost.setPreviousDirection(MoveDirection.LEFT);
             return MoveDirection.LEFT;
         }
-        else if (nombreAleatoire == 3 && !somethingRIGHT  && ghost.getPreviousDirection() != MoveDirection.LEFT){
+        else if (random == 3 && !somethingRIGHT  && ghost.getPreviousDirection() != MoveDirection.LEFT){
             ghost.getKeepDirection().put("KeepRight",true);
             ghost.setPreviousDirection(MoveDirection.RIGHT);
             return MoveDirection.RIGHT;
         }
-        else if (nombreAleatoire == 3){
+        else if (random == 3){
             ghost.getKeepDirection().put("KeepUp",true);
             ghost.setPreviousDirection(MoveDirection.UP);
             return MoveDirection.UP;
         }
 
-        if (nombreAleatoire == 4 && !somethingLEFT && ghost.getPreviousDirection() != MoveDirection.RIGHT){
+        if (random == 4 && !somethingLEFT && ghost.getPreviousDirection() != MoveDirection.RIGHT){
             ghost.getKeepDirection().put("KeepLeft",true);
             ghost.setPreviousDirection(MoveDirection.LEFT);
             return MoveDirection.LEFT;
         }
-        else if (nombreAleatoire == 4 && !somethingDOWN && ghost.getPreviousDirection() != MoveDirection.UP){
+        else if (random == 4 && !somethingDOWN && ghost.getPreviousDirection() != MoveDirection.UP){
             ghost.getKeepDirection().put("KeepDown",true);
             ghost.setPreviousDirection(MoveDirection.UP);
             return MoveDirection.DOWN;
         }
-        else if (nombreAleatoire == 4 && !somethingUP  && ghost.getPreviousDirection() != MoveDirection.DOWN){
+        else if (random == 4 && !somethingUP  && ghost.getPreviousDirection() != MoveDirection.DOWN){
             ghost.getKeepDirection().put("KeepUp",true);
             ghost.setPreviousDirection(MoveDirection.UP);
             return MoveDirection.UP;
         }
-        else if (nombreAleatoire == 4){
+        else if (random == 4){
             ghost.getKeepDirection().put("KeepRight",true);
             ghost.setPreviousDirection(MoveDirection.RIGHT);
             return MoveDirection.RIGHT;
@@ -910,35 +913,29 @@ public class Gameplay {
      * @param ghost fantome
      */
     public void pacmanGhostCollision(Ghost ghost) {
-        // Si les fantômes sont appeurés
-        if (ghostFear.get()) eatGhost(ghost);
+        if (isEatPowerUpEnabled.get()) eatGhost(ghost);
         else decreasePacmanLife();
     }
 
     /**
      * Collision entre pacman et un mur lors du pouvoir breaker
-     * @param wall
+     * @param wall mur
      */
     public void pacmanWallCollision(Entity wall) {
-        // Si le breaker est actif
-        System.out.println("Je rentre ici");
-        if (pacmanBreak.get()) {
-            System.out.println(pacmanBreak.get());
+        if (isBreakPowerUpEnabled.get())
             breakWall(wall);
-        }
-
     }
 
     /**
      * Décrémenter la vie de pacman lorsqu'il se fait toucher par un fantome
      */
     private void decreasePacmanLife() {
+        soundEngine().stopSounds();
         moveGhostsOut();
         kernelEngine.pauseEvents();
         currentLevel.updateLives();
         graphicsEngine().bindAnimation(pacman, pacman.getAnimations().get("death"));
-        new Thread(() -> {
-            soundEngine().pauseSound("siren1");
+        executorService.execute(() -> {
             soundEngine().playSound("death1");
             try { sleep(700); } catch (InterruptedException e) { e.printStackTrace(); }
             soundEngine().stopSound("death1");
@@ -946,11 +943,11 @@ public class Gameplay {
             try { sleep(2000); } catch (InterruptedException e) { e.printStackTrace(); }
             if (currentLevel.getLivesCount().get() > 0) playLevel(currentLevel);
             else showEndGameView("YOU LOST !", new Color(255,0,0));
-        }).start();
+        });
     }
 
     /**
-     * Placer les fanomes hors du niveau
+     * Placer les fantomes hors du niveau
      */
     private void moveGhostsOut() {
         for (Ghost ghost1 : ghosts.values())
@@ -966,14 +963,14 @@ public class Gameplay {
             soundEngine().playSound("eatGhost");
             this.currentLevel.updateActualScore(this.currentLevel.getActualScore() + 250);
             ghost.setEaten(true);
-            new Thread(() -> {
+            executorService.execute(() -> {
                 try {
                     sleep(5000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 ghost.setEaten(false);
-            }).start();
+            });
         }
     }
 
@@ -982,15 +979,10 @@ public class Gameplay {
      * @param wall mur
      */
     private void breakWall(Entity wall) {
-        if (wall.getPhysicEntity().getX() != 1 && wall.getPhysicEntity().getX() != 19) {
-            physicsEngine().removeCollisions(pacman, wall);
-            for (Ghost ghost : ghosts.values())
-                physicsEngine().removeCollisions(ghost, wall);
-            int[] wallPosition = currentLevel.getEntityPositionInMatrix(wall);
-            currentLevel.getWalls()[wallPosition[0]][wallPosition[1]] = false;
-            currentLevel.applyWallTextures();
-            kernelEngine.removeEntity(wall);
-        }
+        int[] wallPosition = currentLevel.getEntityPositionInMatrix(wall);
+        currentLevel.getWalls()[wallPosition[0]][wallPosition[1]] = false;
+        currentLevel.applyWallTextures();
+        kernelEngine.removeEntity(wall);
     }
 
     /**
@@ -1090,17 +1082,17 @@ public class Gameplay {
      */
     protected void spawnPlayersOnLevel() {
         currentLevel.spawnPlayer(15,10);
-        currentLevel.spawnGhost(ghosts.get("red"),7,10);
-        currentLevel.spawnGhost(ghosts.get("blue"),11,9);
-        currentLevel.spawnGhost(ghosts.get("pink"),9,10);
-        currentLevel.spawnGhost(ghosts.get("orange"),9,11);
+        currentLevel.spawnGhost(ghosts.get(GHOSTS.RED),7,10);
+        currentLevel.spawnGhost(ghosts.get(GHOSTS.BLUE),11,9);
+        currentLevel.spawnGhost(ghosts.get(GHOSTS.PINK),9,10);
+        currentLevel.spawnGhost(ghosts.get(GHOSTS.ORANGE),9,11);
     }
 
     /**
      * Rejouer un niveau
      */
     protected void restartLevel() {
-        levels.remove(currentLevel);
+        levels.clear();
         initDefaultLevel();
         playLevel(levels.get(0));
     }
@@ -1111,105 +1103,91 @@ public class Gameplay {
      */
     protected void playLevel(Level level) {
         currentLevel = level;
-        ghostFear.set(false);
-        ghostFearTimeout.set(0);
+        isEatPowerUpEnabled.getAndSet(false);
+        eatPowerUpTimeout.getAndSet(eatPowerUpInitialTime);
+        isBreakPowerUpEnabled.getAndSet(false);
+        breakPowerUpTimeout.getAndSet(breakPowerUpInitialTime);
 
-        pacmanBreak.set(false);
-        pacmanBreakTimeout.set(0);
-
-        for (Ghost ghost : ghosts.values()) {
+        for (Ghost ghost : ghosts.values())
             if (ghost.getEaten()) ghost.setEaten(false);
-        }
 
+        soundEngine().stopSounds();
         ioEngine().resetLastPressedKey();
         spawnPlayersOnLevel();
         kernelEngine().switchScene(currentLevel.getScene());
+
         if (currentLevel.getLivesCount().get() == 3)
             soundEngine().playSound("gameStart");
-        new Thread(() -> {
+
+        executorService.execute(() -> {
             kernelEngine.pauseEvents();
-            try {
-                sleep(currentLevel.getLivesCount().get() == 3 ? 4000 : 1000);
-                sleep(1);
-            }
+            try { sleep(currentLevel.getLivesCount().get() == 3 ? 4000 : 1000); }
             catch (InterruptedException e) { e.printStackTrace(); }
             kernelEngine.resumeEvents();
             soundEngine().loopSound("siren1");
-        }).start();
+        });
     }
 
     /**
-     * Activer le super pouvoir de manger pour 8 secondes
+     * Attacher l'IA de crainte aux fantomes
+     */
+    public void bindGhostsFearAI() {
+        aiEngine().bindEvent(ghosts.get(GHOSTS.BLUE),"moveFearGhostBlue");
+        aiEngine().bindEvent(ghosts.get(GHOSTS.ORANGE),"moveFearGhostOrange");
+        aiEngine().bindEvent(ghosts.get(GHOSTS.PINK),"moveFearGhostPink");
+        aiEngine().bindEvent(ghosts.get(GHOSTS.RED),"moveFearGhostRed");
+    }
+
+    /**
+     * Attacher l'IA de base aux fantomes
+     */
+    public void bindGhostsInitialAI() {
+        aiEngine().bindEvent(ghosts.get(GHOSTS.RED), "moveRedGhost");
+        aiEngine().bindEvent(ghosts.get(GHOSTS.BLUE), "moveBlueGhost");
+        aiEngine().bindEvent(ghosts.get(GHOSTS.ORANGE),"moveOrangeGhost");
+        aiEngine().bindEvent(ghosts.get(GHOSTS.PINK),"movePinkGhost");
+    }
+
+    /**
+     * Activer le super pouvoir de manger les fantomes
      */
     public void enableEatPowerUP() {
+        isEatPowerUpEnabled.getAndSet(true);
+        eatPowerUpTimeout.getAndSet(eatPowerUpInitialTime);
+        bindGhostsFearAI();
+        soundEngine().pauseSound("siren1");
+        soundEngine().loopSound("powerup");
         soundEngine().playSound("eatGomme");
-        int time = 8;
-        if (ghostFear.get()) time = time + ghostFearTimeout.get();
-        else {
-            ghostFear.getAndSet(true);
-
-            aiEngine().bindEvent(ghosts.get("blue"),"moveFearGhostBlue");
-            aiEngine().bindEvent(ghosts.get("orange"),"moveFearGhostOrange");
-            aiEngine().bindEvent(ghosts.get("pink"),"moveFearGhostPink");
-            aiEngine().bindEvent(ghosts.get("red"),"moveFearGhostRed");
-        }
-        int finalTime = time;
-
-        Thread timerThread = new Thread(() -> {
-            soundEngine().pauseSound("siren1");
-            soundEngine().loopSound("powerup");
-            for (int i = 0; i < finalTime ; i++) {
+        executorService.execute(() -> {
+            for (int i = 0; i < eatPowerUpInitialTime; i++) {
                 try { sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
-                if (ghostFearTimeout.get() > 0) ghostFearTimeout.getAndDecrement();
+                eatPowerUpTimeout.getAndDecrement();
             }
-
-            // Si le thread courant n'est pas le dernier à être lancé alors il ne modifie pas la peur
-            // des fantômes
-            if (Thread.currentThread().equals(timerGommePool.get(timerGommePool.size()-1)))
-            {
-                ghostFear.getAndSet(false);
-                soundEngine().pauseSound("powerup");
-                soundEngine().pauseSound("siren1");
-                aiEngine().bindEvent(ghosts.get("red"), "moveRedGhost");
-                aiEngine().bindEvent(ghosts.get("blue"), "moveBlueGhost");
-                aiEngine().bindEvent(ghosts.get("orange"),"moveOrangeGhost");
-                aiEngine().bindEvent(ghosts.get("pink"), "movePinkGhost");
-                timerGommePool.clear();
-            }
+            isEatPowerUpEnabled.getAndSet(false);
+            soundEngine().pauseSound("powerup");
+            soundEngine().loopSound("siren1");
+            bindGhostsInitialAI();
         });
-
-        this.timerGommePool.add(timerThread);
-        timerThread.start();
     }
 
     /**
      * Activer le super pouvoir de casser les murs pour 5 secondes
      */
     public void enableBreakPowerUp() {
-        int time = 5;
-        if (pacmanBreak.get()) time = time + pacmanBreakTimeout.get();
-        else pacmanBreak.getAndSet(true);
-        System.out.println("Breaker " + pacmanBreak.get());
-        int finalTime = time;
-
-        Thread timerThread = new Thread( () -> {
-            soundEngine().playSound("powerup");
-            try {
-                Thread.sleep(finalTime*1000);
+        isBreakPowerUpEnabled.getAndSet(true);
+        breakPowerUpTimeout.getAndSet(breakPowerUpInitialTime);
+        soundEngine().pauseSound("siren1");
+        soundEngine().loopSound("powerup");
+        soundEngine().playSound("eatGomme");
+        executorService.execute(() -> {
+            for (int i = 0; i < breakPowerUpInitialTime; i++) {
+                try { sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
+                breakPowerUpTimeout.getAndDecrement();
             }
-            catch (InterruptedException e) { e.printStackTrace(); }
-            if (pacmanBreakTimeout.get() > 0) pacmanBreakTimeout.getAndDecrement();
-
-            if (Thread.currentThread().equals(timerBreakerPool.get(timerBreakerPool.size()-1)))
-            {
-                pacmanBreak.getAndSet(false);
-                System.out.println("Breaker " + pacmanBreak.get());
-                timerBreakerPool.clear();
-            }
+            isBreakPowerUpEnabled.getAndSet(false);
+            soundEngine().pauseSound("powerup");
+            soundEngine().loopSound("siren1");
         });
-
-        timerBreakerPool.add(timerThread);
-        timerThread.start();
     }
 
     /**
@@ -1235,7 +1213,7 @@ public class Gameplay {
     public void start() {
         kernelEngine().switchScene(menuView);
         kernelEngine.start();
-        setGlobalVolume(0);
+        setGlobalVolume(30);
     }
 
     // GETTERS //
@@ -1256,7 +1234,7 @@ public class Gameplay {
 
     public Pacman getPlayer() { return pacman; }
 
-    public Map<String,Ghost> getGhosts() { return ghosts; }
+    public Map<GHOSTS,Ghost> getGhosts() { return ghosts; }
 
     public ArrayList<Level> getLevels() { return levels; }
 }

@@ -5,7 +5,6 @@ import engines.kernel.EventListener;
 
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -67,31 +66,25 @@ public class PhysicsEngine implements CollisionEvent {
      * Mettre à jour les entités physiques
      */
     public void updateEntites() {
-
         for (Map.Entry<PhysicEntity[],String> event : collisionsEvents.entrySet()) {
             PhysicEntity e1 = event.getKey()[0];
             PhysicEntity e2 = event.getKey()[1];
             if ((e2 == null && e1.isColliding())
-                    || (e2 != null && isInCollision(e1.getParent(), e2.getParent()))) {
-                System.out.println("salut");
+                    || (e2 != null && isInCollision(e1.getParent(), e2.getParent())))
                 notifyCollision(event.getValue());
-            }
+        }
 
+        for (Map.Entry<PhysicEntity[],String> event : centeredEvents.entrySet()) {
+            if (isCentered(event.getKey()[0].getParent(),event.getKey()[1].getParent()))
+                notifyCollision(event.getValue());
         }
 
         for (PhysicEntity entity : entities.values()) {
-
             if (isInCollision(entity.getParent()) || !isInBounds(entity.getParent())) {
                 move(entity.getParent(), entity.getLastX(), entity.getLastY());
                 entity.setColliding(true);
             }
             else entity.setColliding(false);
-        }
-
-
-        for (Map.Entry<PhysicEntity[],String> event : centeredEvents.entrySet()) {
-            if (isCentered(event.getKey()[0].getParent(),event.getKey()[1].getParent()))
-                notifyCollision(event.getValue());
         }
     }
 
@@ -427,6 +420,9 @@ public class PhysicsEngine implements CollisionEvent {
 
         ArrayList<PhysicEntity[]> removes = new ArrayList<>();
 
+        for (PhysicEntity physicEntity : entities.values())
+            physicEntity.getCollisions().remove(entity.getPhysicEntity());
+
         for (PhysicEntity[] entities : collisionsEvents.keySet())
             if (entities[0] == entity.getPhysicEntity() || entities[1] == entity.getPhysicEntity())
                 removes.add(entities);
@@ -434,8 +430,8 @@ public class PhysicsEngine implements CollisionEvent {
             collisionsEvents.remove(element);
 
         removes.clear();
-        Set<PhysicEntity[]> centeredEventsEntities = centeredEvents.keySet();
-        for (PhysicEntity[] entities : centeredEventsEntities)
+
+        for (PhysicEntity[] entities : centeredEvents.keySet())
             if (entities[0] == entity.getPhysicEntity() || entities[1] == entity.getPhysicEntity())
                 removes.add(entities);
         for (PhysicEntity[] element : removes)

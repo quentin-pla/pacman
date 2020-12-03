@@ -27,7 +27,7 @@ public class Ghost extends Player {
     /**
      * Couleur
      */
-    private final String color;
+    private final Gameplay.GHOSTS color;
 
     /**
      * hashmap de patrouille des zones
@@ -55,7 +55,7 @@ public class Ghost extends Player {
      * @param gameplay gameplay
      * @param color couleur
      */
-    public Ghost(Gameplay gameplay, String color) {
+    public Ghost(Gameplay gameplay, Gameplay.GHOSTS color) {
         super(gameplay.kernelEngine());
         this.gameplay = gameplay;
         this.forbiddenDirection = new HashSet<>();
@@ -64,10 +64,10 @@ public class Ghost extends Player {
         gameplay.physicsEngine().resize(this, 30, 30);
         gameplay.physicsEngine().setSpeed(this, 2);
         switch (color) {
-            case "red"    : defaultTextureCoords = new int[]{3, 1}; break;
-            case "pink"   : defaultTextureCoords = new int[]{4, 1}; break;
-            case "blue"   : defaultTextureCoords = new int[]{5, 1}; break;
-            case "orange" : defaultTextureCoords = new int[]{6, 1};break;
+            case RED    : defaultTextureCoords = new int[]{3, 1}; break;
+            case PINK   : defaultTextureCoords = new int[]{4, 1}; break;
+            case BLUE   : defaultTextureCoords = new int[]{5, 1}; break;
+            case ORANGE : defaultTextureCoords = new int[]{6, 1};break;
         }
         scatterPatrolZones.put("TopRight",false);
         scatterPatrolZones.put("TopLeft",false);
@@ -158,7 +158,7 @@ public class Ghost extends Player {
 
     public void setEaten(boolean eaten) { this.eaten = eaten; }
 
-    public String getColor() { return color; }
+    public Gameplay.GHOSTS getColor() { return color; }
 
     public boolean isPatroleZoneReached() {
         return patroleZoneReached;
