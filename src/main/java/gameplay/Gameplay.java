@@ -161,6 +161,13 @@ public class Gameplay {
         kernelEngine.addEvent("moveBlueGhost", this::applyBlueGhostAI);
         //Déplacer le fantome orange
         kernelEngine.addEvent("moveOrangeGhost", this::applyOrangeGhostAI);
+        //Déplacer fantome rose
+        kernelEngine.addEvent("movePinkGhost", this::applyPinkGhostAI);
+        //Ghost fear
+        kernelEngine.addEvent("moveFearGhostBlue", this::applyFearBlueGhost);
+        kernelEngine.addEvent("moveFearGhostRed", this::applyFearRedGhost);
+        kernelEngine.addEvent("moveFearGhostOrange", this::applyFearOrangeGhost);
+        kernelEngine.addEvent("moveFearGhostPink", this::applyFearPinkGhost);
         //Se déplacer vers le haut
         kernelEngine.addEvent("pacmanGoUp", () -> switchPacmanDirection(MoveDirection.UP));
         //Se déplacer vers la droite
@@ -193,6 +200,7 @@ public class Gameplay {
         aiEngine().bindEvent(ghosts.get("red"), "moveRedGhost");
         aiEngine().bindEvent(ghosts.get("blue"), "moveBlueGhost");
         aiEngine().bindEvent(ghosts.get("orange"),"moveOrangeGhost");
+        aiEngine().bindEvent(ghosts.get("pink"),"movePinkGhost");
     }
 
     /**
@@ -553,6 +561,12 @@ public class Gameplay {
         reachTarget(ghost,playerPhysic);
     }
 
+    private void applyPinkGhostAI(){
+        Ghost ghost = ghosts.get("pink");
+        PhysicEntity playerPhysic = pacman.getPhysicEntity();
+        reachTarget(ghost,playerPhysic);
+    }
+
     private void applyOrangeGhostAI(){
         Ghost ghost = ghosts.get("orange");
         PhysicEntity playerPhysic = pacman.getPhysicEntity();
@@ -569,7 +583,7 @@ public class Gameplay {
         //distance entre joueur et fantome
         int distanceJoueurFantome = (int) Math.sqrt(((ghostXmiddle - playerXmiddle)*(ghostXmiddle - playerXmiddle)) + ((ghostYmiddle - playerYmiddle)*(ghostYmiddle - playerYmiddle)));
         if (distanceJoueurFantome <= 100){
-           //target un des coins
+            //target un des coins
             //quand le fantome est en bas a droite de pacman
             if (playerXmiddle <= ghostXmiddle && playerYmiddle < ghostYmiddle){
                 PhysicEntity targetBottomRight = targets.get("BottomRight").getPhysicEntity();
@@ -598,10 +612,69 @@ public class Gameplay {
         }
     }
 
+    protected void GhostFearAI(Ghost ghost){
+
+        PhysicEntity playerPhysic = pacman.getPhysicEntity();
+        PhysicEntity ghostPhysic = ghost.getPhysicEntity();
+
+        //Calcul de la distance horizontale et verticale entre pacman et le fantome
+        int playerXmiddle = (playerPhysic.getX() + playerPhysic.getWidth()) / 2;
+        int playerYmiddle = (playerPhysic.getY() + playerPhysic.getHeight()) / 2;
+        int ghostXmiddle = (ghostPhysic.getX() + ghostPhysic.getWidth()) / 2;
+        int ghostYmiddle = (ghostPhysic.getY() + ghostPhysic.getHeight()) / 2;
+        int xDistance = playerXmiddle - ghostXmiddle;
+        int yDistance = playerYmiddle - ghostYmiddle;
+
+        //distance entre joueur et fantome
+        int distanceJoueurFantome = (int) Math.sqrt(((ghostXmiddle - playerXmiddle)*(ghostXmiddle - playerXmiddle)) + ((ghostYmiddle - playerYmiddle)*(ghostYmiddle - playerYmiddle)));
+        if (distanceJoueurFantome <= 200){
+            //target un des coins
+            //quand le fantome est en bas a droite de pacman
+            if (playerXmiddle <= ghostXmiddle && playerYmiddle < ghostYmiddle){
+                PhysicEntity targetBottomRight = targets.get("BottomRight").getPhysicEntity();
+                reachTarget(ghost,targetBottomRight);
+            }
+            //quand le fantome est en bas a gauche de pacman
+            else if (playerXmiddle > ghostXmiddle && playerYmiddle <= ghostYmiddle){
+                PhysicEntity targetBottomLeft = targets.get("BottomLeft").getPhysicEntity();
+                reachTarget(ghost,targetBottomLeft);
+            }
+            else if (playerXmiddle < ghostXmiddle && playerYmiddle <= ghostYmiddle){
+                PhysicEntity targetTopRight = targets.get("TopRight").getPhysicEntity();
+                reachTarget(ghost,targetTopRight);
+            }
+            else {
+                PhysicEntity targetTopLeft = targets.get("TopLeft").getPhysicEntity();
+                reachTarget(ghost,targetTopLeft);
+            }
+        }
+        else{
+            ghost.setCurrentDirection(updateGhostDirectionWithRandomness(ghost));
+            if (ghost.getCurrentDirection() != null) {
+                callEventFromDirection(ghost, ghost.getCurrentDirection());
+                updateGhostAnimation(ghost);
+            }
+        }
+
+    }
+
+    private void applyFearBlueGhost(){
+        GhostFearAI(ghosts.get("blue"));
+    }
+    private void applyFearRedGhost(){
+        GhostFearAI(ghosts.get("red"));
+    }
+    private void applyFearOrangeGhost(){
+        GhostFearAI(ghosts.get("orange"));
+    }
+    private void applyFearPinkGhost(){
+        GhostFearAI(ghosts.get("pink"));
+    }
+
     /**
      * Appliquer l'intelligence artificielle au fantome bleu
      */
-    protected void applyBlueGhostAI() {
+    private void applyBlueGhostAI() {
         Ghost ghost = ghosts.get("blue");
         //setting new patrol zone depending on score
         if(currentLevel.getActualScore() == 0){
@@ -699,7 +772,7 @@ public class Gameplay {
      * @param ghost fantome
      * @return direction
      */
-    protected MoveDirection updateGhostDirectionWithRandomness(Ghost ghost) {
+    private MoveDirection updateGhostDirectionWithRandomness(Ghost ghost) {
         boolean somethingUP     = physicsEngine().isSomethingUp(ghost) != null;
         boolean somethingRIGHT  = physicsEngine().isSomethingRight(ghost) != null;
         boolean somethingDOWN   = physicsEngine().isSomethingDown(ghost) != null;
@@ -1069,7 +1142,14 @@ public class Gameplay {
         soundEngine().playSound("eatGomme");
         int time = 8;
         if (ghostFear.get()) time = time + ghostFearTimeout.get();
-        else ghostFear.getAndSet(true);
+        else {
+            ghostFear.getAndSet(true);
+
+            aiEngine().bindEvent(ghosts.get("blue"),"moveFearGhostBlue");
+            aiEngine().bindEvent(ghosts.get("orange"),"moveFearGhostOrange");
+            aiEngine().bindEvent(ghosts.get("pink"),"moveFearGhostPink");
+            aiEngine().bindEvent(ghosts.get("red"),"moveFearGhostRed");
+        }
         int finalTime = time;
 
         Thread timerThread = new Thread(() -> {
@@ -1087,6 +1167,10 @@ public class Gameplay {
                 ghostFear.getAndSet(false);
                 soundEngine().pauseSound("powerup");
                 soundEngine().pauseSound("siren1");
+                aiEngine().bindEvent(ghosts.get("red"), "moveRedGhost");
+                aiEngine().bindEvent(ghosts.get("blue"), "moveBlueGhost");
+                aiEngine().bindEvent(ghosts.get("orange"),"moveOrangeGhost");
+                aiEngine().bindEvent(ghosts.get("pink"), "movePinkGhost");
                 timerGommePool.clear();
             }
         });
