@@ -987,6 +987,16 @@ public class Gameplay {
      */
     protected void playLevel(Level level) {
         currentLevel = level;
+        ghostFear.set(false);
+        ghostFearTimeout.set(0);
+
+        pacmanBreak.set(false);
+        pacmanBreakTimeout.set(0);
+
+        for (Ghost ghost : ghosts.values()) {
+            if (ghost.getEaten()) ghost.setEaten(false);
+        }
+
         ioEngine().resetLastPressedKey();
         spawnPlayersOnLevel();
         kernelEngine().switchScene(currentLevel.getScene());
