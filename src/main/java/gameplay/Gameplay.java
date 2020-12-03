@@ -571,16 +571,16 @@ public class Gameplay {
         if (distanceJoueurFantome <= 100){
            //target un des coins
             //quand le fantome est en bas a droite de pacman
-            if (playerXmiddle <= ghostXmiddle && playerYmiddle <= ghostYmiddle){
+            if (playerXmiddle <= ghostXmiddle && playerYmiddle < ghostYmiddle){
                 PhysicEntity targetBottomRight = targets.get("BottomRight").getPhysicEntity();
                 reachTarget(ghost,targetBottomRight);
             }
             //quand le fantome est en bas a gauche de pacman
-            else if (playerXmiddle > ghostXmiddle && playerYmiddle >= ghostYmiddle){
+            else if (playerXmiddle > ghostXmiddle && playerYmiddle <= ghostYmiddle){
                 PhysicEntity targetBottomLeft = targets.get("BottomLeft").getPhysicEntity();
                 reachTarget(ghost,targetBottomLeft);
             }
-            else if (playerXmiddle < ghostXmiddle && playerYmiddle >= ghostYmiddle){
+            else if (playerXmiddle < ghostXmiddle && playerYmiddle <= ghostYmiddle){
                 PhysicEntity targetTopRight = targets.get("TopRight").getPhysicEntity();
                 reachTarget(ghost,targetTopRight);
             }
