@@ -129,5 +129,5 @@ public class PhysicEntity extends EngineEntity {
 
     public boolean isColliding() { return isColliding; }
 
-    protected void setColliding(boolean colliding) { isColliding = colliding; }
+    public void setColliding(boolean colliding) { isColliding = colliding; }
 }

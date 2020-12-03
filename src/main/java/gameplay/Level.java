@@ -121,6 +121,7 @@ public class Level {
     }
 
     /**
+    /**
      * Faire apparaitre un fantome à un endroit
      * @param ghost fantome
      * @param row ligne
