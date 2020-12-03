@@ -42,6 +42,12 @@ public class Level {
     private int gommes;
 
     /**
+     * Nombre de breakers
+     */
+
+    private int breakers;
+
+    /**
      * Score actuel
      */
     private int actualScore;
@@ -217,6 +223,25 @@ public class Level {
         });
         gameplay.physicsEngine().bindEventOnSameLocation(gameplay.getPlayer(), gomme, "eraseGomme" + gommes);
         ++gommes;
+    }
+
+
+    /**
+     * Ajouter un breaker
+     * @param row ligne
+     * @param col colonne
+     */
+
+    public void addBreaker(int row, int col) {
+        Entity breaker = matrix[row] [col];
+        gameplay.graphicsEngine().bindTexture(breaker, gameplay.getTexturesFile(), 9, 6);
+        gameplay.kernelEngine().addEvent("eraseBreaker" + breakers, () -> {
+            gameplay.kernelEngine().removeEntity(breaker);
+            updateActualScore(actualScore + 80);
+        });
+        gameplay.physicsEngine().bindEventOnSameLocation(gameplay.getPlayer(), breaker, "eraseBreaker" + breakers);
+        ++breakers;
+
     }
 
     /**

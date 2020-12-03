@@ -314,7 +314,7 @@ public class Gameplay {
 
         ballRows.put(1, new int[]{2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16});
         ballRows.put(2, new int[]{1, 4, 8, 10, 14, 17});
-        ballRows.put(3, new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17});
+        ballRows.put(3, new int[]{1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17});
         ballRows.put(4, new int[]{1, 4, 6, 12, 14, 17});
         ballRows.put(5, new int[]{1, 2, 3, 4, 6, 7, 8, 10, 11, 12, 14, 15, 16, 17});
         ballRows.put(6, new int[]{4, 8, 10, 14});
@@ -348,6 +348,8 @@ public class Gameplay {
         defaultLevel.addGomme(19,2);
         defaultLevel.addGomme(1,18);
         defaultLevel.addGomme(19,18);
+
+        defaultLevel.addBreaker(3,10);
 
         //ajout target pour scatter (patrouille)
         targets.put("TopLeft", defaultLevel.addTarget(1,2));
