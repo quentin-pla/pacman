@@ -185,7 +185,7 @@ public class PhysicsEngine implements CollisionEvent {
     public PhysicEntity isSomethingUp(Entity entity) {
         PhysicEntity physicEntity = entity.getPhysicEntity();
         ArrayList<PhysicEntity> elements = getEntityAtPosition(physicEntity.getX(),
-                physicEntity.getY() - physicEntity.getHeight(), physicEntity.getHeight(), physicEntity.getWidth());
+                physicEntity.getY() - 1, physicEntity.getHeight(), physicEntity.getWidth());
         for (PhysicEntity entity1 : elements)
             if (physicEntity.getCollisions().contains(entity1))
                 return entity1;
@@ -199,7 +199,7 @@ public class PhysicsEngine implements CollisionEvent {
      */
     public PhysicEntity isSomethingRight(Entity entity) {
         PhysicEntity physicEntity = entity.getPhysicEntity();
-        ArrayList<PhysicEntity> elements = getEntityAtPosition(physicEntity.getX() + physicEntity.getWidth(),
+        ArrayList<PhysicEntity> elements = getEntityAtPosition(physicEntity.getX() + 1,
                 physicEntity.getY(), physicEntity.getHeight(), physicEntity.getWidth());
         for (PhysicEntity entity1 : elements)
             if (physicEntity.getCollisions().contains(entity1))
@@ -215,7 +215,7 @@ public class PhysicsEngine implements CollisionEvent {
     public PhysicEntity isSomethingDown(Entity entity) {
         PhysicEntity physicEntity = entity.getPhysicEntity();
         ArrayList<PhysicEntity> elements = getEntityAtPosition(physicEntity.getX(),
-                physicEntity.getY() + physicEntity.getHeight(), physicEntity.getHeight(), physicEntity.getWidth());
+                physicEntity.getY() + 1, physicEntity.getHeight(), physicEntity.getWidth());
         for (PhysicEntity entity1 : elements)
             if (physicEntity.getCollisions().contains(entity1))
                 return entity1;
@@ -229,7 +229,7 @@ public class PhysicsEngine implements CollisionEvent {
      */
     public PhysicEntity isSomethingLeft(Entity entity) {
         PhysicEntity physicEntity = entity.getPhysicEntity();
-        ArrayList<PhysicEntity> elements = getEntityAtPosition(physicEntity.getX() - physicEntity.getWidth(),
+        ArrayList<PhysicEntity> elements = getEntityAtPosition(physicEntity.getX() - 1,
                 physicEntity.getY(), physicEntity.getHeight(), physicEntity.getWidth());
         for (PhysicEntity entity1 : elements)
             if (physicEntity.getCollisions().contains(entity1))
