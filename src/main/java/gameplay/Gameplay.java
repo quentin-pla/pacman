@@ -85,15 +85,32 @@ public class Gameplay {
      */
     private final AtomicBoolean ghostFear;
 
+
+    /**
+     * Booléen pour savoir si le pouvoir de briser les murs est actif
+     */
+    private final AtomicBoolean pacmanBreak;
+
     /**
      * Temps restant pour la crainte des fantomes
      */
     private final AtomicInteger ghostFearTimeout;
 
     /**
+     * Temps restant pour le breaker
+     */
+    private final AtomicInteger pacmanBreakTimeout;
+
+    /**
      * Pool de thread gérant les timers pour les gommes
      */
     private volatile Vector<Thread> timerGommePool = new Vector<>();
+
+
+    /**
+     * Pool de thread gérant les timers pour les breakers
+     */
+    private volatile  Vector<Thread> timerBreakerPool = new Vector<>();
 
     /**
      * Constructeur
@@ -104,6 +121,8 @@ public class Gameplay {
         this.levels = new ArrayList<>();
         this.ghostFear = new AtomicBoolean(false);
         this.ghostFearTimeout = new AtomicInteger(8);
+        this.pacmanBreak = new AtomicBoolean(false);
+        this.pacmanBreakTimeout = new AtomicInteger(5);
         initGameplay();
     }
 
@@ -168,7 +187,7 @@ public class Gameplay {
         ioEngine().bindEventOnLastKey(KeyEvent.VK_RIGHT, "pacmanGoRight");
         ioEngine().bindEventOnLastKey(KeyEvent.VK_DOWN, "pacmanGoDown");
         ioEngine().bindEventOnLastKey(KeyEvent.VK_LEFT, "pacmanGoLeft");
-        physicsEngine().bindEventOnCollision(pacman, "pacmanOnCollision");
+        //physicsEngine().bindEventOnCollision(pacman, "pacmanOnCollision");
         aiEngine().bindEvent(ghosts.get("red"), "moveRedGhost");
         aiEngine().bindEvent(ghosts.get("blue"), "moveBlueGhost");
     }
@@ -183,6 +202,7 @@ public class Gameplay {
         soundEngine().loadSound("death_1.wav","death1");
         soundEngine().loadSound("death_2.wav","death2");
         soundEngine().loadSound("siren_1.wav", "siren1");
+        soundEngine().loadSound("siren_2.wav", "siren2");
         soundEngine().loadSound("power_pellet.wav", "powerup");
         soundEngine().loadSound("eat_ghost.wav", "eatGhost");
         soundEngine().loadSound("eat_fruit.wav", "eatGomme");
@@ -314,7 +334,7 @@ public class Gameplay {
 
         ballRows.put(1, new int[]{2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16});
         ballRows.put(2, new int[]{1, 4, 8, 10, 14, 17});
-        ballRows.put(3, new int[]{1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17});
+        ballRows.put(3, new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17});
         ballRows.put(4, new int[]{1, 4, 6, 12, 14, 17});
         ballRows.put(5, new int[]{1, 2, 3, 4, 6, 7, 8, 10, 11, 12, 14, 15, 16, 17});
         ballRows.put(6, new int[]{4, 8, 10, 14});
@@ -326,7 +346,7 @@ public class Gameplay {
         ballRows.put(12, new int[]{4, 6, 12, 14});
         ballRows.put(13, new int[]{1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17});
         ballRows.put(14, new int[]{1, 4, 8, 10, 14, 17});
-        ballRows.put(15, new int[]{1, 2, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 16, 17});
+        ballRows.put(15, new int[]{1, 2, 4, 5, 6, 7, 10, 11, 12, 13, 14, 16, 17});
         ballRows.put(16, new int[]{2, 4, 6, 12, 14, 16});
         ballRows.put(17, new int[]{1, 2, 3, 4, 6, 7, 8, 10, 11, 12, 14, 15, 16, 17});
         ballRows.put(18, new int[]{1, 8, 10, 17});
@@ -349,7 +369,7 @@ public class Gameplay {
         defaultLevel.addGomme(1,18);
         defaultLevel.addGomme(19,18);
 
-        defaultLevel.addBreaker(3,10);
+        defaultLevel.addBreaker(15,9);
 
         //ajout target pour scatter (patrouille)
         targets.put("TopLeft", defaultLevel.addTarget(1,2));
@@ -782,6 +802,20 @@ public class Gameplay {
     }
 
     /**
+     * Collision entre pacman et un mur lors du pouvoir breaker
+     * @param wall
+     */
+    public void pacmanWallCollision(Entity wall) {
+        // Si le breaker est actif
+        System.out.println("Je rentre ici");
+        if (pacmanBreak.get()) {
+            System.out.println(pacmanBreak.get());
+            breakWall(wall);
+        }
+
+    }
+
+    /**
      * Décrémenter la vie de pacman lorsqu'il se fait toucher par un fantome
      */
     private void decreasePacmanLife() {
@@ -829,6 +863,10 @@ public class Gameplay {
         }
     }
 
+    private void breakWall(Entity wall) {
+        System.out.println("Je dois casser le mur");
+        kernelEngine.removeEntity(wall);
+    }
     /**
      * Incrémente le volume 5 par 5
      */
@@ -954,7 +992,10 @@ public class Gameplay {
             soundEngine().playSound("gameStart");
         new Thread(() -> {
             kernelEngine.pauseEvents();
-            try { sleep(currentLevel.getLivesCount().get() == 3 ? 4000 : 1000); }
+            try {
+                //sleep(currentLevel.getLivesCount().get() == 3 ? 4000 : 1000);
+                sleep(1);
+            }
             catch (InterruptedException e) { e.printStackTrace(); }
             kernelEngine.resumeEvents();
             soundEngine().loopSound("siren1");
@@ -962,9 +1003,9 @@ public class Gameplay {
     }
 
     /**
-     * Activer le super pouvoir pour 5 secondes
+     * Activer le super pouvoir de manger pour 8 secondes
      */
-    public void enablePowerUP() {
+    public void enableEatPowerUP() {
         soundEngine().playSound("eatGomme");
         int time = 8;
         if (ghostFear.get()) time = time + ghostFearTimeout.get();
@@ -985,12 +1026,42 @@ public class Gameplay {
             {
                 ghostFear.getAndSet(false);
                 soundEngine().pauseSound("powerup");
-                soundEngine().loopSound("siren1");
+                soundEngine().pauseSound("siren1");
                 timerGommePool.clear();
             }
         });
 
         this.timerGommePool.add(timerThread);
+        timerThread.start();
+    }
+
+    /**
+     * Activer le super pouvoir de casser les murs pour 5 secondes
+     */
+    public void enableBreakPowerUp() {
+        int time = 5;
+        if (pacmanBreak.get()) time = time + pacmanBreakTimeout.get();
+        else pacmanBreak.getAndSet(true);
+        System.out.println("Breaker " + pacmanBreak.get());
+        int finalTime = time;
+
+        Thread timerThread = new Thread( () -> {
+            soundEngine().playSound("powerup");
+            try {
+                Thread.sleep(finalTime*1000);
+            }
+            catch (InterruptedException e) { e.printStackTrace(); }
+            if (pacmanBreakTimeout.get() > 0) pacmanBreakTimeout.getAndDecrement();
+
+            if (Thread.currentThread().equals(timerBreakerPool.get(timerBreakerPool.size()-1)))
+            {
+                pacmanBreak.getAndSet(false);
+                System.out.println("Breaker " + pacmanBreak.get());
+                timerBreakerPool.clear();
+            }
+        });
+
+        timerBreakerPool.add(timerThread);
         timerThread.start();
     }
 

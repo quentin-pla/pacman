@@ -128,6 +128,7 @@ public class Level {
      */
     public void spawnGhost(Ghost ghost, int row, int col) {
         if (!scene.getEntities().contains(ghost.getGraphicEntity())) {
+
             gameplay.kernelEngine().addEvent("pacman" + ghost.getColor() + "ghostCollision",
                     () -> gameplay.pacmanGhostCollision(ghost));
             gameplay.physicsEngine().bindEventOnCollision(gameplay.getPlayer(), ghost,
@@ -146,7 +147,12 @@ public class Level {
      */
     public void addWall(int row, int col) {
         Entity wall = matrix[row][col];
+
         gameplay.physicsEngine().addCollisions(gameplay.getPlayer(), wall);
+        gameplay.kernelEngine().addEvent("pacman" + wall + "breakCollision",
+                () -> gameplay.pacmanWallCollision(wall));
+        gameplay.physicsEngine().bindEventOnCollision(gameplay.getPlayer(), wall, "pacman" + wall + "breakCollision");
+
         for (Ghost ghost : gameplay.getGhosts().values())
             gameplay.physicsEngine().addCollisions(ghost, wall);
         walls[row][col] = true;
@@ -219,7 +225,7 @@ public class Level {
         gameplay.kernelEngine().addEvent("eraseGomme" + gommes, () -> {
             gameplay.kernelEngine().removeEntity(gomme);
             updateActualScore(actualScore + 50);
-            gameplay.enablePowerUP();
+            gameplay.enableEatPowerUP();
         });
         gameplay.physicsEngine().bindEventOnSameLocation(gameplay.getPlayer(), gomme, "eraseGomme" + gommes);
         ++gommes;
@@ -238,6 +244,7 @@ public class Level {
         gameplay.kernelEngine().addEvent("eraseBreaker" + breakers, () -> {
             gameplay.kernelEngine().removeEntity(breaker);
             updateActualScore(actualScore + 80);
+            gameplay.enableBreakPowerUp();
         });
         gameplay.physicsEngine().bindEventOnSameLocation(gameplay.getPlayer(), breaker, "eraseBreaker" + breakers);
         ++breakers;
