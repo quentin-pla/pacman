@@ -57,7 +57,6 @@ public class AIEngine implements AIEvent {
      * @param event évènement
      */
     public void bindEvent(Entity entity, String event) {
-        entity.getAiEntity().setEvent(null);
         entity.getAiEntity().setEvent(event);
     }
 
