@@ -189,6 +189,8 @@ public class Level {
     public void addFence(int row, int col) {
         fence = matrix[row][col];
         gameplay.physicsEngine().addCollisions(gameplay.getPlayer(), fence);
+        for (Ghost ghost : gameplay.getGhosts().values())
+            gameplay.physicsEngine().addCollisions(ghost, fence);
         gameplay.graphicsEngine().bindTexture(fence,gameplay.getTexturesFile(),11,6);
     }
 

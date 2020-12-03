@@ -53,7 +53,7 @@ public class Gameplay {
     /**
      * Niveaux disponibles
      */
-    private ArrayList<Level> levels;
+    private final ArrayList<Level> levels;
 
     /**
      * Niveau courant
@@ -85,7 +85,6 @@ public class Gameplay {
      */
     private final AtomicBoolean ghostFear;
 
-
     /**
      * Booléen pour savoir si le pouvoir de briser les murs est actif
      */
@@ -104,13 +103,12 @@ public class Gameplay {
     /**
      * Pool de thread gérant les timers pour les gommes
      */
-    private volatile Vector<Thread> timerGommePool = new Vector<>();
-
+    private final Vector<Thread> timerGommePool = new Vector<>();
 
     /**
      * Pool de thread gérant les timers pour les breakers
      */
-    private volatile  Vector<Thread> timerBreakerPool = new Vector<>();
+    private final Vector<Thread> timerBreakerPool = new Vector<>();
 
     /**
      * Constructeur
@@ -407,7 +405,7 @@ public class Gameplay {
      * @param ghost fantome
      * @param target entité
      */
-    private void reachTarget(Ghost ghost,PhysicEntity target){
+    private void reachTarget(Ghost ghost, PhysicEntity target){
         PhysicEntity ghostPhysic = ghost.getPhysicEntity();
         Set<MoveDirection> forbiddenDirections = ghost.getForbiddenDirection();
 
@@ -425,35 +423,32 @@ public class Gameplay {
         MoveDirection yDirection = yDistance == 0 ? null
                 : yDistance < 0 ? MoveDirection.UP : MoveDirection.DOWN;
 
-        //Définition de la prochaine direction
-        MoveDirection nextDirection = Math.abs(xDistance) > Math.abs(yDistance) ? xDirection : yDirection;
-
         //Vérification des collisions
-        boolean somethingUP     = physicsEngine().isSomethingUp(ghost) != null;
+        boolean somethingUP     = physicsEngine().isSomethingUp(ghost)    != null;
         boolean somethingRIGHT  = physicsEngine().isSomethingRight(ghost) != null;
-        boolean somethingDOWN   = physicsEngine().isSomethingDown(ghost) != null;
-        boolean somethingLEFT   = physicsEngine().isSomethingLeft(ghost) != null;
+        boolean somethingDOWN   = physicsEngine().isSomethingDown(ghost)  != null;
+        boolean somethingLEFT   = physicsEngine().isSomethingLeft(ghost)  != null;
 
         //Détermination de la prochaine direction
         if (Math.abs(xDistance) <= 1 && Math.abs(yDistance) <= 1) {
             ghost.setCurrentDirection(null);
-        } else if (nextDirection == MoveDirection.UP && !forbiddenDirections.contains(MoveDirection.UP) && !somethingUP) {
+        } else if (yDirection == MoveDirection.UP && !forbiddenDirections.contains(MoveDirection.UP) && !somethingUP) {
             ghost.setCurrentDirection(MoveDirection.UP);
             forbiddenDirections.clear();
-        } else if (nextDirection == MoveDirection.DOWN && !forbiddenDirections.contains(MoveDirection.DOWN) && !somethingDOWN) {
+        } else if (yDirection == MoveDirection.DOWN && !forbiddenDirections.contains(MoveDirection.DOWN) && !somethingDOWN) {
             ghost.setCurrentDirection(MoveDirection.DOWN);
             forbiddenDirections.clear();
-        } else if (nextDirection == MoveDirection.LEFT && !forbiddenDirections.contains(MoveDirection.LEFT) && !somethingLEFT) {
+        } else if (xDirection == MoveDirection.LEFT && !forbiddenDirections.contains(MoveDirection.LEFT) && !somethingLEFT) {
             ghost.setCurrentDirection(MoveDirection.LEFT);
             forbiddenDirections.clear();
-        } else if (nextDirection == MoveDirection.RIGHT && !forbiddenDirections.contains(MoveDirection.RIGHT) && !somethingRIGHT) {
+        } else if (xDirection == MoveDirection.RIGHT && !forbiddenDirections.contains(MoveDirection.RIGHT) && !somethingRIGHT) {
             ghost.setCurrentDirection(MoveDirection.RIGHT);
             forbiddenDirections.clear();
         } else {
-            if (nextDirection == MoveDirection.UP || nextDirection == MoveDirection.DOWN) {
-                if (forbiddenDirections.size() == 1 && forbiddenDirections.contains(nextDirection))
-                    if (!somethingUP && nextDirection == MoveDirection.UP
-                            || !somethingDOWN && nextDirection == MoveDirection.DOWN)
+            if (yDirection == MoveDirection.UP || yDirection == MoveDirection.DOWN) {
+                if (forbiddenDirections.size() == 1 && forbiddenDirections.contains(yDirection))
+                    if (!somethingUP && yDirection == MoveDirection.UP
+                            || !somethingDOWN && yDirection == MoveDirection.DOWN)
                         forbiddenDirections.clear();
 
                 if (somethingRIGHT) forbiddenDirections.add(MoveDirection.RIGHT);
@@ -470,9 +465,7 @@ public class Gameplay {
                     forbiddenDirections.add(MoveDirection.LEFT);
                 } else {
                     boolean removeXDirections = false;
-                    if (xDirection != null)
-                        ghost.setCurrentDirection(xDirection);
-                    else if (nextDirection == MoveDirection.UP) {
+                    if (yDirection == MoveDirection.UP) {
                         forbiddenDirections.add(MoveDirection.UP);
                         if (!somethingDOWN) ghost.setCurrentDirection(MoveDirection.DOWN);
                         else removeXDirections = true;
@@ -485,13 +478,11 @@ public class Gameplay {
                         forbiddenDirections.removeAll(Arrays.asList(MoveDirection.LEFT,MoveDirection.RIGHT));
                 }
             }
-            else if (nextDirection == MoveDirection.LEFT || nextDirection == MoveDirection.RIGHT) {
-                if (forbiddenDirections.size() == 1 && forbiddenDirections.contains(nextDirection)) {
-                    if (!somethingLEFT && nextDirection == MoveDirection.LEFT)
+            else if (xDirection == MoveDirection.LEFT || xDirection == MoveDirection.RIGHT) {
+                if (forbiddenDirections.size() == 1 && forbiddenDirections.contains(xDirection))
+                    if (!somethingLEFT && xDirection == MoveDirection.LEFT
+                            || !somethingRIGHT && xDirection == MoveDirection.RIGHT)
                         forbiddenDirections.clear();
-                    else if (!somethingRIGHT && nextDirection == MoveDirection.RIGHT)
-                        forbiddenDirections.clear();
-                }
 
                 if (somethingUP) forbiddenDirections.add(MoveDirection.UP);
                 if (somethingDOWN) forbiddenDirections.add(MoveDirection.DOWN);
@@ -508,8 +499,7 @@ public class Gameplay {
                     forbiddenDirections.add(MoveDirection.UP);
                 } else {
                     boolean removeYDirections = false;
-                    if (yDirection != null) ghost.setCurrentDirection(yDirection);
-                    else if (nextDirection == MoveDirection.LEFT) {
+                    if (xDirection == MoveDirection.LEFT) {
                         forbiddenDirections.add(MoveDirection.LEFT);
                         if (!somethingRIGHT) ghost.setCurrentDirection(MoveDirection.RIGHT);
                         else removeYDirections = true;
@@ -523,7 +513,10 @@ public class Gameplay {
                 }
             }
         }
-        if (forbiddenDirections.size() == 4) forbiddenDirections.clear();
+
+        if (forbiddenDirections.size() == 4)
+            forbiddenDirections.clear();
+
         if (ghost.getCurrentDirection() != null) {
             callEventFromDirection(ghost, ghost.getCurrentDirection());
             updateGhostAnimation(ghost);
@@ -863,10 +856,15 @@ public class Gameplay {
         }
     }
 
+    /**
+     * Casser un mur
+     * @param wall mur
+     */
     private void breakWall(Entity wall) {
         System.out.println("Je dois casser le mur");
         kernelEngine.removeEntity(wall);
     }
+
     /**
      * Incrémente le volume 5 par 5
      */
@@ -893,7 +891,7 @@ public class Gameplay {
      * @param direction direction
      */
     private void setEntityNextDirection(Player entity, MoveDirection direction) {
-        PhysicEntity entityNearby = null;
+        PhysicEntity entityNearby;
         switch (direction) {
             case UP:
                 entityNearby = physicsEngine().isSomethingUp(entity);
@@ -964,7 +962,7 @@ public class Gameplay {
      */
     protected void spawnPlayersOnLevel() {
         currentLevel.spawnPlayer(15,10);
-        currentLevel.spawnGhost(ghosts.get("red"),11,10);
+        currentLevel.spawnGhost(ghosts.get("red"),7,10);
         currentLevel.spawnGhost(ghosts.get("blue"),11,9);
         currentLevel.spawnGhost(ghosts.get("pink"),9,10);
         currentLevel.spawnGhost(ghosts.get("orange"),9,11);
@@ -993,7 +991,7 @@ public class Gameplay {
         new Thread(() -> {
             kernelEngine.pauseEvents();
             try {
-                //sleep(currentLevel.getLivesCount().get() == 3 ? 4000 : 1000);
+                sleep(currentLevel.getLivesCount().get() == 3 ? 4000 : 1000);
                 sleep(1);
             }
             catch (InterruptedException e) { e.printStackTrace(); }
