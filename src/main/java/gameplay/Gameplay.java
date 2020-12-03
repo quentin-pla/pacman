@@ -187,7 +187,7 @@ public class Gameplay {
         ioEngine().bindEventOnLastKey(KeyEvent.VK_RIGHT, "pacmanGoRight");
         ioEngine().bindEventOnLastKey(KeyEvent.VK_DOWN, "pacmanGoDown");
         ioEngine().bindEventOnLastKey(KeyEvent.VK_LEFT, "pacmanGoLeft");
-        //physicsEngine().bindEventOnCollision(pacman, "pacmanOnCollision");
+        physicsEngine().bindEventOnCollision(pacman, "pacmanOnCollision");
         aiEngine().bindEvent(ghosts.get("red"), "moveRedGhost");
         aiEngine().bindEvent(ghosts.get("blue"), "moveBlueGhost");
     }
@@ -864,8 +864,10 @@ public class Gameplay {
     }
 
     private void breakWall(Entity wall) {
-        System.out.println("Je dois casser le mur");
-        kernelEngine.removeEntity(wall);
+        if (wall.getPhysicEntity().getX() != 1 && wall.getPhysicEntity().getX() != 19) {
+            physicsEngine().removeCollisions(pacman.getPhysicEntity(), wall.getPhysicEntity());
+            kernelEngine.removeEntity(wall);
+        }
     }
     /**
      * Incrémente le volume 5 par 5
