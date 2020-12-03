@@ -983,7 +983,12 @@ public class Gameplay {
      */
     private void breakWall(Entity wall) {
         if (wall.getPhysicEntity().getX() != 1 && wall.getPhysicEntity().getX() != 19) {
-            physicsEngine().removeCollisions(pacman.getPhysicEntity(), wall.getPhysicEntity());
+            physicsEngine().removeCollisions(pacman, wall);
+            for (Ghost ghost : ghosts.values())
+                physicsEngine().removeCollisions(ghost, wall);
+            int[] wallPosition = currentLevel.getEntityPositionInMatrix(wall);
+            currentLevel.getWalls()[wallPosition[0]][wallPosition[1]] = false;
+            currentLevel.applyWallTextures();
             kernelEngine.removeEntity(wall);
         }
     }

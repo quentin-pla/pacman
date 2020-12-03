@@ -156,6 +156,7 @@ public class Level {
 
         for (Ghost ghost : gameplay.getGhosts().values())
             gameplay.physicsEngine().addCollisions(ghost, wall);
+
         walls[row][col] = true;
     }
 
@@ -372,6 +373,13 @@ public class Level {
         livesEntity = new Entity[] {life, life2, life3};
     }
 
+    /**
+     * Définir la partie visible du niveau
+     * @param x position horizontale
+     * @param y position verticale
+     * @param height hauteur
+     * @param width largeur
+     */
     public void setVisiblePart(int x, int y, int height, int width) {
         int xDifference = x > scene.getX() ? -x : x;
         int yDifference = y > scene.getY() ? -y : y;
@@ -380,6 +388,19 @@ public class Level {
         gameplay.physicsEngine().translate(scoreLabel, xDifference * -1, yDifference * -1);
         for (Entity liveEntity : livesEntity)
             gameplay.physicsEngine().translate(liveEntity, xDifference, yDifference);
+    }
+
+    /**
+     * Obtenir la position d'une entité dans la matrice
+     * @param entity entité
+     * @return position de l'entité
+     */
+    public int[] getEntityPositionInMatrix(Entity entity) {
+        for (int i = 0; i < matrix.length; i++)
+            for (int j = 0; j < matrix[i].length; j++)
+                if (matrix[i][j] == entity)
+                    return new int[]{i, j};
+        return null;
     }
 
     // GETTERS //
@@ -392,7 +413,5 @@ public class Level {
 
     public Entity getFence() { return fence; }
 
-    public boolean[][] getWalls() {
-        return walls;
-    }
+    public boolean[][] getWalls() { return walls; }
 }

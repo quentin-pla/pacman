@@ -110,9 +110,9 @@ public class PhysicsEngine implements CollisionEvent {
      * @param entity1 entité 1
      * @param entity2 entité 2
      */
-    public void removeCollisions(PhysicEntity entity1, PhysicEntity entity2) {
-        entity1.getCollisions().remove(entity2);
-        entity2.getCollisions().remove(entity1);
+    public void removeCollisions(Entity entity1, Entity entity2) {
+        entity1.getPhysicEntity().getCollisions().remove(entity2.getPhysicEntity());
+        entity2.getPhysicEntity().getCollisions().remove(entity1.getPhysicEntity());
     }
 
     /**
