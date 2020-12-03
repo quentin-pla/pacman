@@ -91,6 +91,11 @@ public class Gameplay {
     private final AtomicInteger ghostFearTimeout;
 
     /**
+     * Pool de thread gérant les timers pour les gommes
+     */
+    private volatile Vector<Thread> timerGommePool = new Vector<>();
+
+    /**
      * Constructeur
      */
     public Gameplay() {
@@ -98,7 +103,7 @@ public class Gameplay {
         this.textures = kernelEngine.getGraphicsEngine().loadSpriteSheet("assets/sprite_sheet.png", 12, 11);
         this.levels = new ArrayList<>();
         this.ghostFear = new AtomicBoolean(false);
-        this.ghostFearTimeout = new AtomicInteger(5);
+        this.ghostFearTimeout = new AtomicInteger(8);
         initGameplay();
     }
 
@@ -959,19 +964,38 @@ public class Gameplay {
      */
     public void enablePowerUP() {
         soundEngine().playSound("eatGomme");
-        ghostFear.getAndSet(true);
-        ghostFearTimeout.getAndSet(5);
-        new Thread(() -> {
+
+        int time = 8;
+
+        if (ghostFear.get()) time = time + ghostFearTimeout.get();
+        else ghostFear.getAndSet(true);
+
+        System.out.println("Duration : " + time + " s");
+
+        System.out.println("ICI " + ghostFearTimeout.getAndSet(time));
+
+        int finalTime = time;
+        Thread timerThread = new Thread(() -> {
             soundEngine().pauseSound("siren1");
             soundEngine().loopSound("powerup");
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < finalTime ; i++) {
                 try { sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
-                ghostFearTimeout.getAndDecrement();
+                if (ghostFearTimeout.get() > 0) ghostFearTimeout.getAndDecrement();
             }
-            ghostFear.getAndSet(false);
-            soundEngine().pauseSound("powerup");
-            soundEngine().loopSound("siren1");
-        }).start();
+
+            // Si le thread courant n'est pas le dernier à être lancé alors il ne modifie pas la peur
+            // des fantômes
+            if (Thread.currentThread().equals(timerGommePool.get(timerGommePool.size()-1)))
+            {
+                ghostFear.getAndSet(false);
+                soundEngine().pauseSound("powerup");
+                soundEngine().loopSound("siren1");
+                timerGommePool.clear();
+            }
+        });
+
+        this.timerGommePool.add(timerThread);
+        timerThread.start();
     }
 
     /**
@@ -997,7 +1021,7 @@ public class Gameplay {
     public void start() {
         kernelEngine().switchScene(menuView);
         kernelEngine.start();
-        setGlobalVolume(50);
+        setGlobalVolume(0);
     }
 
     // GETTERS //
