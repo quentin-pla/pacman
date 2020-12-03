@@ -67,20 +67,28 @@ public class PhysicsEngine implements CollisionEvent {
      * Mettre à jour les entités physiques
      */
     public void updateEntites() {
+
+        for (Map.Entry<PhysicEntity[],String> event : collisionsEvents.entrySet()) {
+            PhysicEntity e1 = event.getKey()[0];
+            PhysicEntity e2 = event.getKey()[1];
+            if ((e2 == null && e1.isColliding())
+                    || (e2 != null && isInCollision(e1.getParent(), e2.getParent()))) {
+                System.out.println("salut");
+                notifyCollision(event.getValue());
+            }
+
+        }
+
         for (PhysicEntity entity : entities.values()) {
+
             if (isInCollision(entity.getParent()) || !isInBounds(entity.getParent())) {
                 move(entity.getParent(), entity.getLastX(), entity.getLastY());
                 entity.setColliding(true);
             }
             else entity.setColliding(false);
         }
-        for (Map.Entry<PhysicEntity[],String> event : collisionsEvents.entrySet()) {
-            PhysicEntity e1 = event.getKey()[0];
-            PhysicEntity e2 = event.getKey()[1];
-            if ((e2 == null && e1.isColliding())
-                    || (e2 != null && isInCollision(e1.getParent(), e2.getParent())))
-                notifyCollision(event.getValue());
-        }
+
+
         for (Map.Entry<PhysicEntity[],String> event : centeredEvents.entrySet()) {
             if (isCentered(event.getKey()[0].getParent(),event.getKey()[1].getParent()))
                 notifyCollision(event.getValue());
