@@ -440,8 +440,6 @@ public class Gameplay {
         int xDistance = physicsEngine().getHorizontalDistance(ghost,target);
         int yDistance = physicsEngine().getVerticalDistance(ghost,target);
 
-        System.out.println(physicsEngine().getDistance(ghost,target));
-
         //Définition des directions horizontales et verticales
         MoveDirection xDirection = xDistance == 0 ? null
                 : xDistance > 0 ? MoveDirection.LEFT : MoveDirection.RIGHT;
@@ -1166,10 +1164,7 @@ public class Gameplay {
             soundEngine().loopSound("siren1");
             for (Ghost ghost : ghosts.values()) {
                 ghost.setReturnBase(false);
-                if (!ghost.getEaten()) {
-                    System.out.println("not eaten");
-                    bindGhostInitialAI(ghost);
-                }
+                if (!ghost.getEaten()) bindGhostInitialAI(ghost);
             }
         });
     }
