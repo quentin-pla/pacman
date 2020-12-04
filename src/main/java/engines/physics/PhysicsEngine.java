@@ -179,6 +179,45 @@ public class PhysicsEngine implements CollisionEvent {
     }
 
     /**
+     * Obtenir la distance horizontale entre deux entités
+     * @param entity1 entité 1
+     * @param entity2 entité 2
+     * @return distance horizontale
+     */
+    public int getHorizontalDistance(Entity entity1, Entity entity2) {
+        PhysicEntity entity1Physic = entity1.getPhysicEntity();
+        PhysicEntity entity2Physic = entity2.getPhysicEntity();
+        int e1XMid = (entity1Physic.getX() + entity1Physic.getWidth()) / 2;
+        int e2XMid = (entity2Physic.getX() + entity2Physic.getWidth()) / 2;
+        return e1XMid - e2XMid;
+    }
+
+    /**
+     * Obtenir la distance verticale entre deux entités
+     * @param entity1 entité 1
+     * @param entity2 entité 2
+     * @return distance verticale
+     */
+    public int getVerticalDistance(Entity entity1, Entity entity2) {
+        PhysicEntity entity1Physic = entity1.getPhysicEntity();
+        PhysicEntity entity2Physic = entity2.getPhysicEntity();
+        int e1YMid = (entity1Physic.getY() + entity1Physic.getHeight()) / 2;
+        int e2YMid = (entity2Physic.getY() + entity2Physic.getHeight()) / 2;
+        return e1YMid - e2YMid;
+    }
+
+    /**
+     * Obtenir la distance entre deux entités
+     * @param entity1 entité 1
+     * @param entity2 entité 2
+     * @return
+     */
+    public int getDistance(Entity entity1, Entity entity2) {
+        return Math.max(Math.abs(getHorizontalDistance(entity1, entity2)),
+                Math.abs(getVerticalDistance(entity1, entity2)));
+    }
+
+    /**
      * Vérifier si une entité est présente en haut
      * @param entity entité
      * @return s'il y a une entité
