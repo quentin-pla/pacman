@@ -178,29 +178,29 @@ public class Gameplay {
         //Rejouer un niveau
         kernelEngine.addEvent("restartLevel", this::restartLevel);
         //Déplacer le fantome rouge
-        kernelEngine.addEvent("moveRedGhost", this::applyRedGhostAI);
+        kernelEngine.addEvent("moveREDGhost", this::applyRedGhostAI);
         //Déplacer le fantome Bleu
-        kernelEngine.addEvent("moveBlueGhost", this::applyBlueGhostAI);
+        kernelEngine.addEvent("moveBLUEGhost", this::applyBlueGhostAI);
         //Déplacer le fantome orange
-        kernelEngine.addEvent("moveOrangeGhost", this::applyOrangeGhostAI);
+        kernelEngine.addEvent("moveORANGEGhost", this::applyOrangeGhostAI);
         //Déplacer fantome rose
-        kernelEngine.addEvent("movePinkGhost", this::applyPinkGhostAI);
+        kernelEngine.addEvent("movePINKGhost", this::applyPinkGhostAI);
         //Déplacement fantome bleu craintif
-        kernelEngine.addEvent("moveFearGhostBlue", () -> applyGhostFearAI(ghosts.get(GHOSTS.BLUE)));
+        kernelEngine.addEvent("moveFearBLUEGhost", () -> applyGhostFearAI(ghosts.get(GHOSTS.BLUE)));
         //Déplacement fantome rouge craintif
-        kernelEngine.addEvent("moveFearGhostRed", () -> applyGhostFearAI(ghosts.get(GHOSTS.RED)));
+        kernelEngine.addEvent("moveFearREDGhost", () -> applyGhostFearAI(ghosts.get(GHOSTS.RED)));
         //Déplacement fantome orange craintif
-        kernelEngine.addEvent("moveFearGhostOrange", () -> applyGhostFearAI(ghosts.get(GHOSTS.ORANGE)));
+        kernelEngine.addEvent("moveFearORANGEGhost", () -> applyGhostFearAI(ghosts.get(GHOSTS.ORANGE)));
         //Déplacement fantome rose craintif
-        kernelEngine.addEvent("moveFearGhostPink", () -> applyGhostFearAI(ghosts.get(GHOSTS.PINK)));
+        kernelEngine.addEvent("moveFearPINKGhost", () -> applyGhostFearAI(ghosts.get(GHOSTS.PINK)));
         //Déplacement fantôme Bleu vers la base
-        kernelEngine.addEvent("moveBaseGhostBLUE", () -> applyBaseAI(ghosts.get(GHOSTS.BLUE)));
+        kernelEngine.addEvent("moveBaseBLUEGhost", () -> applyBaseAI(ghosts.get(GHOSTS.BLUE)));
         //Déplacement fantôme Rouge vers la base
-        kernelEngine.addEvent("moveBaseGhostRED", () -> applyBaseAI(ghosts.get(GHOSTS.RED)));
+        kernelEngine.addEvent("moveBaseREDGhost", () -> applyBaseAI(ghosts.get(GHOSTS.RED)));
         //Déplacement fantôme Orange vers la base
-        kernelEngine.addEvent("moveBaseGhostORANGE", () -> applyBaseAI(ghosts.get(GHOSTS.ORANGE)));
+        kernelEngine.addEvent("moveBaseORANGEGhost", () -> applyBaseAI(ghosts.get(GHOSTS.ORANGE)));
         //Déplacement fantôme Rose vers la base
-        kernelEngine.addEvent("moveBaseGhostPINK", () -> applyBaseAI(ghosts.get(GHOSTS.PINK)));
+        kernelEngine.addEvent("moveBasePINKGhost", () -> applyBaseAI(ghosts.get(GHOSTS.PINK)));
         //Se déplacer vers le haut
         kernelEngine.addEvent("pacmanGoUp", () -> switchPacmanDirection(MoveDirection.UP));
         //Se déplacer vers la droite
@@ -222,7 +222,8 @@ public class Gameplay {
         ioEngine().bindEventOnLastKey(KeyEvent.VK_DOWN, "pacmanGoDown");
         ioEngine().bindEventOnLastKey(KeyEvent.VK_LEFT, "pacmanGoLeft");
         physicsEngine().bindEventOnCollision(pacman, "pacmanOnCollision");
-        bindGhostsInitialAI();
+        for (Ghost ghost : ghosts.values())
+            bindGhostInitialAI(ghost);
     }
 
     /**
@@ -394,12 +395,11 @@ public class Gameplay {
         defaultLevel.addBreaker(15,9);
 
         //ajout target pour scatter (patrouille)
-        targets.put("TopLeft", defaultLevel.addTarget(1,2));
-        targets.put("TopRight",defaultLevel.addTarget(1,18));
-        targets.put("BottomLeft",defaultLevel.addTarget(19,2));
-        targets.put("BottomRight",defaultLevel.addTarget(19,18));
-        targets.put("Base", defaultLevel.addTarget(9,9));
-
+        targets.put("TopLeft", defaultLevel.getMatrixEntity(1,2));
+        targets.put("TopRight",defaultLevel.getMatrixEntity(1,18));
+        targets.put("BottomLeft",defaultLevel.getMatrixEntity(19,2));
+        targets.put("BottomRight",defaultLevel.getMatrixEntity(19,18));
+        targets.put("Base", defaultLevel.getMatrixEntity(7,10));
 
         //Réduction de la taille pour ne pas voir les extrémités
         defaultLevel.setVisiblePart(30,0,
@@ -431,13 +431,14 @@ public class Gameplay {
      * @param ghost fantome
      * @param target entité
      */
-    private void reachTarget(Ghost ghost, PhysicEntity target){
+    private void reachTarget(Ghost ghost, Entity target){
+        PhysicEntity targetPhysic = target.getPhysicEntity();
         PhysicEntity ghostPhysic = ghost.getPhysicEntity();
         Set<MoveDirection> forbiddenDirections = ghost.getForbiddenDirection();
 
         //Calcul de la distance horizontale et verticale entre pacman et le fantome
-        int playerXmiddle = (target.getX() + target.getWidth()) / 2;
-        int playerYmiddle = (target.getY() + target.getHeight()) / 2;
+        int playerXmiddle = (targetPhysic.getX() + targetPhysic.getWidth()) / 2;
+        int playerYmiddle = (targetPhysic.getY() + targetPhysic.getHeight()) / 2;
         int ghostXmiddle = (ghostPhysic.getX() + ghostPhysic.getWidth()) / 2;
         int ghostYmiddle = (ghostPhysic.getY() + ghostPhysic.getHeight()) / 2;
         int xDistance = playerXmiddle - ghostXmiddle;
@@ -557,9 +558,6 @@ public class Gameplay {
         String animationName = ghost.getCurrentDirection().name();
         if (ghost.getEaten())
             animationName = "eaten" + animationName;
-        else if (ghost.getReturnBase()) {
-            animationName = ghost.getCurrentDirection().name();
-        }
         else if (isEatPowerUpEnabled.get() && !ghost.getEaten() && !ghost.getReturnBase())
             animationName = eatPowerUpTimeout.get() > 2 ? "fear" : "fearEnd";
         graphicsEngine().bindAnimation(ghost, ghost.getAnimations().get(animationName));
@@ -569,18 +567,14 @@ public class Gameplay {
      * Appliquer l'intelligence artificielle au fantome rouge
      */
     private void applyRedGhostAI() {
-        Ghost ghost = ghosts.get(GHOSTS.RED);
-        PhysicEntity playerPhysic = pacman.getPhysicEntity();
-        reachTarget(ghost,playerPhysic);
+        reachTarget(ghosts.get(GHOSTS.RED), pacman);
     }
 
     /**
      * Appliquer l'intelligence artificielle au fantome rose
      */
     private void applyPinkGhostAI() {
-        Ghost ghost = ghosts.get(GHOSTS.PINK);
-        PhysicEntity playerPhysic = pacman.getPhysicEntity();
-        reachTarget(ghost,playerPhysic);
+        reachTarget(ghosts.get(GHOSTS.PINK), pacman);
     }
 
     /**
@@ -588,51 +582,15 @@ public class Gameplay {
      */
     private void applyOrangeGhostAI() {
         Ghost ghost = ghosts.get(GHOSTS.ORANGE);
-        PhysicEntity playerPhysic = pacman.getPhysicEntity();
-        PhysicEntity ghostPhysic = ghost.getPhysicEntity();
-
-        //Calcul de la distance horizontale et verticale entre pacman et le fantome
-        int playerXmiddle = (playerPhysic.getX() + playerPhysic.getWidth()) / 2;
-        int playerYmiddle = (playerPhysic.getY() + playerPhysic.getHeight()) / 2;
-        int ghostXmiddle = (ghostPhysic.getX() + ghostPhysic.getWidth()) / 2;
-        int ghostYmiddle = (ghostPhysic.getY() + ghostPhysic.getHeight()) / 2;
-        int xDistance = playerXmiddle - ghostXmiddle;
-        int yDistance = playerYmiddle - ghostYmiddle;
-
-        //distance entre joueur et fantome
-        int distanceJoueurFantome = (int) Math.sqrt(((ghostXmiddle - playerXmiddle)*(ghostXmiddle - playerXmiddle)) + ((ghostYmiddle - playerYmiddle)*(ghostYmiddle - playerYmiddle)));
-        if (distanceJoueurFantome <= 100){
-            //target un des coins
-            //quand le fantome est en bas a droite de pacman
-            if (playerXmiddle <= ghostXmiddle && playerYmiddle < ghostYmiddle){
-                PhysicEntity targetBottomRight = targets.get("BottomRight").getPhysicEntity();
-                reachTarget(ghost,targetBottomRight);
-            }
-            //quand le fantome est en bas a gauche de pacman
-            else if (playerXmiddle > ghostXmiddle && playerYmiddle <= ghostYmiddle){
-                PhysicEntity targetBottomLeft = targets.get("BottomLeft").getPhysicEntity();
-                reachTarget(ghost,targetBottomLeft);
-            }
-            else if (playerXmiddle < ghostXmiddle && playerYmiddle <= ghostYmiddle){
-                PhysicEntity targetTopRight = targets.get("TopRight").getPhysicEntity();
-                reachTarget(ghost,targetTopRight);
-            }
-            else {
-                PhysicEntity targetTopLeft = targets.get("TopLeft").getPhysicEntity();
-                reachTarget(ghost,targetTopLeft);
-            }
-        }
-        else{
-            ghost.setCurrentDirection(updateGhostDirectionWithRandomness(ghost));
-            if (ghost.getCurrentDirection() != null) {
-                callEventFromDirection(ghost, ghost.getCurrentDirection());
-                updateGhostAnimation(ghost);
-            }
-        }
+        targetNearestCorner(ghost);
     }
 
+    /**
+     * Intelligence artificielle pour retourner à la barrière blanche
+     * @param ghost fantome
+     */
     private void applyBaseAI(Ghost ghost) {
-        reachTarget(ghost, targets.get("Base").getPhysicEntity());
+        reachTarget(ghost, targets.get("Base"));
     }
 
     /**
@@ -640,6 +598,14 @@ public class Gameplay {
      * @param ghost fantome
      */
     protected void applyGhostFearAI(Ghost ghost) {
+        targetNearestCorner(ghost);
+    }
+
+    /**
+     * Diriger un fantome vers le coin le plus proche
+     * @param ghost fantome
+     */
+    public void targetNearestCorner(Ghost ghost) {
         PhysicEntity playerPhysic = pacman.getPhysicEntity();
         PhysicEntity ghostPhysic = ghost.getPhysicEntity();
 
@@ -655,26 +621,15 @@ public class Gameplay {
 
         if (distanceJoueurFantome <= 120){
             //target un des coins
-            //quand le fantome est en bas a droite de pacman
-            if (playerXmiddle <= ghostXmiddle && playerYmiddle < ghostYmiddle){
-                PhysicEntity targetBottomRight = targets.get("BottomRight").getPhysicEntity();
-                reachTarget(ghost,targetBottomRight);
-            }
-            //quand le fantome est en bas a gauche de pacman
-            else if (playerXmiddle > ghostXmiddle && playerYmiddle <= ghostYmiddle){
-                PhysicEntity targetBottomLeft = targets.get("BottomLeft").getPhysicEntity();
-                reachTarget(ghost,targetBottomLeft);
-            }
-            else if (playerXmiddle < ghostXmiddle && playerYmiddle <= ghostYmiddle){
-                PhysicEntity targetTopRight = targets.get("TopRight").getPhysicEntity();
-                reachTarget(ghost,targetTopRight);
-            }
-            else {
-                PhysicEntity targetTopLeft = targets.get("TopLeft").getPhysicEntity();
-                reachTarget(ghost,targetTopLeft);
-            }
+            if (playerXmiddle <= ghostXmiddle && playerYmiddle < ghostYmiddle)
+                reachTarget(ghost,targets.get("BottomRight"));
+            else if (playerXmiddle > ghostXmiddle && playerYmiddle <= ghostYmiddle)
+                reachTarget(ghost,targets.get("BottomLeft"));
+            else if (playerXmiddle < ghostXmiddle && playerYmiddle <= ghostYmiddle)
+                reachTarget(ghost,targets.get("TopRight"));
+            else reachTarget(ghost,targets.get("TopLeft"));
         }
-        else{
+        else {
             ghost.setCurrentDirection(updateGhostDirectionWithRandomness(ghost));
             if (ghost.getCurrentDirection() != null) {
                 callEventFromDirection(ghost, ghost.getCurrentDirection());
@@ -714,69 +669,38 @@ public class Gameplay {
             ghost.getScatterPatrolZones().put("BottomLeft",false);
             ghost.setPatroleZoneReached(false);
         }
-
-        //vérifie si on a atteint la zone de patrouille
-        if (!ghost.isPatroleZoneReached()){
-            //on enregistre la position du fantome
-            PhysicEntity ghostPhysic = ghost.getPhysicEntity();
-            int ghostX = ghostPhysic.getX();
-            int ghostY = ghostPhysic.getY();
-
-            //on décide de l'endroit ou aller en fonction de la zone visée
-            if (ghost.getScatterPatrolZones().get("TopRight")){
-                //on récupère l'entité cible qui est en l'occurence dans le coin haut droit
-                PhysicEntity targetTopRight = targets.get("TopRight").getPhysicEntity();
-                //pn cherche a rejoindre cette cible
-                reachTarget(ghost,targetTopRight);
-                //si on atteint la cible, donc que les coordonnées sont les memes, on passe a la suite
-                int targetX = (targetTopRight.getX());
-                int targetY = (targetTopRight.getY());
-                if ((ghostX <= (targetX+4)) && (ghostX >= (targetX-4)) && (ghostY <= (targetY+4)) && (ghostY >= (targetY-4))){
-                    ghost.setPatroleZoneReached(true);
-                }
-                return;
-            }
-            else if (ghost.getScatterPatrolZones().get("TopLeft")){
-                PhysicEntity targetTopLeft = targets.get("TopLeft").getPhysicEntity();
-                reachTarget(ghost,targetTopLeft);
-                int targetX = (targetTopLeft.getX());
-                int targetY = (targetTopLeft.getY());
-                if ((ghostX <= (targetX+4)) && (ghostX >= (targetX-4)) && (ghostY <= (targetY+4)) && (ghostY >= (targetY-4))){
-                    ghost.setPatroleZoneReached(true);
-                }
-                return;
-            }
-            else if (ghost.getScatterPatrolZones().get("BottomRight")){
-
-                PhysicEntity targetBottomRight = targets.get("BottomRight").getPhysicEntity();
-                reachTarget(ghost,targetBottomRight);
-                int targetX = (targetBottomRight.getX());
-                int targetY = (targetBottomRight.getY());
-
-                if ((ghostX <= (targetX+4)) && (ghostX >= (targetX-4)) && (ghostY <= (targetY+4)) && (ghostY >= (targetY-4))){
-                    ghost.setPatroleZoneReached(true);
-                }
-                return;
-            }
-            else if (ghost.getScatterPatrolZones().get("BottomLeft")){
-                PhysicEntity targetBottomLeft = targets.get("BottomLeft").getPhysicEntity();
-                reachTarget(ghost,targetBottomLeft);
-                int targetX = (targetBottomLeft.getX());
-                int targetY = (targetBottomLeft.getY());
-
-                if ((ghostX <= (targetX+4)) && (ghostX >= (targetX-4)) && (ghostY <= (targetY+4)) && (ghostY >= (targetY-4))){
-                    ghost.setPatroleZoneReached(true);
-                }
-                return;
+        if (ghost.isPatroleZoneReached()) {
+            ghost.setCurrentDirection(updateGhostDirectionWithRandomness(ghost));
+            if (ghost.getCurrentDirection() != null) {
+                callEventFromDirection(ghost, ghost.getCurrentDirection());
+                updateGhostAnimation(ghost);
             }
         } else {
-            //une fois dans la zone on patrouille au hasard
-            ghost.setCurrentDirection(updateGhostDirectionWithRandomness(ghost));
+            if (ghost.getScatterPatrolZones().get("TopRight"))
+                checkPatrolZoneReached(ghost, targets.get("TopRight"));
+            else if (ghost.getScatterPatrolZones().get("TopLeft"))
+                checkPatrolZoneReached(ghost, targets.get("TopLeft"));
+            else if (ghost.getScatterPatrolZones().get("BottomRight"))
+                checkPatrolZoneReached(ghost, targets.get("BottomRight"));
+            else if (ghost.getScatterPatrolZones().get("BottomLeft"))
+                checkPatrolZoneReached(ghost, targets.get("BottomLeft"));
         }
-        if (ghost.getCurrentDirection() != null) {
-            callEventFromDirection(ghost, ghost.getCurrentDirection());
-            updateGhostAnimation(ghost);
-        }
+    }
+
+    /**
+     * Vérifier si un fantome a atteint une zone de controle
+     * @param ghost fantome
+     * @param zone zone de controle
+     */
+    public void checkPatrolZoneReached(Ghost ghost, Entity zone) {
+        PhysicEntity zonePhysic = zone.getPhysicEntity();
+        PhysicEntity ghostPhysic = ghost.getPhysicEntity();
+        reachTarget(ghost,zone);
+        int targetX = (zonePhysic.getX());
+        int targetY = (zonePhysic.getY());
+        if ((ghostPhysic.getX() <= (targetX+4)) && (ghostPhysic.getX() >= (targetX-4))
+                && (ghostPhysic.getY() <= (targetY+4)) && (ghostPhysic.getY() >= (targetY-4)))
+            ghost.setPatroleZoneReached(true);
     }
 
     /**
@@ -951,11 +875,8 @@ public class Gameplay {
             ghost.setPreviousDirection(MoveDirection.RIGHT);
             return MoveDirection.RIGHT;
         }
-
         ghost.setPreviousDirection(MoveDirection.RIGHT);
-        return MoveDirection.RIGHT; //default move
-        //random direction
-
+        return MoveDirection.RIGHT;
     }
 
     /**
@@ -983,9 +904,7 @@ public class Gameplay {
      * @param ghost fantome
      */
     public void pacmanGhostCollision(Ghost ghost) {
-        if (isEatPowerUpEnabled.get()) {
-            eatGhost(ghost);
-        }
+        if (isEatPowerUpEnabled.get()) eatGhost(ghost);
         else decreasePacmanLife();
     }
 
@@ -1033,15 +952,15 @@ public class Gameplay {
     private void eatGhost(Ghost ghost) {
         if (!ghost.getEaten()) {
             soundEngine().playSound("eatGhost");
+            physicsEngine().removeCollisions(pacman, ghost);
             this.currentLevel.updateActualScore(this.currentLevel.getActualScore() + 250);
-
             ghost.setEaten(true);
+            ghost.setReturnBase(false);
             bindGhostBaseAI(ghost);
             executorService.execute(() -> {
                 while(ghost.getPhysicEntity().getX() != targets.get("Base").getPhysicEntity().getX() &&
-                      ghost.getPhysicEntity().getY() != targets.get("Base").getPhysicEntity().getY()) {
+                      ghost.getPhysicEntity().getY() != targets.get("Base").getPhysicEntity().getY())
                     System.out.println("Je suis pas à la base");
-                }
                 System.out.println("Je suis à la base");
                 try {
                     Thread.sleep(1000);
@@ -1049,9 +968,10 @@ public class Gameplay {
                     e.printStackTrace();
                 }
                 ghost.setEaten(false);
-                ghost.setReturnBase(true);
+                ghost.setReturnBase(isEatPowerUpEnabled.get());
+                physicsEngine().addCollisions(pacman, ghost);
                 updateGhostAnimation(ghost);
-                bindGhostsInitialAI();
+                bindGhostInitialAI(ghost);
             });
         }
     }
@@ -1065,7 +985,6 @@ public class Gameplay {
         currentLevel.getWalls()[wallPosition[0]][wallPosition[1]] = false;
         currentLevel.applyWallTextures();
         kernelEngine.removeEntity(wall);
-        currentLevel.setWallsAlreadyBroken(true);
     }
 
     /**
@@ -1213,28 +1132,27 @@ public class Gameplay {
 
     /**
      * Attacher l'IA de crainte aux fantomes
+     * @param ghost fantome
      */
-    private void bindGhostsFearAI() {
-        aiEngine().bindEvent(ghosts.get(GHOSTS.BLUE),"moveFearGhostBlue");
-        aiEngine().bindEvent(ghosts.get(GHOSTS.ORANGE),"moveFearGhostOrange");
-        aiEngine().bindEvent(ghosts.get(GHOSTS.PINK),"moveFearGhostPink");
-        aiEngine().bindEvent(ghosts.get(GHOSTS.RED),"moveFearGhostRed");
+    private void bindGhostFearAI(Ghost ghost) {
+        aiEngine().bindEvent(ghost,"moveFear" + ghost.getColor() + "Ghost");
     }
 
     /**
-     * Attacher l'IA de base aux fantomes
+     * Attacher l'IA de base à un fantome
+     * @param ghost fantome
      */
-    private void bindGhostsInitialAI() {
-        aiEngine().bindEvent(ghosts.get(GHOSTS.RED), "moveRedGhost");
-        aiEngine().bindEvent(ghosts.get(GHOSTS.BLUE), "moveBlueGhost");
-        aiEngine().bindEvent(ghosts.get(GHOSTS.ORANGE),"moveOrangeGhost");
-        aiEngine().bindEvent(ghosts.get(GHOSTS.PINK),"movePinkGhost");
+    private void bindGhostInitialAI(Ghost ghost) {
+        aiEngine().bindEvent(ghost, "move" + ghost.getColor() + "Ghost");
     }
 
+    /**
+     * Attacher l'IA pour aller à la base à un fantome
+     * @param ghost fantome
+     */
     private void bindGhostBaseAI(Ghost ghost) {
-        aiEngine().bindEvent(ghost, "moveBaseGhost"+ghost.getColor());
+        aiEngine().bindEvent(ghost, "moveBase" + ghost.getColor() + "Ghost");
     }
-
 
     /**
      * Activer le super pouvoir de manger les fantomes
@@ -1242,7 +1160,8 @@ public class Gameplay {
     public void enableEatPowerUP() {
         isEatPowerUpEnabled.getAndSet(true);
         eatPowerUpTimeout.getAndSet(eatPowerUpInitialTime);
-        bindGhostsFearAI();
+        for (Ghost ghost : ghosts.values())
+            bindGhostFearAI(ghost);
         soundEngine().pauseSound("siren1");
         soundEngine().loopSound("powerup");
         soundEngine().playSound("eatGomme");
@@ -1254,9 +1173,10 @@ public class Gameplay {
             isEatPowerUpEnabled.getAndSet(false);
             soundEngine().pauseSound("powerup");
             soundEngine().loopSound("siren1");
-            bindGhostsInitialAI();
             for (Ghost ghost : ghosts.values()) {
-                if (ghost.getReturnBase()) ghost.setReturnBase(false);
+                ghost.setReturnBase(false);
+                if (!ghost.getEaten())
+                    bindGhostInitialAI(ghost);
             }
         });
     }

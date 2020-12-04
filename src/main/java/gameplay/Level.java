@@ -131,7 +131,6 @@ public class Level {
      */
     public void spawnGhost(Ghost ghost, int row, int col) {
         if (!scene.getEntities().contains(ghost.getGraphicEntity())) {
-
             gameplay.kernelEngine().addEvent("pacman" + ghost.getColor() + "ghostCollision",
                     () -> gameplay.pacmanGhostCollision(ghost));
             gameplay.physicsEngine().bindEventOnCollision(gameplay.getPlayer(), ghost,
@@ -255,15 +254,6 @@ public class Level {
         gameplay.physicsEngine().bindEventOnSameLocation(gameplay.getPlayer(), breaker, "eraseBreaker" + breakers);
         ++breakers;
 
-    }
-
-    /**
-     * creating invisible target for scattering
-     * @param row ligne
-     * @param col colonne
-     */
-    public Entity addTarget(int row, int col){
-        return matrix[row][col];
     }
 
     /**
@@ -403,6 +393,15 @@ public class Level {
                 if (matrix[i][j] == entity)
                     return new int[]{i, j};
         return null;
+    }
+
+    /**
+     * Obtenir une entité à une position spécifique dans la matrice
+     * @param row ligne
+     * @param col colonne
+     */
+    public Entity getMatrixEntity(int row, int col){
+        return matrix[row][col];
     }
 
     // GETTERS //
