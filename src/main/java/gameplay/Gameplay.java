@@ -618,7 +618,8 @@ public class Gameplay {
         //distance entre joueur et fantome
         int distanceJoueurFantome = (int) Math.sqrt(((ghostXmiddle - playerXmiddle)*(ghostXmiddle - playerXmiddle))
                 + ((ghostYmiddle - playerYmiddle)*(ghostYmiddle - playerYmiddle)));
-        if (distanceJoueurFantome <= 100){
+
+        if (distanceJoueurFantome <= 120){
             //target un des coins
             if (playerXmiddle <= ghostXmiddle && playerYmiddle < ghostYmiddle)
                 reachTarget(ghost,targets.get("BottomRight"));
@@ -712,6 +713,11 @@ public class Gameplay {
         boolean somethingRIGHT  = physicsEngine().isSomethingRight(ghost) != null;
         boolean somethingDOWN   = physicsEngine().isSomethingDown(ghost) != null;
         boolean somethingLEFT   = physicsEngine().isSomethingLeft(ghost) != null;
+
+        //si le fantome est dans un espace ouvert a cause du cassage de murs
+        if (!somethingDOWN && !somethingUP && !somethingLEFT && !somethingRIGHT && currentLevel.isWallsAlreadyBroken()){
+            return ghost.getPreviousDirection();
+        }
 
         int random = 1 + (int)(Math.random() * ((4 - 1) + 1));
 
@@ -1031,9 +1037,9 @@ public class Gameplay {
     protected void spawnPlayersOnLevel() {
         currentLevel.spawnPlayer(15,10);
         currentLevel.spawnGhost(ghosts.get(GHOSTS.RED),7,10);
-//        currentLevel.spawnGhost(ghosts.get(GHOSTS.BLUE),11,9);
-//        currentLevel.spawnGhost(ghosts.get(GHOSTS.PINK),9,10);
-//        currentLevel.spawnGhost(ghosts.get(GHOSTS.ORANGE),9,11);
+        currentLevel.spawnGhost(ghosts.get(GHOSTS.BLUE),11,9);
+        currentLevel.spawnGhost(ghosts.get(GHOSTS.PINK),9,10);
+        currentLevel.spawnGhost(ghosts.get(GHOSTS.ORANGE),9,11);
     }
 
     /**
