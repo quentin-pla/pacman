@@ -1075,11 +1075,10 @@ public class Gameplay {
      */
     protected void spawnPlayersOnLevel() {
         currentLevel.spawnPlayer(15,10);
-//        currentLevel.spawnGhost(ghosts.get(GHOSTS.RED),7,10);
         currentLevel.spawnGhost(ghosts.get(GHOSTS.RED),7,10);
-//        currentLevel.spawnGhost(ghosts.get(GHOSTS.BLUE),11,9);
-//        currentLevel.spawnGhost(ghosts.get(GHOSTS.PINK),9,10);
-//        currentLevel.spawnGhost(ghosts.get(GHOSTS.ORANGE),9,11);
+        currentLevel.spawnGhost(ghosts.get(GHOSTS.BLUE),11,9);
+        currentLevel.spawnGhost(ghosts.get(GHOSTS.PINK),9,10);
+        currentLevel.spawnGhost(ghosts.get(GHOSTS.ORANGE),9,11);
     }
 
     /**
