@@ -711,10 +711,7 @@ public class Gameplay {
         boolean somethingDOWN   = physicsEngine().isSomethingDown(ghost) != null;
         boolean somethingLEFT   = physicsEngine().isSomethingLeft(ghost) != null;
 
-        //si le fantome est dans un espace ouvert a cause du cassage de murs
-        if (!somethingDOWN && !somethingUP && !somethingLEFT && !somethingRIGHT && currentLevel.isWallsAlreadyBroken()){
-            return ghost.getPreviousDirection();
-        }
+
 
         int random = 1 + (int)(Math.random() * ((4 - 1) + 1));
 
@@ -740,6 +737,57 @@ public class Gameplay {
         ghost.getKeepDirection().put("KeepRight",false);
         ghost.getKeepDirection().put("KeepDown",false);
         ghost.getKeepDirection().put("KeepLeft",false);
+
+
+        //améliore le comportement
+        //si le fantome est dans un espace ouvert a cause du cassage de murs
+        //n'est pas infaillible mais permet de débloquer la situation a un moment ou un autre
+       if (!somethingDOWN && !somethingUP && !somethingLEFT && !somethingRIGHT && currentLevel.isWallsAlreadyBroken() && !ghost.isHasbeenStuckInOpenSpace()){
+            ghost.setHasbeenStuckInOpenSpace(true);
+            if (ghost.getPreviousDirection() == MoveDirection.UP){
+                ghost.getKeepDirection().put("KeepUp",true);
+                ghost.setHasbeenStuckInOpenSpace(false);
+                return MoveDirection.UP;
+            }
+            else if (ghost.getPreviousDirection() == MoveDirection.LEFT){
+                ghost.getKeepDirection().put("KeepLeft",true);
+                ghost.setHasbeenStuckInOpenSpace(false);
+                return MoveDirection.LEFT;
+            }
+            else if (ghost.getPreviousDirection() == MoveDirection.RIGHT){
+                ghost.getKeepDirection().put("KeepRight",true);
+                ghost.setHasbeenStuckInOpenSpace(false);
+                return MoveDirection.RIGHT;
+            }
+            else{
+                ghost.getKeepDirection().put("KeepDown",true);
+                ghost.setHasbeenStuckInOpenSpace(false);
+                return MoveDirection.DOWN;
+            }
+        }
+        else if (ghost.isHasbeenStuckInOpenSpace()){
+            if (!somethingUP && ghost.getPreviousDirection() != MoveDirection.DOWN){
+                ghost.getKeepDirection().put("KeepUp",true);
+                ghost.setHasbeenStuckInOpenSpace(false);
+                return MoveDirection.UP;
+
+            }
+            else if (!somethingLEFT && ghost.getPreviousDirection() != MoveDirection.RIGHT){
+                ghost.getKeepDirection().put("KeepLeft",true);
+                ghost.setHasbeenStuckInOpenSpace(false);
+                return MoveDirection.LEFT;
+            }
+            else if (!somethingRIGHT && ghost.getPreviousDirection() != MoveDirection.LEFT){
+                ghost.getKeepDirection().put("KeepRight",true);
+                ghost.setHasbeenStuckInOpenSpace(false);
+                return MoveDirection.RIGHT;
+            }
+            else if (!somethingDOWN && ghost.getPreviousDirection() != MoveDirection.UP){
+                ghost.getKeepDirection().put("KeepDown",true);
+                ghost.setHasbeenStuckInOpenSpace(false);
+                return MoveDirection.DOWN;
+            }
+        }
 
         if (random == 1 && !somethingUP && ghost.getPreviousDirection() != MoveDirection.DOWN){
             ghost.getKeepDirection().put("KeepUp",true);
