@@ -29,6 +29,7 @@ public class Ghost extends Player {
      */
 
     private boolean returnBase;
+    private boolean hasbeenStuckInOpenSpace;
 
     /**
      * Couleur
@@ -193,5 +194,13 @@ public class Ghost extends Player {
 
     public void setKeepDirection(HashMap<String, Boolean> keepDirection) {
         this.keepDirection = keepDirection;
+    }
+
+    public boolean isHasbeenStuckInOpenSpace() {
+        return hasbeenStuckInOpenSpace;
+    }
+
+    public void setHasbeenStuckInOpenSpace(boolean hasbeenStuckInOpenSpace) {
+        this.hasbeenStuckInOpenSpace = hasbeenStuckInOpenSpace;
     }
 }
