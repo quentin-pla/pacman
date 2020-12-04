@@ -11,6 +11,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Niveau de jeu
  */
 public class Level {
+
+    private boolean wallsAlreadyBroken = false;
     /**
      * Gameplay
      */
@@ -414,4 +416,12 @@ public class Level {
     public Entity getFence() { return fence; }
 
     public boolean[][] getWalls() { return walls; }
+
+    public boolean isWallsAlreadyBroken() {
+        return wallsAlreadyBroken;
+    }
+
+    public void setWallsAlreadyBroken(boolean wallsAlreadyBroken) {
+        this.wallsAlreadyBroken = wallsAlreadyBroken;
+    }
 }

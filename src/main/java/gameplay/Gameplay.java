@@ -400,6 +400,7 @@ public class Gameplay {
         targets.put("BottomRight",defaultLevel.addTarget(19,18));
         targets.put("Base", defaultLevel.addTarget(9,9));
 
+
         //Réduction de la taille pour ne pas voir les extrémités
         defaultLevel.setVisiblePart(30,0,
                 defaultLevel.getScene().getHeight(),defaultLevel.getScene().getWidth() - 30);
@@ -652,7 +653,7 @@ public class Gameplay {
         int distanceJoueurFantome = (int) Math.sqrt(((ghostXmiddle - playerXmiddle)*(ghostXmiddle - playerXmiddle))
                 + ((ghostYmiddle - playerYmiddle)*(ghostYmiddle - playerYmiddle)));
 
-        if (distanceJoueurFantome <= 200){
+        if (distanceJoueurFantome <= 120){
             //target un des coins
             //quand le fantome est en bas a droite de pacman
             if (playerXmiddle <= ghostXmiddle && playerYmiddle < ghostYmiddle){
@@ -788,6 +789,11 @@ public class Gameplay {
         boolean somethingRIGHT  = physicsEngine().isSomethingRight(ghost) != null;
         boolean somethingDOWN   = physicsEngine().isSomethingDown(ghost) != null;
         boolean somethingLEFT   = physicsEngine().isSomethingLeft(ghost) != null;
+
+        //si le fantome est dans un espace ouvert a cause du cassage de murs
+        if (!somethingDOWN && !somethingUP && !somethingLEFT && !somethingRIGHT && currentLevel.isWallsAlreadyBroken()){
+            return ghost.getPreviousDirection();
+        }
 
         int random = 1 + (int)(Math.random() * ((4 - 1) + 1));
 
@@ -1011,6 +1017,7 @@ public class Gameplay {
         currentLevel.getWalls()[wallPosition[0]][wallPosition[1]] = false;
         currentLevel.applyWallTextures();
         kernelEngine.removeEntity(wall);
+        currentLevel.setWallsAlreadyBroken(true);
     }
 
     /**
