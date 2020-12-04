@@ -37,7 +37,7 @@ public class Ghost extends Player {
     /**
      * hashmap de patrouille des zones
      */
-    private HashMap<String,Boolean> scatterPatrolZones = new HashMap<>();
+    private HashMap<Gameplay.TARGETS,Boolean> scatterPatrolZones = new HashMap<>();
 
     /**
      * Si la zone de patrouille est atteinte
@@ -75,10 +75,10 @@ public class Ghost extends Player {
             case BLUE   : defaultTextureCoords = new int[]{5, 1}; break;
             case ORANGE : defaultTextureCoords = new int[]{6, 1};break;
         }
-        scatterPatrolZones.put("TopRight",false);
-        scatterPatrolZones.put("TopLeft",false);
-        scatterPatrolZones.put("BottomRight",false);
-        scatterPatrolZones.put("BottomLeft",false);
+        scatterPatrolZones.put(Gameplay.TARGETS.TOP_L,false);
+        scatterPatrolZones.put(Gameplay.TARGETS.TOP_R,false);
+        scatterPatrolZones.put(Gameplay.TARGETS.BOT_L,false);
+        scatterPatrolZones.put(Gameplay.TARGETS.BOT_R,false);
         keepDirection.put("KeepUp",false);
         keepDirection.put("KeepDown",false);
         keepDirection.put("KeepLeft",false);
@@ -154,11 +154,7 @@ public class Ghost extends Player {
 
     public Set<Gameplay.MoveDirection> getForbiddenDirection() { return forbiddenDirection; }
 
-    public HashMap<String, Boolean> getScatterPatrolZones() {
-        return scatterPatrolZones;
-    }
-
-    public void setScatterPatrolZones(HashMap<String, Boolean> scatterPatrolZones) { this.scatterPatrolZones = scatterPatrolZones; }
+    public HashMap<Gameplay.TARGETS, Boolean> getScatterPatrolZones() { return scatterPatrolZones; }
 
     public boolean getEaten() { return this.eaten; }
 

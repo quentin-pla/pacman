@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Level {
 
     private boolean wallsAlreadyBroken = false;
+
     /**
      * Gameplay
      */
@@ -46,7 +47,6 @@ public class Level {
     /**
      * Nombre de breakers
      */
-
     private int breakers;
 
     /**
@@ -62,7 +62,7 @@ public class Level {
     /**
      * Nombre de vies
      */
-    private final AtomicInteger livesCount = new AtomicInteger(3);
+    private final AtomicInteger livesCount;
 
     /**
      * Barrière blanche
@@ -73,8 +73,14 @@ public class Level {
      * Entités vies
      */
     private Entity[] livesEntity;
+
     /**
-     * Constructeur surchargé
+     * Taille par défaut d'une entité de la matrice
+     */
+    private final int defaultEntitySize = 30;
+
+    /**
+     * Constructeur
      * @param rows nombre de lignes
      * @param cols nombre de colonnes
      */
@@ -83,7 +89,9 @@ public class Level {
         this.matrix = new Entity[rows][cols];
         this.walls = new boolean[rows][cols];
         this.actualScore = 0;
-        this.scene = gameplay.graphicsEngine().generateScene(rows * 30 + 30,(cols * 30));
+        this.livesCount = new AtomicInteger(3);
+        this.scene = gameplay.graphicsEngine().generateScene(rows * defaultEntitySize
+                + 30, (cols * defaultEntitySize));
         fillMatrix();
         initScore();
         initLives();
@@ -96,12 +104,12 @@ public class Level {
         for (int i = 0; i < matrix.length; i++)
             Arrays.fill(walls[i],false);
         Entity defaultFloor = gameplay.kernelEngine().generateEntity();
-        gameplay.physicsEngine().resize(defaultFloor,30,30);
+        gameplay.physicsEngine().resize(defaultFloor,defaultEntitySize,defaultEntitySize);
         gameplay.graphicsEngine().bindColor(defaultFloor,0,0,0);
         for (int row = 0; row < matrix.length; row++) {
             for (int col = 0; col < matrix[row].length; col++) {
                 matrix[row][col] = defaultFloor.clone();
-                gameplay.physicsEngine().move(matrix[row][col], (30 * col), (30 * row));
+                gameplay.physicsEngine().move(matrix[row][col], (defaultEntitySize * col), (defaultEntitySize * row));
                 gameplay.graphicsEngine().addToScene(scene, matrix[row][col]);
             }
         }
@@ -387,12 +395,23 @@ public class Level {
      * @param entity entité
      * @return position de l'entité
      */
-    public int[] getEntityPositionInMatrix(Entity entity) {
+    public int[] getMatrixEntityPosition(Entity entity) {
         for (int i = 0; i < matrix.length; i++)
             for (int j = 0; j < matrix[i].length; j++)
                 if (matrix[i][j] == entity)
                     return new int[]{i, j};
         return null;
+    }
+
+    /**
+     * Obtenir la position dans la matrice d'une entité externe à la matrice
+     * @param entity entité
+     * @return position
+     */
+    public int[] getEntityPosition(Entity entity) {
+        int row = entity.getPhysicEntity().getY()/defaultEntitySize;
+        int col = entity.getPhysicEntity().getX()/defaultEntitySize;
+        return new int[]{row, col};
     }
 
     /**
