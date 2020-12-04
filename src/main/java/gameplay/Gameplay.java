@@ -193,6 +193,14 @@ public class Gameplay {
         kernelEngine.addEvent("moveFearGhostOrange", () -> applyGhostFearAI(ghosts.get(GHOSTS.ORANGE)));
         //Déplacement fantome rose craintif
         kernelEngine.addEvent("moveFearGhostPink", () -> applyGhostFearAI(ghosts.get(GHOSTS.PINK)));
+        //Déplacement fantôme Bleu vers la base
+        kernelEngine.addEvent("moveBaseGhostBLUE", () -> applyBaseAI(ghosts.get(GHOSTS.BLUE)));
+        //Déplacement fantôme Rouge vers la base
+        kernelEngine.addEvent("moveBaseGhostRED", () -> applyBaseAI(ghosts.get(GHOSTS.RED)));
+        //Déplacement fantôme Orange vers la base
+        kernelEngine.addEvent("moveBaseGhostORANGE", () -> applyBaseAI(ghosts.get(GHOSTS.ORANGE)));
+        //Déplacement fantôme Rose vers la base
+        kernelEngine.addEvent("moveBaseGhostPINK", () -> applyBaseAI(ghosts.get(GHOSTS.PINK)));
         //Se déplacer vers le haut
         kernelEngine.addEvent("pacmanGoUp", () -> switchPacmanDirection(MoveDirection.UP));
         //Se déplacer vers la droite
@@ -390,6 +398,7 @@ public class Gameplay {
         targets.put("TopRight",defaultLevel.addTarget(1,18));
         targets.put("BottomLeft",defaultLevel.addTarget(19,2));
         targets.put("BottomRight",defaultLevel.addTarget(19,18));
+        targets.put("Base", defaultLevel.addTarget(9,9));
 
         //Réduction de la taille pour ne pas voir les extrémités
         defaultLevel.setVisiblePart(30,0,
@@ -547,7 +556,10 @@ public class Gameplay {
         String animationName = ghost.getCurrentDirection().name();
         if (ghost.getEaten())
             animationName = "eaten" + animationName;
-        else if (isEatPowerUpEnabled.get())
+        else if (ghost.getReturnBase()) {
+            animationName = ghost.getCurrentDirection().name();
+        }
+        else if (isEatPowerUpEnabled.get() && !ghost.getEaten() && !ghost.getReturnBase())
             animationName = eatPowerUpTimeout.get() > 2 ? "fear" : "fearEnd";
         graphicsEngine().bindAnimation(ghost, ghost.getAnimations().get(animationName));
     }
@@ -616,6 +628,10 @@ public class Gameplay {
                 updateGhostAnimation(ghost);
             }
         }
+    }
+
+    private void applyBaseAI(Ghost ghost) {
+        reachTarget(ghost, targets.get("Base").getPhysicEntity());
     }
 
     /**
@@ -913,7 +929,9 @@ public class Gameplay {
      * @param ghost fantome
      */
     public void pacmanGhostCollision(Ghost ghost) {
-        if (isEatPowerUpEnabled.get()) eatGhost(ghost);
+        if (isEatPowerUpEnabled.get()) {
+            eatGhost(ghost);
+        }
         else decreasePacmanLife();
     }
 
@@ -962,14 +980,24 @@ public class Gameplay {
         if (!ghost.getEaten()) {
             soundEngine().playSound("eatGhost");
             this.currentLevel.updateActualScore(this.currentLevel.getActualScore() + 250);
+
             ghost.setEaten(true);
+            bindGhostBaseAI(ghost);
             executorService.execute(() -> {
+                while(ghost.getPhysicEntity().getX() != targets.get("Base").getPhysicEntity().getX() &&
+                      ghost.getPhysicEntity().getY() != targets.get("Base").getPhysicEntity().getY()) {
+                    System.out.println("Je suis pas à la base");
+                }
+                System.out.println("Je suis à la base");
                 try {
-                    sleep(5000);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 ghost.setEaten(false);
+                ghost.setReturnBase(true);
+                updateGhostAnimation(ghost);
+                bindGhostsInitialAI();
             });
         }
     }
@@ -1131,7 +1159,7 @@ public class Gameplay {
     /**
      * Attacher l'IA de crainte aux fantomes
      */
-    public void bindGhostsFearAI() {
+    private void bindGhostsFearAI() {
         aiEngine().bindEvent(ghosts.get(GHOSTS.BLUE),"moveFearGhostBlue");
         aiEngine().bindEvent(ghosts.get(GHOSTS.ORANGE),"moveFearGhostOrange");
         aiEngine().bindEvent(ghosts.get(GHOSTS.PINK),"moveFearGhostPink");
@@ -1141,12 +1169,17 @@ public class Gameplay {
     /**
      * Attacher l'IA de base aux fantomes
      */
-    public void bindGhostsInitialAI() {
+    private void bindGhostsInitialAI() {
         aiEngine().bindEvent(ghosts.get(GHOSTS.RED), "moveRedGhost");
         aiEngine().bindEvent(ghosts.get(GHOSTS.BLUE), "moveBlueGhost");
         aiEngine().bindEvent(ghosts.get(GHOSTS.ORANGE),"moveOrangeGhost");
         aiEngine().bindEvent(ghosts.get(GHOSTS.PINK),"movePinkGhost");
     }
+
+    private void bindGhostBaseAI(Ghost ghost) {
+        aiEngine().bindEvent(ghost, "moveBaseGhost"+ghost.getColor());
+    }
+
 
     /**
      * Activer le super pouvoir de manger les fantomes
@@ -1167,6 +1200,9 @@ public class Gameplay {
             soundEngine().pauseSound("powerup");
             soundEngine().loopSound("siren1");
             bindGhostsInitialAI();
+            for (Ghost ghost : ghosts.values()) {
+                if (ghost.getReturnBase()) ghost.setReturnBase(false);
+            }
         });
     }
 
@@ -1213,7 +1249,7 @@ public class Gameplay {
     public void start() {
         kernelEngine().switchScene(menuView);
         kernelEngine.start();
-        setGlobalVolume(30);
+        setGlobalVolume(0);
     }
 
     // GETTERS //

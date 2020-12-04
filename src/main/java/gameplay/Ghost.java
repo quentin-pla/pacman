@@ -25,6 +25,12 @@ public class Ghost extends Player {
     private boolean eaten;
 
     /**
+     * Est retourné à la base
+     */
+
+    private boolean returnBase;
+
+    /**
      * Couleur
      */
     private final Gameplay.GHOSTS color;
@@ -60,6 +66,7 @@ public class Ghost extends Player {
         this.gameplay = gameplay;
         this.forbiddenDirection = new HashSet<>();
         this.eaten = false;
+        this.returnBase = false;
         this.color = color;
         gameplay.physicsEngine().resize(this, 30, 30);
         gameplay.physicsEngine().setSpeed(this, 2);
@@ -157,6 +164,10 @@ public class Ghost extends Player {
     public boolean getEaten() { return this.eaten; }
 
     public void setEaten(boolean eaten) { this.eaten = eaten; }
+
+    public boolean getReturnBase() { return this.returnBase; }
+
+    public void setReturnBase(boolean base) { this.returnBase = base; }
 
     public Gameplay.GHOSTS getColor() { return color; }
 
