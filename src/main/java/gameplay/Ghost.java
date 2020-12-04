@@ -27,7 +27,6 @@ public class Ghost extends Player {
     /**
      * Est retourné à la base
      */
-
     private boolean returnBase;
 
     /**
@@ -38,7 +37,7 @@ public class Ghost extends Player {
     /**
      * hashmap de patrouille des zones
      */
-    private HashMap<String,Boolean> scatterPatrolZones = new HashMap<String, Boolean>();
+    private HashMap<String,Boolean> scatterPatrolZones = new HashMap<>();
 
     /**
      * Si la zone de patrouille est atteinte
@@ -151,16 +150,16 @@ public class Ghost extends Player {
         animations.put("fearEnd", fearEnd);
     }
 
-    public Set<Gameplay.MoveDirection> getForbiddenDirection() { return forbiddenDirection; }
+    // GETTERS //
 
+    public Set<Gameplay.MoveDirection> getForbiddenDirection() { return forbiddenDirection; }
 
     public HashMap<String, Boolean> getScatterPatrolZones() {
         return scatterPatrolZones;
     }
 
-    public void setScatterPatrolZones(HashMap<String, Boolean> scatterPatrolZones) {
-        this.scatterPatrolZones = scatterPatrolZones;
-    }
+    public void setScatterPatrolZones(HashMap<String, Boolean> scatterPatrolZones) { this.scatterPatrolZones = scatterPatrolZones; }
+
     public boolean getEaten() { return this.eaten; }
 
     public void setEaten(boolean eaten) { this.eaten = eaten; }
@@ -183,9 +182,7 @@ public class Ghost extends Player {
         return previousDirection;
     }
 
-    public void setPreviousDirection(Gameplay.MoveDirection previousDirection) {
-        this.previousDirection = previousDirection;
-    }
+    public void setPreviousDirection(Gameplay.MoveDirection previousDirection) { this.previousDirection = previousDirection; }
 
     public HashMap<String, Boolean> getKeepDirection() {
         return keepDirection;
