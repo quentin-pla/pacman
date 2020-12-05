@@ -1,5 +1,6 @@
 package engines.kernel;
 
+import api.SwingTimer;
 import engines.AI.AIEngine;
 import engines.graphics.GraphicEntity;
 import engines.graphics.GraphicsEngine;
@@ -9,9 +10,7 @@ import engines.physics.PhysicEntity;
 import engines.physics.PhysicsEngine;
 import engines.sound.SoundEngine;
 
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -142,18 +141,6 @@ public class KernelEngine implements EventListener {
     }
 
     /**
-     * Rafraichir le jeu
-     */
-    private final ActionListener refresh = evt -> {
-        if (!pauseEvents) {
-            ioEngine.updateEntities();
-            aiEngine.updateEntities();
-            physicsEngine.updateEntites();
-        }
-        if (!pauseGraphics) graphicsEngine.refreshWindow();
-    };
-
-    /**
      * Mettre en pause les évènements
      */
     public void pauseEvents() {
@@ -205,8 +192,37 @@ public class KernelEngine implements EventListener {
     public void start() {
         graphicsEngine.showWindow();
         //Rafraichissement 60 images par seconde
-        new Timer(delay, refresh).start();
+        startTimer("refresh", delay, () -> {
+            if (!pauseEvents) {
+                ioEngine.updateEntities();
+                aiEngine.updateEntities();
+                physicsEngine.updateEntites();
+            }
+            if (!pauseGraphics) graphicsEngine.refreshWindow();
+        });
     }
+
+    /**
+     * Exécuter une commande de manière périodique
+     * @param name nom
+     * @param delay délai
+     * @param command commande
+     */
+    public void startTimer(String name, int delay, Runnable command) {
+        SwingTimer.getInstance().startTimer(name, delay, command);
+    }
+
+    /**
+     * Arrêter un timer
+     * @param name nom
+     */
+    public void stopTimer(String name) { SwingTimer.getInstance().stopTimer(name); }
+
+    /**
+     * Redémarrer un timer
+     * @param name nom
+     */
+    public void restartTimer(String name) { SwingTimer.getInstance().restartTimer(name); }
 
     /**
      * Mettre à jour les entités sur lesquelles on a le focus
