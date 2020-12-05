@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Fantome
@@ -22,12 +23,16 @@ public class Ghost extends Player {
     /**
      * Mangé
      */
-    private boolean eaten;
+    private final AtomicBoolean eaten;
 
     /**
      * Est retourné à la base
      */
-    private boolean returnBase;
+    private final AtomicBoolean returnBase;
+
+    /**
+     * Est bloqué dans l'espace ouvert
+     */
     private boolean hasbeenStuckInOpenSpace;
 
     /**
@@ -65,8 +70,8 @@ public class Ghost extends Player {
         super(gameplay.kernelEngine());
         this.gameplay = gameplay;
         this.forbiddenDirection = new HashSet<>();
-        this.eaten = false;
-        this.returnBase = false;
+        this.eaten = new AtomicBoolean(false);
+        this.returnBase = new AtomicBoolean(false);
         this.color = color;
         gameplay.physicsEngine().resize(this, 30, 30);
         gameplay.physicsEngine().setSpeed(this, 2);
@@ -157,43 +162,23 @@ public class Ghost extends Player {
 
     public HashMap<Gameplay.TARGETS, Boolean> getScatterPatrolZones() { return scatterPatrolZones; }
 
-    public boolean getEaten() { return this.eaten; }
+    public AtomicBoolean getEaten() { return eaten; }
 
-    public void setEaten(boolean eaten) { this.eaten = eaten; }
-
-    public boolean getReturnBase() { return this.returnBase; }
-
-    public void setReturnBase(boolean base) { this.returnBase = base; }
+    public AtomicBoolean getReturnBase() { return returnBase; }
 
     public Gameplay.GHOSTS getColor() { return color; }
 
-    public boolean isPatroleZoneReached() {
-        return patroleZoneReached;
-    }
+    public boolean isPatroleZoneReached() { return patroleZoneReached; }
 
-    public void setPatroleZoneReached(boolean patroleZoneReached) {
-        this.patroleZoneReached = patroleZoneReached;
-    }
+    public void setPatroleZoneReached(boolean patroleZoneReached) { this.patroleZoneReached = patroleZoneReached; }
 
-    public Gameplay.MoveDirection getPreviousDirection() {
-        return previousDirection;
-    }
+    public Gameplay.MoveDirection getPreviousDirection() { return previousDirection; }
 
     public void setPreviousDirection(Gameplay.MoveDirection previousDirection) { this.previousDirection = previousDirection; }
 
-    public HashMap<String, Boolean> getKeepDirection() {
-        return keepDirection;
-    }
+    public HashMap<String, Boolean> getKeepDirection() { return keepDirection; }
 
-    public void setKeepDirection(HashMap<String, Boolean> keepDirection) {
-        this.keepDirection = keepDirection;
-    }
+    public boolean isHasbeenStuckInOpenSpace() { return hasbeenStuckInOpenSpace; }
 
-    public boolean isHasbeenStuckInOpenSpace() {
-        return hasbeenStuckInOpenSpace;
-    }
-
-    public void setHasbeenStuckInOpenSpace(boolean hasbeenStuckInOpenSpace) {
-        this.hasbeenStuckInOpenSpace = hasbeenStuckInOpenSpace;
-    }
+    public void setHasbeenStuckInOpenSpace(boolean hasbeenStuckInOpenSpace) { this.hasbeenStuckInOpenSpace = hasbeenStuckInOpenSpace; }
 }
