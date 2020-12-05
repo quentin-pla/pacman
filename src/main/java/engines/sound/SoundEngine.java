@@ -81,7 +81,7 @@ public class SoundEngine {
     /**
      * Arrêter tous les sons
      */
-    public void stopSounds() {
+    public void clearSounds() {
         for (Clip sound : sounds.values())
             sound.stop();
     }
