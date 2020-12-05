@@ -67,7 +67,7 @@ public class PhysicsEngine implements CollisionEvent {
      */
     public void updateEntites() {
         for (PhysicEntity entity : entities.values())
-            if (entity != null) updateEntity(entity);
+            updateEntity(entity);
     }
 
     /**
@@ -75,6 +75,7 @@ public class PhysicsEngine implements CollisionEvent {
      * @param entity entité
      */
     public void updateEntity(PhysicEntity entity) {
+        entity.setColliding(isInCollision(entity.getParent()) || !isInBounds(entity.getParent()));
         for (Map.Entry<PhysicEntity[], String> event : collisionsEvents.entrySet()) {
             PhysicEntity e1 = event.getKey()[0];
             PhysicEntity e2 = event.getKey()[1];
@@ -92,19 +93,8 @@ public class PhysicsEngine implements CollisionEvent {
                     notifyCollision(event.getValue());
             }
         }
-        checkEntityColliding(entity);
-    }
-
-    /**
-     * Vérifier les collisions d'une entité
-     * @param entity entité
-     */
-    public void checkEntityColliding(PhysicEntity entity) {
-        if (isInCollision(entity.getParent()) || !isInBounds(entity.getParent())) {
+        if (entity.isColliding())
             move(entity.getParent(), entity.getLastX(), entity.getLastY());
-            entity.setColliding(true);
-        }
-        else entity.setColliding(false);
     }
 
     /**
@@ -359,10 +349,10 @@ public class PhysicsEngine implements CollisionEvent {
      */
     public void goUp(Entity entity) {
         PhysicEntity physicEntity = entity.getPhysicEntity();
-        if (physicEntity.getSpeed() > 1)
-            for (int i = 1; i < physicEntity.getSpeed() && !physicEntity.isColliding(); i++, checkEntityColliding(physicEntity))
-                translate(entity, 0, -1);
-        translate(entity, 0, -1);
+        for (int i = 0; i < physicEntity.getSpeed() && !physicEntity.isColliding(); i++) {
+            translate(entity, 0, -1);
+            updateEntity(physicEntity);
+        }
     }
 
     /**
@@ -371,10 +361,10 @@ public class PhysicsEngine implements CollisionEvent {
      */
     public void goRight(Entity entity) {
         PhysicEntity physicEntity = entity.getPhysicEntity();
-        if (physicEntity.getSpeed() > 1)
-            for (int i = 1; i < physicEntity.getSpeed() && !physicEntity.isColliding(); i++, checkEntityColliding(physicEntity))
-                translate(entity, 1, 0);
-        translate(entity, 1, 0);
+        for (int i = 0; i < physicEntity.getSpeed() && !physicEntity.isColliding(); i++) {
+            translate(entity, 1, 0);
+            updateEntity(physicEntity);
+        }
     }
 
     /**
@@ -383,10 +373,10 @@ public class PhysicsEngine implements CollisionEvent {
      */
     public void goLeft(Entity entity) {
         PhysicEntity physicEntity = entity.getPhysicEntity();
-        if (physicEntity.getSpeed() > 1)
-            for (int i = 1; i < physicEntity.getSpeed() && !physicEntity.isColliding(); i++, checkEntityColliding(physicEntity))
-                translate(entity, -1, 0);
-        translate(entity, -1, 0);
+        for (int i = 0; i < physicEntity.getSpeed() && !physicEntity.isColliding(); i++) {
+            translate(entity, -1, 0);
+            updateEntity(physicEntity);
+        }
     }
 
     /**
@@ -395,10 +385,10 @@ public class PhysicsEngine implements CollisionEvent {
      */
     public void goDown(Entity entity) {
         PhysicEntity physicEntity = entity.getPhysicEntity();
-        if (physicEntity.getSpeed() > 1)
-            for (int i = 1; i < physicEntity.getSpeed() && !physicEntity.isColliding(); i++, checkEntityColliding(physicEntity))
-                translate(entity, 0, 1);
-        translate(entity, 0, 1);
+        for (int i = 0; i < physicEntity.getSpeed() && !physicEntity.isColliding(); i++) {
+            translate(entity, 0, 1);
+            updateEntity(physicEntity);
+        }
     }
 
     /**
@@ -424,13 +414,11 @@ public class PhysicsEngine implements CollisionEvent {
      */
     public void translate(Entity entity, int x, int y) {
         PhysicEntity physicEntity = entity.getPhysicEntity();
-        if (!physicEntity.isColliding()) {
-            physicEntity.setLastX(physicEntity.getX());
-            physicEntity.setLastY(physicEntity.getY());
-            physicEntity.setX(physicEntity.getX() + x);
-            physicEntity.setY(physicEntity.getY() + y);
-            notifyEntityUpdate(physicEntity);
-        }
+        physicEntity.setLastX(physicEntity.getX());
+        physicEntity.setLastY(physicEntity.getY());
+        physicEntity.setX(physicEntity.getX() + x);
+        physicEntity.setY(physicEntity.getY() + y);
+        notifyEntityUpdate(physicEntity);
     }
 
     /**
