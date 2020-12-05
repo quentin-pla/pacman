@@ -102,6 +102,9 @@ public class KernelEngine implements EventListener {
         notifyEntityUpdate(entity);
     }
 
+    /**
+     * S'abonner aux évènements des moteurs
+     */
     private void initListeners() {
         graphicsEngine.subscribeEvents(this);
         ioEngine.subscribeEvents(this);
