@@ -39,7 +39,7 @@ public class Gameplay {
     /**
      * Service d'exécution
      */
-    private final ExecutorService executorService;
+    private ExecutorService executorService;
 
     /**
      * Identifiant du fichier contenant les textures du jeu
@@ -117,6 +117,11 @@ public class Gameplay {
     private final AtomicInteger breakPowerUpTimeout;
 
     /**
+     * Chronomètre
+     */
+    private final AtomicInteger timer;
+
+    /**
      * Fantomes disponibles
      */
     public enum GHOSTS {RED, BLUE, ORANGE, PINK}
@@ -130,14 +135,14 @@ public class Gameplay {
      * Constructeur
      */
     public Gameplay() {
-        this.kernelEngine = new KernelEngine();
-        this.executorService = Executors.newFixedThreadPool(8);
-        this.textures = kernelEngine.getGraphicsEngine().loadSpriteSheet("assets/sprite_sheet.png", 12, 11);
-        this.levels = new ArrayList<>();
-        this.isEatPowerUpEnabled = new AtomicBoolean(false);
-        this.eatPowerUpTimeout = new AtomicInteger(eatPowerUpInitialTime);
-        this.isBreakPowerUpEnabled = new AtomicBoolean(false);
-        this.breakPowerUpTimeout = new AtomicInteger(breakPowerUpInitialTime);
+        kernelEngine = new KernelEngine();
+        textures = kernelEngine.getGraphicsEngine().loadSpriteSheet("assets/sprite_sheet.png", 12, 11);
+        levels = new ArrayList<>();
+        isEatPowerUpEnabled = new AtomicBoolean(false);
+        eatPowerUpTimeout = new AtomicInteger(eatPowerUpInitialTime);
+        isBreakPowerUpEnabled = new AtomicBoolean(false);
+        breakPowerUpTimeout = new AtomicInteger(breakPowerUpInitialTime);
+        timer = new AtomicInteger(0);
         initGameplay();
     }
 
@@ -275,7 +280,8 @@ public class Gameplay {
         physicsEngine().resize(currentVolume,200,50);
         physicsEngine().move(currentVolume, 100,337);
         graphicsEngine().bindColor(currentVolume,50,50,50);
-        graphicsEngine().bindText(currentVolume, "Volume is : " + (int) soundEngine().getGlobalVolume()*100, new Color(255,255,255), 20, true);
+        graphicsEngine().bindText(currentVolume, "Volume is : " + soundEngine().getGlobalVolume(),
+                new Color(255,255,255), 20, true);
         graphicsEngine().addToScene(menuView, currentVolume);
 
         physicsEngine().resize(button,100,50);
@@ -544,9 +550,9 @@ public class Gameplay {
     private void updateGhostAnimation(Ghost ghost) {
         if (ghost.getCurrentDirection() != null) {
             String animationName = ghost.getCurrentDirection().name();
-            if (ghost.getEaten())
+            if (ghost.getEaten().get())
                 animationName = "eaten" + animationName;
-            else if (isEatPowerUpEnabled.get() && !ghost.getEaten() && !ghost.getReturnBase())
+            else if (isEatPowerUpEnabled.get() && !ghost.getEaten().get() && !ghost.getReturnBase().get())
                 animationName = eatPowerUpTimeout.get() > 2 ? "fear" : "fearEnd";
             graphicsEngine().bindAnimation(ghost, ghost.getAnimations().get(animationName));
         }
@@ -902,8 +908,10 @@ public class Gameplay {
      * @param wall mur
      */
     public void pacmanWallCollision(Entity wall) {
-        if (isBreakPowerUpEnabled.get())
+        if (isBreakPowerUpEnabled.get()) {
+            System.out.println("BREAK");
             breakWall(wall);
+        }
     }
 
     /**
@@ -922,7 +930,11 @@ public class Gameplay {
             soundEngine().playSound("death2");
             try { sleep(2000); } catch (InterruptedException e) { e.printStackTrace(); }
             if (currentLevel.getLivesCount().get() > 0) playLevel(currentLevel);
-            else showEndGameView("YOU LOST !", new Color(255,0,0));
+            else {
+                kernelEngine.stopTimer("chrono");
+                executorService.shutdown();
+                showEndGameView("YOU LOST !", new Color(255,0,0));
+            }
         });
     }
 
@@ -939,20 +951,18 @@ public class Gameplay {
      * @param ghost fantome
      */
     private void eatGhost(Ghost ghost) {
-        if (!ghost.getEaten()) {
+        if (!ghost.getEaten().get()) {
             soundEngine().playSound("eatGhost");
-            physicsEngine().removeCollisions(pacman, ghost);
             currentLevel.updateActualScore(currentLevel.getActualScore() + 250);
-            ghost.setEaten(true);
-            ghost.setReturnBase(false);
+            ghost.getEaten().getAndSet(true);
+            ghost.getReturnBase().getAndSet(false);
             bindGhostBaseAI(ghost);
             executorService.execute(() -> {
                 while(true)
                     if (physicsEngine().getDistance(ghost, targets.get(TARGETS.BASE)) <= 1)
                         break;
-                ghost.setEaten(false);
-                ghost.setReturnBase(isEatPowerUpEnabled.get());
-                physicsEngine().addCollisions(pacman, ghost);
+                ghost.getEaten().getAndSet(false);
+                ghost.getReturnBase().getAndSet(isEatPowerUpEnabled.get());
                 updateGhostAnimation(ghost);
                 bindGhostInitialAI(ghost);
             });
@@ -1068,9 +1078,27 @@ public class Gameplay {
     protected void spawnPlayersOnLevel() {
         currentLevel.spawnPlayer(15,10);
         currentLevel.spawnGhost(ghosts.get(GHOSTS.RED),7,10);
-        currentLevel.spawnGhost(ghosts.get(GHOSTS.BLUE),11,9);
-        currentLevel.spawnGhost(ghosts.get(GHOSTS.PINK),9,10);
-        currentLevel.spawnGhost(ghosts.get(GHOSTS.ORANGE),9,11);
+//        currentLevel.spawnGhost(ghosts.get(GHOSTS.BLUE),9,9);
+//        currentLevel.spawnGhost(ghosts.get(GHOSTS.PINK),9,10);
+//        currentLevel.spawnGhost(ghosts.get(GHOSTS.ORANGE),9,11);
+    }
+
+    /**
+     * Libérer les fantomes de l'enclos 1 à 1
+     */
+    public void freeGhosts() {
+        PhysicEntity base = targets.get(TARGETS.BASE).getPhysicEntity();
+        GHOSTS[] order = new GHOSTS[]{GHOSTS.BLUE,GHOSTS.ORANGE,GHOSTS.PINK};
+        executorService.execute(() -> {
+            int count = 0;
+            while (count < 3) {
+                if (timer.get() == 5 * (count + 1)) {
+                    physicsEngine().move(ghosts.get(order[count]), base.getX(), base.getY());
+                    ++count;
+                }
+                try { sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
+            }
+        });
     }
 
     /**
@@ -1088,13 +1116,15 @@ public class Gameplay {
      */
     protected void playLevel(Level level) {
         currentLevel = level;
+        executorService = Executors.newFixedThreadPool(8);
+
         isEatPowerUpEnabled.getAndSet(false);
         eatPowerUpTimeout.getAndSet(eatPowerUpInitialTime);
         isBreakPowerUpEnabled.getAndSet(false);
         breakPowerUpTimeout.getAndSet(breakPowerUpInitialTime);
 
         for (Ghost ghost : ghosts.values())
-            if (ghost.getEaten()) ghost.setEaten(false);
+            if (ghost.getEaten().get()) ghost.getEaten().getAndSet(false);
 
         soundEngine().stopSounds();
         ioEngine().resetLastPressedKey();
@@ -1106,10 +1136,13 @@ public class Gameplay {
 
         executorService.execute(() -> {
             kernelEngine.pauseEvents();
+            timer.getAndSet(0);
             try { sleep(currentLevel.getLivesCount().get() == 3 ? 4000 : 1000); }
             catch (InterruptedException e) { e.printStackTrace(); }
             kernelEngine.resumeEvents();
+            kernelEngine.startTimer("chrono", 1000, timer::getAndIncrement);
             soundEngine().loopSound("siren1");
+            freeGhosts();
         });
     }
 
@@ -1149,16 +1182,14 @@ public class Gameplay {
         soundEngine().loopSound("powerup");
         soundEngine().playSound("eatGomme");
         executorService.execute(() -> {
-            for (int i = 0; i < eatPowerUpInitialTime; i++) {
+            for (int i = 0; i < eatPowerUpInitialTime; i++, eatPowerUpTimeout.getAndDecrement())
                 try { sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
-                eatPowerUpTimeout.getAndDecrement();
-            }
             isEatPowerUpEnabled.getAndSet(false);
             soundEngine().pauseSound("powerup");
             soundEngine().loopSound("siren1");
             for (Ghost ghost : ghosts.values()) {
-                ghost.setReturnBase(false);
-                if (!ghost.getEaten()) bindGhostInitialAI(ghost);
+                ghost.getReturnBase().getAndSet(false);
+                if (!ghost.getEaten().get()) bindGhostInitialAI(ghost);
             }
         });
     }
@@ -1204,6 +1235,7 @@ public class Gameplay {
      * Lancer le jeu
      */
     public void start() {
+        playLevel(levels.get(0));
         kernelEngine().switchScene(menuView);
         kernelEngine.start();
         setGlobalVolume(50);
@@ -1228,6 +1260,4 @@ public class Gameplay {
     public Pacman getPlayer() { return pacman; }
 
     public Map<GHOSTS,Ghost> getGhosts() { return ghosts; }
-
-    public ArrayList<Level> getLevels() { return levels; }
 }
