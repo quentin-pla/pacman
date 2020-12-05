@@ -66,26 +66,40 @@ public class PhysicsEngine implements CollisionEvent {
      * Mettre à jour les entités physiques
      */
     public void updateEntites() {
-        for (Map.Entry<PhysicEntity[],String> event : collisionsEvents.entrySet()) {
-            PhysicEntity e1 = event.getKey()[0];
-            PhysicEntity e2 = event.getKey()[1];
-            if ((e2 == null && e1.isColliding())
-                    || (e2 != null && isInCollision(e1.getParent(), e2.getParent())))
-                notifyCollision(event.getValue());
-        }
-
-        for (Map.Entry<PhysicEntity[],String> event : centeredEvents.entrySet()) {
-            if (isCentered(event.getKey()[0].getParent(),event.getKey()[1].getParent()))
-                notifyCollision(event.getValue());
-        }
-
         for (PhysicEntity entity : entities.values()) {
-            if (isInCollision(entity.getParent()) || !isInBounds(entity.getParent())) {
-                move(entity.getParent(), entity.getLastX(), entity.getLastY());
-                entity.setColliding(true);
+            if (entity != null) {
+                for (Map.Entry<PhysicEntity[], String> event : collisionsEvents.entrySet()) {
+                    PhysicEntity e1 = event.getKey()[0];
+                    PhysicEntity e2 = event.getKey()[1];
+                    if (e1 == entity || e2 == entity) {
+                        if ((e2 == null && e1.isColliding())
+                                || (e2 != null && isInCollision(e1.getParent(), e2.getParent())))
+                            notifyCollision(event.getValue());
+                    }
+                }
+                for (Map.Entry<PhysicEntity[], String> event : centeredEvents.entrySet()) {
+                    PhysicEntity e1 = event.getKey()[0];
+                    PhysicEntity e2 = event.getKey()[1];
+                    if (e1 == entity || e2 == entity) {
+                        if (isCentered(e1.getParent(), e2.getParent()))
+                            notifyCollision(event.getValue());
+                    }
+                }
+                checkEntityColliding(entity);
             }
-            else entity.setColliding(false);
         }
+    }
+
+    /**
+     * Vérifier les collisions d'une entité
+     * @param entity entité
+     */
+    public void checkEntityColliding(PhysicEntity entity) {
+        if (isInCollision(entity.getParent()) || !isInBounds(entity.getParent())) {
+            move(entity.getParent(), entity.getLastX(), entity.getLastY());
+            entity.setColliding(true);
+        }
+        else entity.setColliding(false);
     }
 
     /**
@@ -187,8 +201,8 @@ public class PhysicsEngine implements CollisionEvent {
     public int getHorizontalDistance(Entity entity1, Entity entity2) {
         PhysicEntity entity1Physic = entity1.getPhysicEntity();
         PhysicEntity entity2Physic = entity2.getPhysicEntity();
-        int e1XMid = (entity1Physic.getX() + entity1Physic.getWidth()) / 2;
-        int e2XMid = (entity2Physic.getX() + entity2Physic.getWidth()) / 2;
+        int e1XMid = (entity1Physic.getX() + entity1Physic.getWidth());
+        int e2XMid = (entity2Physic.getX() + entity2Physic.getWidth());
         return e1XMid - e2XMid;
     }
 
@@ -201,8 +215,8 @@ public class PhysicsEngine implements CollisionEvent {
     public int getVerticalDistance(Entity entity1, Entity entity2) {
         PhysicEntity entity1Physic = entity1.getPhysicEntity();
         PhysicEntity entity2Physic = entity2.getPhysicEntity();
-        int e1YMid = (entity1Physic.getY() + entity1Physic.getHeight()) / 2;
-        int e2YMid = (entity2Physic.getY() + entity2Physic.getHeight()) / 2;
+        int e1YMid = (entity1Physic.getY() + entity1Physic.getHeight());
+        int e2YMid = (entity2Physic.getY() + entity2Physic.getHeight());
         return e1YMid - e2YMid;
     }
 
@@ -210,7 +224,7 @@ public class PhysicsEngine implements CollisionEvent {
      * Obtenir la distance entre deux entités
      * @param entity1 entité 1
      * @param entity2 entité 2
-     * @return
+     * @return distance
      */
     public int getDistance(Entity entity1, Entity entity2) {
         return Math.max(Math.abs(getHorizontalDistance(entity1, entity2)),
@@ -339,7 +353,14 @@ public class PhysicsEngine implements CollisionEvent {
      * @param entity entité physique
      */
     public void goUp(Entity entity) {
-        translate(entity, 0, -entity.getPhysicEntity().getSpeed());
+        if (entity.getPhysicEntity().getSpeed() > 1) {
+            for (int i = 1; i < entity.getPhysicEntity().getSpeed(); i++) {
+                translate(entity, 0, -1);
+                checkEntityColliding(entity.getPhysicEntity());
+                if (entity.getPhysicEntity().isColliding()) break;
+            }
+        }
+        translate(entity, 0, -1);
     }
 
     /**
@@ -347,7 +368,14 @@ public class PhysicsEngine implements CollisionEvent {
      * @param entity entité physique
      */
     public void goRight(Entity entity) {
-        translate(entity, entity.getPhysicEntity().getSpeed(), 0);
+        if (entity.getPhysicEntity().getSpeed() > 1) {
+            for (int i = 1; i < entity.getPhysicEntity().getSpeed(); i++) {
+                translate(entity, 1, 0);
+                checkEntityColliding(entity.getPhysicEntity());
+                if (entity.getPhysicEntity().isColliding()) break;
+            }
+        }
+        translate(entity, 1, 0);
     }
 
     /**
@@ -355,7 +383,14 @@ public class PhysicsEngine implements CollisionEvent {
      * @param entity entité physique
      */
     public void goLeft(Entity entity) {
-        translate(entity, -entity.getPhysicEntity().getSpeed(), 0);
+        if (entity.getPhysicEntity().getSpeed() > 1) {
+            for (int i = 1; i < entity.getPhysicEntity().getSpeed(); i++) {
+                translate(entity, -1, 0);
+                checkEntityColliding(entity.getPhysicEntity());
+                if (entity.getPhysicEntity().isColliding()) break;
+            }
+        }
+        translate(entity, -1, 0);
     }
 
     /**
@@ -363,7 +398,14 @@ public class PhysicsEngine implements CollisionEvent {
      * @param entity entité physique
      */
     public void goDown(Entity entity) {
-        translate(entity, 0, entity.getPhysicEntity().getSpeed());
+        if (entity.getPhysicEntity().getSpeed() > 1) {
+            for (int i = 1; i < entity.getPhysicEntity().getSpeed(); i++) {
+                translate(entity, 0, 1);
+                checkEntityColliding(entity.getPhysicEntity());
+                if (entity.getPhysicEntity().isColliding()) break;
+            }
+        }
+        translate(entity, 0, 1);
     }
 
     /**
