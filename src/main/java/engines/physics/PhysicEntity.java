@@ -78,15 +78,15 @@ public class PhysicEntity extends EngineEntity {
      * Cloner l'entité
      */
     public void clone(PhysicEntity entity) {
-        this.collisions = new ArrayList<>(entity.collisions);
-        this.boundLimits = entity.boundLimits;
-        this.speed = entity.speed;
-        this.lastX = entity.x;
-        this.lastY = entity.y;
-        this.x = entity.x;
-        this.y = entity.y;
-        this.height = entity.height;
-        this.width = entity.width;
+        collisions = new ArrayList<>(entity.collisions);
+        boundLimits = entity.boundLimits;
+        speed = entity.speed;
+        lastX = entity.x;
+        lastY = entity.y;
+        x = entity.x;
+        y = entity.y;
+        height = entity.height;
+        width = entity.width;
     }
 
     // GETTERS & SETTERS //
