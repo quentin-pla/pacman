@@ -441,27 +441,21 @@ public class Gameplay {
         int yDistance = physicsEngine().getVerticalDistance(ghost,target);
 
         //Définition des directions horizontales et verticales
-        MoveDirection xDirection = xDistance == 0 ? null
+        MoveDirection xDirection = Math.abs(xDistance) <= 1 ? null
                 : xDistance > 0 ? MoveDirection.LEFT : MoveDirection.RIGHT;
-        MoveDirection yDirection = yDistance == 0 ? null
+        MoveDirection yDirection = Math.abs(yDistance) <= 1 ? null
                 : yDistance > 0 ? MoveDirection.UP : MoveDirection.DOWN;
-
-        xDistance = Math.abs(xDistance);
-        yDistance = Math.abs(yDistance);
 
         Set<MoveDirection> forbiddenDirections = ghost.getForbiddenDirection();
 
-        if (yDirection == null)
-            forbiddenDirections.clear();
-
         //Vérification des collisions
-        boolean somethingUP     = physicsEngine().isSomethingUp(ghost)    != null;
-        boolean somethingRIGHT  = physicsEngine().isSomethingRight(ghost) != null;
-        boolean somethingDOWN   = physicsEngine().isSomethingDown(ghost)  != null;
-        boolean somethingLEFT   = physicsEngine().isSomethingLeft(ghost)  != null;
+        boolean somethingUP    = physicsEngine().isSomethingUp(ghost)    != null;
+        boolean somethingRIGHT = physicsEngine().isSomethingRight(ghost) != null;
+        boolean somethingDOWN  = physicsEngine().isSomethingDown(ghost)  != null;
+        boolean somethingLEFT  = physicsEngine().isSomethingLeft(ghost)  != null;
 
         //Détermination de la prochaine direction
-        if (xDistance <= 1 && yDistance <= 1) {
+        if (physicsEngine().getDistance(ghost, target) <= 1) {
             ghost.setCurrentDirection(null);
         } else if (yDirection == MoveDirection.UP && !forbiddenDirections.contains(MoveDirection.UP) && !somethingUP) {
             ghost.setCurrentDirection(MoveDirection.UP);
