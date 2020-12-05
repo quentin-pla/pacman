@@ -47,8 +47,16 @@ public class AIEngine implements AIEvent {
      */
     public void updateEntities() {
         for (AIEntity entity : entities.values())
-            if (entity.getEvent() != null)
-                notifyEvent(entity.getEvent());
+            updateEntity(entity);
+    }
+
+    /**
+     * Rafraichir une entité
+     * @param entity entité
+     */
+    public void updateEntity(AIEntity entity) {
+        if (entity.getEvent() != null)
+            notifyEvent(entity.getEvent());
     }
 
     /**
