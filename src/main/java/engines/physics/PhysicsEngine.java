@@ -359,12 +359,9 @@ public class PhysicsEngine implements CollisionEvent {
      */
     public void goUp(Entity entity) {
         PhysicEntity physicEntity = entity.getPhysicEntity();
-        if (physicEntity.getSpeed() > 1) {
-            for (int i = 1; i < physicEntity.getSpeed() && !physicEntity.isColliding(); i++) {
+        if (physicEntity.getSpeed() > 1)
+            for (int i = 1; i < physicEntity.getSpeed() && !physicEntity.isColliding(); i++, checkEntityColliding(physicEntity))
                 translate(entity, 0, -1);
-                checkEntityColliding(physicEntity);
-            }
-        }
         translate(entity, 0, -1);
     }
 
@@ -374,12 +371,9 @@ public class PhysicsEngine implements CollisionEvent {
      */
     public void goRight(Entity entity) {
         PhysicEntity physicEntity = entity.getPhysicEntity();
-        if (physicEntity.getSpeed() > 1) {
-            for (int i = 1; i < physicEntity.getSpeed() && !physicEntity.isColliding(); i++) {
+        if (physicEntity.getSpeed() > 1)
+            for (int i = 1; i < physicEntity.getSpeed() && !physicEntity.isColliding(); i++, checkEntityColliding(physicEntity))
                 translate(entity, 1, 0);
-                checkEntityColliding(physicEntity);
-            }
-        }
         translate(entity, 1, 0);
     }
 
@@ -389,12 +383,9 @@ public class PhysicsEngine implements CollisionEvent {
      */
     public void goLeft(Entity entity) {
         PhysicEntity physicEntity = entity.getPhysicEntity();
-        if (physicEntity.getSpeed() > 1) {
-            for (int i = 1; i < physicEntity.getSpeed() && !physicEntity.isColliding(); i++) {
+        if (physicEntity.getSpeed() > 1)
+            for (int i = 1; i < physicEntity.getSpeed() && !physicEntity.isColliding(); i++, checkEntityColliding(physicEntity))
                 translate(entity, -1, 0);
-                checkEntityColliding(physicEntity);
-            }
-        }
         translate(entity, -1, 0);
     }
 
@@ -404,12 +395,9 @@ public class PhysicsEngine implements CollisionEvent {
      */
     public void goDown(Entity entity) {
         PhysicEntity physicEntity = entity.getPhysicEntity();
-        if (physicEntity.getSpeed() > 1) {
-            for (int i = 1; i < physicEntity.getSpeed() && !physicEntity.isColliding(); i++) {
+        if (physicEntity.getSpeed() > 1)
+            for (int i = 1; i < physicEntity.getSpeed() && !physicEntity.isColliding(); i++, checkEntityColliding(physicEntity))
                 translate(entity, 0, 1);
-                checkEntityColliding(physicEntity);
-            }
-        }
         translate(entity, 0, 1);
     }
 
