@@ -11,9 +11,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Niveau de jeu
  */
 public class Level {
-
-    private boolean wallsAlreadyBroken = false;
-
     /**
      * Gameplay
      */
@@ -33,6 +30,11 @@ public class Level {
      * Liste des murs du niveau
      */
     private boolean[][] walls;
+
+    /**
+     * Murs déjà cassés
+     */
+    private boolean wallsAlreadyBroken;
 
     /**
      * Nombre de boules
@@ -88,6 +90,7 @@ public class Level {
         this.gameplay = gameplay;
         this.matrix = new Entity[rows][cols];
         this.walls = new boolean[rows][cols];
+        this.wallsAlreadyBroken = false;
         this.actualScore = 0;
         this.livesCount = new AtomicInteger(3);
         this.scene = gameplay.graphicsEngine().generateScene(rows * defaultEntitySize
@@ -181,10 +184,12 @@ public class Level {
         int teleportX = teleportLocation.getPhysicEntity().getX();
         int teleportY = teleportLocation.getPhysicEntity().getY();
 
-        gameplay.kernelEngine().addEvent("teleport" + portal + gameplay.getPlayer(),
-                () -> gameplay.teleportPlayer(gameplay.getPlayer(), teleportX, teleportY, direction));
+        gameplay.kernelEngine().addEvent("teleport" + portal + gameplay.getPlayer(), () -> {
+            gameplay.teleportPlayer(gameplay.getPlayer(), teleportX, teleportY, direction);
+        });
         gameplay.physicsEngine().bindEventOnSameLocation(gameplay.getPlayer(), portal,
                 "teleport" + portal + gameplay.getPlayer());
+
         for (Ghost ghost : gameplay.getGhosts().values()) {
             gameplay.kernelEngine().addEvent("teleport" + portal + ghost,
                     () -> gameplay.teleportPlayer(ghost, teleportX, teleportY, direction));
