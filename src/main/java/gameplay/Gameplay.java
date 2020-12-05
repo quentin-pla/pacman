@@ -42,6 +42,11 @@ public class Gameplay {
     private ExecutorService executorService;
 
     /**
+     * Tâches actives
+     */
+    private final ArrayList<Future<Void>> tasks;
+
+    /**
      * Identifiant du fichier contenant les textures du jeu
      */
     private final int textures;
@@ -138,6 +143,7 @@ public class Gameplay {
         kernelEngine = new KernelEngine();
         textures = kernelEngine.getGraphicsEngine().loadSpriteSheet("assets/sprite_sheet.png", 12, 11);
         levels = new ArrayList<>();
+        tasks = new ArrayList<>();
         isEatPowerUpEnabled = new AtomicBoolean(false);
         eatPowerUpTimeout = new AtomicInteger(eatPowerUpInitialTime);
         isBreakPowerUpEnabled = new AtomicBoolean(false);
@@ -919,11 +925,12 @@ public class Gameplay {
      */
     private void decreasePacmanLife() {
         kernelEngine.pauseEvents();
+        clearActiveTasks();
         soundEngine().clearSounds();
         moveGhostsOut();
         currentLevel.updateLives();
-        graphicsEngine().bindAnimation(pacman, pacman.getAnimations().get("death"));
-        executorService.execute(() -> {
+        executeParallelTask(() -> {
+            graphicsEngine().bindAnimation(pacman, pacman.getAnimations().get("death"));
             soundEngine().playSound("death1");
             try { sleep(700); } catch (InterruptedException e) { e.printStackTrace(); }
             soundEngine().stopSound("death1");
@@ -932,7 +939,6 @@ public class Gameplay {
             if (currentLevel.getLivesCount().get() > 0) playLevel(currentLevel);
             else {
                 kernelEngine.stopTimer("chrono");
-                executorService.shutdown();
                 showEndGameView("YOU LOST !", new Color(255,0,0));
             }
         });
@@ -957,8 +963,9 @@ public class Gameplay {
             ghost.getEaten().getAndSet(true);
             ghost.getReturnBase().getAndSet(false);
             bindGhostBaseAI(ghost);
-            executorService.execute(() -> {
+            executeParallelTask(() -> {
                 while(true) {
+                    if (kernelEngine.isEventsPaused()) break;
                     if (physicsEngine().getDistance(ghost, targets.get(TARGETS.BASE)) <= 1)
                         break;
                 }
@@ -1090,11 +1097,13 @@ public class Gameplay {
     public void freeGhosts() {
         PhysicEntity base = targets.get(TARGETS.BASE).getPhysicEntity();
         GHOSTS[] order = new GHOSTS[]{GHOSTS.BLUE,GHOSTS.ORANGE,GHOSTS.PINK};
-        executorService.execute(() -> {
+        executeParallelTask(() -> {
             int count = 0;
             while (count < 3) {
+                if (kernelEngine.isEventsPaused()) break;
                 if (timer.get() == 5 * (count + 1)) {
-                    physicsEngine().move(ghosts.get(order[count]), base.getX(), base.getY());
+                    if (!kernelEngine.isEventsPaused())
+                        physicsEngine().move(ghosts.get(order[count]), base.getX(), base.getY());
                     ++count;
                 }
                 try { sleep(500); } catch (InterruptedException e) { e.printStackTrace(); }
@@ -1135,7 +1144,7 @@ public class Gameplay {
         if (currentLevel.getLivesCount().get() == 3)
             soundEngine().playSound("gameStart");
 
-        executorService.execute(() -> {
+        executeParallelTask(() -> {
             kernelEngine.pauseEvents();
             timer.getAndSet(0);
             try { sleep(currentLevel.getLivesCount().get() == 3 ? 4000 : 1000); }
@@ -1184,8 +1193,9 @@ public class Gameplay {
         soundEngine().clearSounds();
         soundEngine().loopSound("powerup");
         soundEngine().playSound("eatGomme");
-        executorService.execute(() -> {
+        executeParallelTask(() -> {
             while (eatPowerUpTimeout.get() > 0) {
+                if (kernelEngine.isEventsPaused()) break;
                 try { sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
                 eatPowerUpTimeout.decrementAndGet();
             }
@@ -1207,8 +1217,9 @@ public class Gameplay {
         soundEngine().clearSounds();
         soundEngine().loopSound("powerup");
         soundEngine().playSound("eatGomme");
-        executorService.execute(() -> {
+        executeParallelTask(() -> {
             while (breakPowerUpTimeout.get() > 0) {
+                if (kernelEngine.isEventsPaused()) break;
                 try { sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
                 breakPowerUpTimeout.decrementAndGet();
             }
@@ -1242,6 +1253,22 @@ public class Gameplay {
         kernelEngine().switchScene(menuView);
         kernelEngine.start();
         setGlobalVolume(50);
+    }
+
+    /**
+     * Exécuter une tâche en parallèle
+     * @param task tache
+     */
+    public void executeParallelTask(Runnable task) {
+        tasks.add(executorService.submit(task, null));
+    }
+
+    /**
+     * Supprimer toutes les taches en cours
+     */
+    public void clearActiveTasks() {
+        for (Future<Void> task : tasks)
+            task.cancel(false);
     }
 
     // GETTERS //

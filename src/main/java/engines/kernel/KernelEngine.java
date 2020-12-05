@@ -88,17 +88,17 @@ public class KernelEngine implements EventListener {
 
     @Override
     public void onEvent(String event) {
-        notifyEvent(event);
+        if (!pauseEvents) notifyEvent(event);
     }
 
     @Override
     public void onEntityEvent(Entity entity, String eventName) {
-        checkClickEvent(entity, eventName);
+        if (!pauseEvents) checkClickEvent(entity, eventName);
     }
 
     @Override
     public void onEntityUpdate(EngineEntity entity) {
-        notifyEntityUpdate(entity);
+        if (!pauseGraphics) notifyEntityUpdate(entity);
     }
 
     /**
