@@ -905,8 +905,10 @@ public class Gameplay {
      * @param ghost fantome
      */
     public void pacmanGhostCollision(Ghost ghost) {
-        if (isEatPowerUpEnabled.get()) eatGhost(ghost);
-        else decreasePacmanLife();
+        if (!ghost.getEaten().get()) {
+            if (isEatPowerUpEnabled.get()) eatGhost(ghost);
+            else decreasePacmanLife();
+        }
     }
 
     /**
@@ -914,10 +916,8 @@ public class Gameplay {
      * @param wall mur
      */
     public void pacmanWallCollision(Entity wall) {
-        if (isBreakPowerUpEnabled.get()) {
-            System.out.println("BREAK");
+        if (isBreakPowerUpEnabled.get())
             breakWall(wall);
-        }
     }
 
     /**
@@ -957,24 +957,22 @@ public class Gameplay {
      * @param ghost fantome
      */
     private void eatGhost(Ghost ghost) {
-        if (!ghost.getEaten().get()) {
-            soundEngine().playSound("eatGhost");
-            currentLevel.updateActualScore(currentLevel.getActualScore() + 250);
-            ghost.getEaten().getAndSet(true);
-            ghost.getReturnBase().getAndSet(false);
-            bindGhostBaseAI(ghost);
-            executeParallelTask(() -> {
-                while(true) {
-                    if (kernelEngine.isEventsPaused()) break;
-                    if (physicsEngine().getDistance(ghost, targets.get(TARGETS.BASE)) <= 1)
-                        break;
-                }
-                ghost.getEaten().getAndSet(false);
-                ghost.getReturnBase().getAndSet(isEatPowerUpEnabled.get());
-                updateGhostAnimation(ghost);
-                bindGhostInitialAI(ghost);
-            });
-        }
+        soundEngine().playSound("eatGhost");
+        currentLevel.updateActualScore(currentLevel.getActualScore() + 250);
+        ghost.getEaten().getAndSet(true);
+        ghost.getReturnBase().getAndSet(false);
+        bindGhostBaseAI(ghost);
+        executeParallelTask(() -> {
+            while(true) {
+                if (kernelEngine.isEventsPaused()) break;
+                if (physicsEngine().getDistance(ghost, targets.get(TARGETS.BASE)) <= 1)
+                    break;
+            }
+            ghost.getEaten().getAndSet(false);
+            ghost.getReturnBase().getAndSet(isEatPowerUpEnabled.get());
+            updateGhostAnimation(ghost);
+            bindGhostInitialAI(ghost);
+        });
     }
 
     /**
