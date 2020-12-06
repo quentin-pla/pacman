@@ -39,11 +39,6 @@ public class MouseIO implements MouseListener {
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {
-        updateAttributes(e);
-    }
-
-    @Override
     public void mousePressed(MouseEvent e) {
         int key = e.getButton();
         if (!pressedButtons.contains(key))
@@ -56,8 +51,10 @@ public class MouseIO implements MouseListener {
         int key = e.getButton();
         if (pressedButtons.contains(key))
             pressedButtons.remove((Integer) key);
-        updateAttributes(e);
     }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {}
 
     @Override
     public void mouseEntered(MouseEvent e) {}
