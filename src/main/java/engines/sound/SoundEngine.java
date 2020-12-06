@@ -5,18 +5,11 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Moteur audio
  */
 public class SoundEngine {
-    /**
-     * Réservoir de threads
-     */
-    private static ExecutorService executor = Executors.newFixedThreadPool(4);
-
     /**
      * Liste des entités son référencées par leur nom
      */
@@ -56,11 +49,9 @@ public class SoundEngine {
      * @param name entité
      */
     public void playSound(String name) {
-        executor.execute(() -> {
-            Clip sound = sounds.get(name);
-            sound.setFramePosition(0);
-            sound.start();
-        });
+        Clip sound = sounds.get(name);
+        sound.setFramePosition(0);
+        sound.start();
     }
 
     /**

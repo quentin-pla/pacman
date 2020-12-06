@@ -1254,7 +1254,6 @@ public class Gameplay {
     public void start() {
         kernelEngine().switchScene(menuView);
         kernelEngine.start();
-        setGlobalVolume(50);
     }
 
     /**
