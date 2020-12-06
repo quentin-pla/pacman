@@ -129,6 +129,7 @@ public class KernelEngine implements EventListener {
         graphicsEngine.removeEntity(entity);
         physicsEngine.removeEntity(entity);
         aiEngine.removeEntity(entity);
+        entities.remove(entity);
     }
 
     /**
