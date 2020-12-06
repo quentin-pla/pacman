@@ -425,6 +425,10 @@ public class Gameplay {
 
     /**
      * Téléporter une entité
+     * @param player joueur
+     * @param direction direction
+     * @param x position horizontale
+     * @param y position verticale
      */
     public void teleportPlayer(Player player, int x, int y, MoveDirection direction) {
         if (player.getCurrentDirection() == direction) {

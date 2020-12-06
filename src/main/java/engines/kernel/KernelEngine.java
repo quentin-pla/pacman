@@ -246,6 +246,7 @@ public class KernelEngine implements EventListener {
 
     /**
      * Mettre à jour les entités sur lesquelles on a le focus
+     * @param scene scène
      */
     public void updateFocusedEntities(Scene scene) {
         graphicsEngine.getEntities().clear();

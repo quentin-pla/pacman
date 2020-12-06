@@ -162,6 +162,8 @@ public class PhysicsEngine implements CollisionEvent {
      * Obtenir une entité à position spécifique
      * @param x position horizontale
      * @param y position verticale
+     * @param height hauteur
+     * @param width largeur
      * @return id de l'entité sinon null
      */
     public ArrayList<PhysicEntity> getEntityAtPosition(int x, int y, int height, int width) {

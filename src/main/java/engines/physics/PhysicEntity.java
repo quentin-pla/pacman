@@ -77,6 +77,7 @@ public class PhysicEntity extends EngineEntity {
 
     /**
      * Cloner l'entité
+     * @param entity entité
      */
     public void clone(PhysicEntity entity) {
         collisions = new HashSet<>(entity.collisions);

@@ -143,6 +143,7 @@ public class SoundEngine {
     /**
      * Obtenir le volume en float
      * @param volume volume
+     * @return volume au format float
      */
     public float getVolumeAsFloat(int volume) {
         if (volume >= 0 && volume <= 100)

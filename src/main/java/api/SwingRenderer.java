@@ -79,6 +79,7 @@ public class SwingRenderer {
      * @param y position verticale
      * @param height hauteur
      * @param width largeur
+     * @param center centrer le texte
      */
     public void renderText(String text, Color color, int fontSize, boolean center, int x, int y, int height, int width) {
         Graphics2D graphics2D = getCurrentGraphics();

@@ -126,6 +126,7 @@ public class GraphicsEngine implements GraphicEvent {
      * @param text contenu
      * @param color couleur
      * @param fontSize taille police
+     * @param center centrer le texte
      */
     public void bindText(Entity entity, String text, Color color, int fontSize, boolean center) {
         entity.getGraphicEntity().setText(new Text(text,color.getSwingColor(),fontSize,center));
@@ -376,6 +377,7 @@ public class GraphicsEngine implements GraphicEvent {
 
     /**
      * Définir la taille d'une scène
+     * @param scene scène
      * @param height hauteur
      * @param width largeur
      */

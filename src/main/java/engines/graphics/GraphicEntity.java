@@ -57,6 +57,7 @@ public class GraphicEntity extends EngineEntity {
 
     /**
      * Cloner une entité
+     * @param entity entité
      */
     public void clone(GraphicEntity entity) {
         this.x = entity.x;

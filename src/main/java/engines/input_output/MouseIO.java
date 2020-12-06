@@ -67,6 +67,7 @@ public class MouseIO implements MouseListener {
 
     /**
      * Mettre à jour les attributs
+     * @param e évènement
      */
     public void updateAttributes(MouseEvent e) {
         Point point = e.getPoint();

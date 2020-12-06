@@ -176,6 +176,9 @@ public class Level {
      * Ajouter un portail de téléportation
      * @param row ligne
      * @param col colonne
+     * @param direction direction
+     * @param teleportCol colonne sur laquelle se téléporter
+     * @param teleportRow ligne sur laquelle se téléporter
      */
     public void addTeleportationPortal(int row, int col, int teleportRow, int teleportCol, Gameplay.MoveDirection direction) {
         Entity portal = matrix[row][col];
@@ -423,6 +426,7 @@ public class Level {
      * Obtenir une entité à une position spécifique dans la matrice
      * @param row ligne
      * @param col colonne
+     * @return entité
      */
     public Entity getMatrixEntity(int row, int col){
         return matrix[row][col];

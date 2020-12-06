@@ -58,6 +58,7 @@ public class IOEngineTest {
 
     /**
      * Initialisation
+     * @throws AWTException exception
      */
     @BeforeClass
     public static void init() throws AWTException {

@@ -34,6 +34,7 @@ public class SwingTimer {
 
     /**
      * Démarrer un timer
+     * @param name nom
      * @param delay délai
      * @param command commande
      */

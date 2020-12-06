@@ -8,6 +8,7 @@ import engines.kernel.EventListener;
 public interface GraphicEvent {
     /**
      * Notifier une collision
+     * @param event évènement
      */
     void notifyEvent(String event);
 
@@ -15,6 +16,7 @@ public interface GraphicEvent {
 
     /**
      * S'abonner aux évènements
+     * @param listener écouteur
      */
     void subscribeEvents(EventListener listener);
 }

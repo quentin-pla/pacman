@@ -9,6 +9,7 @@ import engines.kernel.EventListener;
 public interface IOEvent {
     /**
      * Notifier une collision
+     * @param event évènement
      */
     void notifyInput(String event);
 
@@ -21,6 +22,7 @@ public interface IOEvent {
 
     /**
      * S'abonner aux évènements
+     * @param listener écouteur
      */
     void subscribeEvents(EventListener listener);
 }

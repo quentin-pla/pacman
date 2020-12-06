@@ -8,11 +8,13 @@ import engines.kernel.EventListener;
 public interface AIEvent {
     /**
      * Notifier un évènement
+     * @param event évènement
      */
     void notifyEvent(String event);
 
     /**
      * S'abonner aux évènements
+     * @param listener écouteur
      */
     void subscribeEvents(EventListener listener);
 }

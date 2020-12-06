@@ -8,6 +8,7 @@ import engines.kernel.EventListener;
 public interface CollisionEvent {
     /**
      * Notifier une collision
+     * @param event évènement
      */
     void notifyCollision(String event);
 
@@ -19,6 +20,7 @@ public interface CollisionEvent {
 
     /**
      * S'abonner aux évènements
+     * @param listener écouteur
      */
     void subscribeEvents(EventListener listener);
 }

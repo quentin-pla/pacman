@@ -19,6 +19,7 @@ public class AIEntity extends EngineEntity {
 
     /**
      * Cloner l'entité
+     * @param entity entité
      */
     public void clone(AIEntity entity) {
         this.event = entity.event;
