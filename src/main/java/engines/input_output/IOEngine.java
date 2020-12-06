@@ -19,9 +19,24 @@ public class IOEngine extends SwingAPI implements IOEvent {
     private final KeyboardIO keyboardIO = new KeyboardIO(this);
 
     /**
+     * Liste des évènements attachés à une touche ou un bouton
+     */
+    public final Map<Integer, String> bindedEvents = new HashMap<>();
+
+    /**
+     * Liste des évènements attachés à la dernière touche / bouton
+     */
+    public final Map<Integer, String> bindedEventsOnLastKey = new HashMap<>();
+
+    /**
      * Écouteur actions utilisateur souris
      */
     private final MouseIO mouseIO = new MouseIO(this);
+
+    /**
+     * Liste des évènements attachés à un click
+     */
+    public final Map<Entity,String> bindedClickEvents = new HashMap<>();
 
     /**
      * Liste des écouteurs d'évènements
@@ -83,16 +98,6 @@ public class IOEngine extends SwingAPI implements IOEvent {
     //-------------------------------//
     //----------- CLAVIER -----------//
     //-------------------------------//
-
-    /**
-     * Liste des évènements attachés à une touche ou un bouton
-     */
-    public final Map<Integer, String> bindedEvents = new HashMap<>();
-
-    /**
-     * Liste des évènements attachés à la dernière touche / bouton
-     */
-    public final Map<Integer, String> bindedEventsOnLastKey = new HashMap<>();
 
     /**
      * Activer les entrées/sorties clavier
@@ -160,12 +165,28 @@ public class IOEngine extends SwingAPI implements IOEvent {
     }
 
     /**
+     * Supprimer un évènement lié à une touche
+     * @param keyCode touche
+     */
+    public void unbindEvent(Integer keyCode) {
+        bindedEvents.remove(keyCode);
+    }
+
+    /**
      * Attacher un évènement à la dernière touche pressée
      * @param keyCode code de la touche
      * @param eventName nom de l'évènement
      */
     public void bindEventOnLastKey(int keyCode, String eventName) {
         bindedEventsOnLastKey.put(keyCode, eventName);
+    }
+
+    /**
+     * Supprimer un évènement lié à la dernière touche pressée
+     * @param keyCode touche
+     */
+    public void unbindEventOnLastKey(Integer keyCode) {
+        bindedEventsOnLastKey.remove(keyCode);
     }
 
     /**
@@ -176,14 +197,16 @@ public class IOEngine extends SwingAPI implements IOEvent {
         bindedEvents.put(-1, eventName);
     }
 
+    /**
+     * Supprimer l'évènement lié lorsque le clavier est libre
+     */
+    public void unbindEventKeyboardFree() {
+        bindedEvents.remove(-1);
+    }
+
     //------------------------------//
     //----------- SOURIS -----------//
     //------------------------------//
-
-    /**
-     * Liste des évènements attachés à un click
-     */
-    public final Map<Entity,String> bindedClickEvents = new HashMap<>();
 
     /**
      * Activer les entrées/sorties souris
@@ -228,7 +251,13 @@ public class IOEngine extends SwingAPI implements IOEvent {
      */
     public Point lastClickCoordinates() { return mouseIO.getClickCoords(); }
 
-    public void resetLastClick() { mouseIO.setClickCoords(null); }
+    /**
+     * Réinitialiser les coordonnées du dernier click
+     */
+    public void resetLastClick() {
+        mouseIO.setLastPressedButton(-1);
+        mouseIO.setClickCoords(null);
+    }
 
     /**
      * Attacher un évènement lors d'un click
@@ -237,5 +266,39 @@ public class IOEngine extends SwingAPI implements IOEvent {
      */
     public void bindEventOnClick(Entity entity, String eventName) {
         bindedClickEvents.put(entity,eventName);
+    }
+
+    /**
+     * Détacher un évènement lors d'un click
+     * @param entity entité
+     */
+    public void unbindEventOnClick(Entity entity) {
+        bindedClickEvents.remove(entity);
+    }
+
+    // GETTERS //
+
+    public KeyboardIO getKeyboardIO() {
+        return keyboardIO;
+    }
+
+    public MouseIO getMouseIO() {
+        return mouseIO;
+    }
+
+    public ArrayList<EventListener> getEventsListeners() {
+        return eventsListeners;
+    }
+
+    public Map<Integer, String> getBindedEvents() {
+        return bindedEvents;
+    }
+
+    public Map<Integer, String> getBindedEventsOnLastKey() {
+        return bindedEventsOnLastKey;
+    }
+
+    public Map<Entity, String> getBindedClickEvents() {
+        return bindedClickEvents;
     }
 }

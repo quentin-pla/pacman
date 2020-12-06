@@ -34,8 +34,10 @@ public class Scene extends SwingScene {
      * @param entity entité
      */
     protected void addEntity(GraphicEntity entity) {
-        entities.add(entity);
-        entity.setScene(this);
+        if (!entities.contains(entity)) {
+            entities.add(entity);
+            entity.setScene(this);
+        }
     }
 
     /**
@@ -77,5 +79,9 @@ public class Scene extends SwingScene {
 
     public ArrayList<GraphicEntity> getEntities() {
         return entities;
+    }
+
+    public GraphicsEngine getGraphicsEngine() {
+        return graphicsEngine;
     }
 }

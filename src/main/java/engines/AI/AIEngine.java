@@ -39,7 +39,15 @@ public class AIEngine implements AIEvent {
      */
     public void clearEvents() {
         for (AIEntity entity : entities.values())
-            entity.setEvent(null);
+            clearEvent(entity);
+    }
+
+    /**
+     * Supprimer l'évènement lié à une entité
+     * @param entity entité
+     */
+    public void clearEvent(AIEntity entity) {
+        entity.setEvent(null);
     }
 
     /**
@@ -92,4 +100,6 @@ public class AIEngine implements AIEvent {
     public ConcurrentMap<Integer, AIEntity> getEntities() {
         return entities;
     }
+
+    public ArrayList<EventListener> getEventsListeners() { return eventsListeners; }
 }

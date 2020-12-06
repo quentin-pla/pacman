@@ -70,6 +70,8 @@ public class GraphicEntity extends EngineEntity {
 
     // GETTERS & SETTERS //
 
+    public int[] getBounds() { return new int[]{x, y, x + width, y + height}; }
+
     public int getX() { return x; }
 
     protected void setX(int x) { this.x = x; }

@@ -21,12 +21,12 @@ public class KeyboardIO implements KeyListener {
     /**
      * Dernière touche pressée
      */
-    private int lastPressedKey;
+    private int lastPressedKey = -1;
 
     /**
      * Constructeur
      */
-    protected KeyboardIO(IOEngine ioEngine) {
+    public KeyboardIO(IOEngine ioEngine) {
         this.ioEngine = ioEngine;
     }
 

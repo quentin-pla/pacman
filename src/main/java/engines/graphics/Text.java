@@ -59,4 +59,10 @@ public class Text extends Cover {
     // GETTERS //
 
     public String getContent() { return content; }
+
+    public Color getColor() { return color; }
+
+    public int getFontSize() { return fontSize; }
+
+    public boolean isCenter() { return center; }
 }

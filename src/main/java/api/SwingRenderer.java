@@ -164,13 +164,13 @@ public class SwingRenderer {
 
     // GETTERS //
 
-    private Graphics2D getCurrentGraphics() {
+    public Graphics2D getCurrentGraphics() {
         if (SwingWindow.getInstance().getCurrentScene() != null)
             return SwingWindow.getInstance().getCurrentScene().get2DGraphics();
         return null;
     }
 
-    private SwingScene getCurrentScene() {
+    public SwingScene getCurrentScene() {
         return SwingWindow.getInstance().getCurrentScene();
     }
 }

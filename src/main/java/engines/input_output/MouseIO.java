@@ -24,7 +24,7 @@ public class MouseIO implements MouseListener {
     /**
      * Dernier bouton pressé
      */
-    private int lastPressedButton;
+    private int lastPressedButton = -1;
 
     /**
      * Coordonnées du click
@@ -40,18 +40,15 @@ public class MouseIO implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        Point point = e.getPoint();
-        point.y = point.y - SwingWindow.getInstance().getUselessTopGap();
-        clickCoords = point;
+        updateAttributes(e);
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
         int key = e.getButton();
-        if (!pressedButtons.contains(key)) {
+        if (!pressedButtons.contains(key))
             pressedButtons.add(key);
-            lastPressedButton = key;
-        }
+        updateAttributes(e);
     }
 
     @Override
@@ -59,6 +56,7 @@ public class MouseIO implements MouseListener {
         int key = e.getButton();
         if (pressedButtons.contains(key))
             pressedButtons.remove((Integer) key);
+        updateAttributes(e);
     }
 
     @Override
@@ -66,6 +64,16 @@ public class MouseIO implements MouseListener {
 
     @Override
     public void mouseExited(MouseEvent e) {}
+
+    /**
+     * Mettre à jour les attributs
+     */
+    public void updateAttributes(MouseEvent e) {
+        Point point = e.getPoint();
+        point.y = point.y - SwingWindow.getInstance().getUselessTopGap();
+        clickCoords = point;
+        lastPressedButton = e.getButton();
+    }
 
     // GETTERS //
 
@@ -75,6 +83,10 @@ public class MouseIO implements MouseListener {
 
     public int getLastPressedButton() {
         return lastPressedButton;
+    }
+
+    public void setLastPressedButton(int lastPressedButton) {
+        this.lastPressedButton = lastPressedButton;
     }
 
     public Point getClickCoords() { return clickCoords; }

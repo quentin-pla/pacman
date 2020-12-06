@@ -88,17 +88,38 @@ public class KernelEngine implements EventListener {
 
     @Override
     public void onEvent(String event) {
-        if (!pauseEvents) notifyEvent(event);
+        if (!pauseEvents) {
+            try {
+                events.get(event).run();
+            } catch (NullPointerException e) {
+                System.err.println("ERREUR : Nom de l'évènement introuvable.");
+                e.printStackTrace();
+                System.exit(1);
+            }
+        }
     }
 
     @Override
     public void onEntityEvent(Entity entity, String eventName) {
-        if (!pauseEvents) checkClickEvent(entity, eventName);
+        if (!pauseEvents) {
+            Point click = ioEngine.lastClickCoordinates();
+            if (click != null) {
+                ArrayList<PhysicEntity> entities = physicsEngine.getEntityAtPosition(click.x,click.y,0,0);
+                if (entities.contains(entity.getPhysicEntity()))
+                    onEvent(eventName);
+            }
+        }
     }
 
     @Override
     public void onEntityUpdate(EngineEntity entity) {
-        if (!pauseGraphics) notifyEntityUpdate(entity);
+        if (!pauseGraphics) {
+            if (entity instanceof PhysicEntity) {
+                PhysicEntity physicEntity = (PhysicEntity) entity;
+                graphicsEngine.move(entity.getParent(), physicEntity.getX(), physicEntity.getY());
+                graphicsEngine.resize(entity.getParent(), physicEntity.getWidth(), physicEntity.getHeight());
+            }
+        }
     }
 
     /**
@@ -116,9 +137,7 @@ public class KernelEngine implements EventListener {
      * @return id généré
      */
     public Entity generateEntity() {
-        Entity entity = new Entity(this);
-        entities.add(entity);
-        return entity;
+        return new Entity(this);
     }
 
     /**
@@ -248,45 +267,6 @@ public class KernelEngine implements EventListener {
         events.put(name, event);
     }
 
-    /**
-     * Exécuter un évènement spécifique
-     * @param eventName nom de l'évènement
-     */
-    public void notifyEvent(String eventName) {
-        try {
-            events.get(eventName).run();
-        } catch (NullPointerException e) {
-            System.err.println("ERREUR : Nom de l'évènement introuvable.");
-            e.printStackTrace();
-            System.exit(1);
-        }
-    }
-
-    /**
-     * Mettre à jour les coordonnées des entités entre les moteurs
-     */
-    public void notifyEntityUpdate(EngineEntity entity) {
-        if (entity instanceof PhysicEntity) {
-            PhysicEntity physicEntity = (PhysicEntity) entity;
-            graphicsEngine.move(entity.getParent(), physicEntity.getX(), physicEntity.getY());
-            graphicsEngine.resize(entity.getParent(), physicEntity.getWidth(), physicEntity.getHeight());
-        }
-    }
-
-    /**
-     * Vérifier un évènement de click
-     * @param entity entité
-     * @param eventName nom de l'évènement
-     */
-    public void checkClickEvent(Entity entity, String eventName) {
-        Point click = ioEngine.lastClickCoordinates();
-        if (click != null) {
-            ArrayList<PhysicEntity> entities = physicsEngine.getEntityAtPosition(click.x,click.y,0,0);
-            if (entities.contains(entity.getPhysicEntity()))
-                notifyEvent(eventName);
-        }
-    }
-
     // GETTERS //
 
     public GraphicsEngine getGraphicsEngine() { return graphicsEngine; }
@@ -302,4 +282,8 @@ public class KernelEngine implements EventListener {
     public boolean isEventsPaused() { return pauseEvents; }
 
     public boolean isGraphicsPaused() { return pauseGraphics; }
+
+    public ArrayList<Entity> getEntities() { return entities; }
+
+    public Map<String, Runnable> getEvents() { return events; }
 }

@@ -42,6 +42,7 @@ public class Entity {
         this.graphicEntity = kernelEngine.getGraphicsEngine().createEntity(this);
         this.physicEntity = kernelEngine.getPhysicsEngine().createEntity(this);
         this.aiEntity = kernelEngine.getAiEngine().createEntity(this);
+        this.kernelEngine.getEntities().add(this);
     }
 
     /**
@@ -57,6 +58,7 @@ public class Entity {
         this.physicEntity.clone(entity.getPhysicEntity());
         this.aiEntity = kernelEngine.getAiEngine().createEntity(this);
         this.aiEntity.clone(entity.getAiEntity());
+        this.kernelEngine.getEntities().add(this);
     }
 
     /**

@@ -56,4 +56,10 @@ public class SwingTimer {
     public void stopTimer(String name) {
         timers.get(name).stop();
     }
+
+    // GETTERS //
+
+    public Map<String, Timer> getTimers() {
+        return timers;
+    }
 }

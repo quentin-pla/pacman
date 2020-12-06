@@ -148,4 +148,20 @@ public class SpriteAnimation extends Cover {
     public boolean isLooping() { return looping; }
 
     public void setLooping(boolean looping) { this.looping = looping; }
+
+    public int getActualFrame() {
+        return actualFrame;
+    }
+
+    public int getSpeed() {
+        return speed;
+    }
+
+    public boolean isAddSubstract() {
+        return addSubstract;
+    }
+
+    public int getTime() {
+        return time;
+    }
 }

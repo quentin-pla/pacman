@@ -3,7 +3,8 @@ package engines.physics;
 import engines.kernel.EngineEntity;
 import engines.kernel.Entity;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Entité physique
@@ -32,7 +33,7 @@ public class PhysicEntity extends EngineEntity {
     /**
      * Liste des entités pouvant être en collision avec celle-ci
      */
-    private ArrayList<PhysicEntity> collisions;
+    private Set<PhysicEntity> collisions;
 
     /**
      * Entité en collision ou pas
@@ -68,7 +69,7 @@ public class PhysicEntity extends EngineEntity {
         y = 0;
         height = 0;
         width = 0;
-        collisions = new ArrayList<>();
+        collisions = new HashSet<>();
         speed = 1;
         lastX = 0;
         lastY = 0;
@@ -78,7 +79,7 @@ public class PhysicEntity extends EngineEntity {
      * Cloner l'entité
      */
     public void clone(PhysicEntity entity) {
-        collisions = new ArrayList<>(entity.collisions);
+        collisions = new HashSet<>(entity.collisions);
         boundLimits = entity.boundLimits;
         speed = entity.speed;
         lastX = entity.x;
@@ -97,7 +98,7 @@ public class PhysicEntity extends EngineEntity {
 
     public int[] getBounds() { return new int[]{x, y, x + width, y + height}; }
 
-    public ArrayList<PhysicEntity> getCollisions() { return collisions; }
+    public Set<PhysicEntity> getCollisions() { return collisions; }
 
     public int[] getBoundLimits() { return boundLimits; }
 

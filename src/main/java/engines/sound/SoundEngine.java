@@ -2,9 +2,9 @@ package engines.sound;
 
 import javax.sound.sampled.*;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -20,17 +20,12 @@ public class SoundEngine {
     /**
      * Liste des entités son référencées par leur nom
      */
-    private final Map<String, Clip> sounds = new HashMap<>();
+    private final ConcurrentMap<String, Clip> sounds = new ConcurrentHashMap<>();
 
     /**
      * Volume global
      */
     private int globalVolume = 50;
-
-    /**
-     * Sons en cours de lecture
-     */
-    private final CopyOnWriteArrayList<Clip> playingSounds = new CopyOnWriteArrayList<>();
 
     /**
      * Constructeur
@@ -62,7 +57,7 @@ public class SoundEngine {
      */
     public void playSound(String name) {
         executor.execute(() -> {
-            Clip sound = this.sounds.get(name);
+            Clip sound = sounds.get(name);
             sound.setFramePosition(0);
             sound.start();
         });
@@ -82,8 +77,8 @@ public class SoundEngine {
      * Arrêter tous les sons
      */
     public void clearSounds() {
-        for (Clip sound : sounds.values())
-            sound.stop();
+        for (String sound : sounds.keySet())
+            stopSound(sound);
     }
 
     /**
@@ -101,7 +96,11 @@ public class SoundEngine {
      */
     public void pauseSound(String name) {
         Clip sound = sounds.get(name);
+        int framePosition = sound.getFramePosition();
+        long seconds = sound.getMicrosecondPosition();
         sound.stop();
+        sound.setFramePosition(framePosition);
+        sound.setMicrosecondPosition(seconds);
     }
 
     /**
@@ -112,38 +111,6 @@ public class SoundEngine {
         Clip sound = sounds.get(name);
         sound.setMicrosecondPosition(sound.getMicrosecondPosition());
         sound.start();
-    }
-
-    /**
-     * Savoir si un son est joué
-     * @param name nom
-     * @return booléen
-     */
-    public boolean isSoundPlaying(String name) {
-        return playingSounds.contains(sounds.get(name));
-    }
-
-    /**
-     * Récupérer le volume actuel d'un son
-     * @param name nom du son
-     * @return volume
-     */
-    public int getVolume(String name) {
-        Clip sound = sounds.get(name);
-        FloatControl gainControl = (FloatControl) sound.getControl(FloatControl.Type.MASTER_GAIN);
-        return Math.round((float) Math.pow(10f, gainControl.getValue() / 20f))*100;
-    }
-
-    /**
-     * Modifier le volume d'un son spécifique
-     * @param name nom du son
-     * @param volume volume de 0 à 100
-     */
-    public void setSoundVolume(String name, int volume) {
-        Clip sound = sounds.get(name);
-        float floatVolume = getVolumeAsFloat(volume);
-        FloatControl gainControl = (FloatControl) sound.getControl(FloatControl.Type.MASTER_GAIN);
-        gainControl.setValue(20f * (float) Math.log10(floatVolume));
     }
 
     /**
@@ -188,4 +155,5 @@ public class SoundEngine {
     public int getGlobalVolume() { return globalVolume; }
 
     public Map<String, Clip> getSounds() { return sounds; }
+
 }

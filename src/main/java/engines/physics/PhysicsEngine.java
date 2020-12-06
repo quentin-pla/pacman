@@ -159,18 +159,6 @@ public class PhysicsEngine implements CollisionEvent {
     }
 
     /**
-     * Vérifier si une entité est en collision
-     * @param entity entité
-     * @return s'il y a une collision
-     */
-    public boolean isInCollision(Entity entity) {
-        for (PhysicEntity collision : entity.getPhysicEntity().getCollisions())
-            if (isInCollision(collision.getParent(),entity))
-                return true;
-        return false;
-    }
-
-    /**
      * Obtenir une entité à position spécifique
      * @param x position horizontale
      * @param y position verticale
@@ -284,6 +272,18 @@ public class PhysicsEngine implements CollisionEvent {
             if (physicEntity.getCollisions().contains(entity1))
                 return entity1;
         return null;
+    }
+
+    /**
+     * Vérifier si une entité est en collision
+     * @param entity entité
+     * @return s'il y a une collision
+     */
+    public boolean isInCollision(Entity entity) {
+        for (PhysicEntity collision : entity.getPhysicEntity().getCollisions())
+            if (isInCollision(collision.getParent(),entity))
+                return true;
+        return false;
     }
 
     /**
@@ -506,5 +506,17 @@ public class PhysicsEngine implements CollisionEvent {
 
     public ConcurrentMap<Integer, PhysicEntity> getEntities() {
         return entities;
+    }
+
+    public ConcurrentMap<PhysicEntity[], String> getCollisionsEvents() {
+        return collisionsEvents;
+    }
+
+    public ConcurrentMap<PhysicEntity[], String> getCenteredEvents() {
+        return centeredEvents;
+    }
+
+    public ArrayList<EventListener> getEventsListeners() {
+        return eventsListeners;
     }
 }
