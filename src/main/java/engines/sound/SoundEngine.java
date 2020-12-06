@@ -35,7 +35,7 @@ public class SoundEngine {
         try {
             clip = AudioSystem.getClip();
             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(
-                SoundEngine.class.getResourceAsStream("/sounds/" + path)
+                SoundEngine.class.getResource("/sounds/" + path)
             );
             clip.open(audioInputStream);
         } catch (LineUnavailableException | UnsupportedAudioFileException | IOException e) {
